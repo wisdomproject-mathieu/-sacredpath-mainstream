@@ -14,11 +14,22 @@ export function Connect() {
   return (
     <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
       <div className="max-w-xl mx-auto space-y-6">
-        <h2 className="text-2xl font-serif text-amber-100">Connect with Partner</h2>
+        <div className="flex justify-center">
+          <img
+            src="/sacred-path-mark.png"
+            alt="Sacred Path symbol"
+            className="w-32 h-32 mb-4"
+          />
+        </div>
+
+        <h2 className="text-2xl font-serif text-amber-100">
+          Connect with your beloved
+        </h2>
         <p className="text-sm text-slate-300">
-          Names stay on this device only. They simply help the guidance feel more
-          intimate.
+          Begin your shared journey to deeper intimacy. Names simply anchor
+          tonight&apos;s ritual to the two of you and the weather between you.
         </p>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
             <label className="text-xs uppercase tracking-wide text-slate-400">
@@ -37,7 +48,9 @@ export function Connect() {
             </label>
             <input
               value={state.partnerName}
-              onChange={(e) => setState({ ...state, partnerName: e.target.value })}
+              onChange={(e) =>
+                setState({ ...state, partnerName: e.target.value })
+              }
               className="w-full rounded-full bg-sp-card border border-slate-700 px-4 py-2 text-sm focus:outline-none focus:border-sp-gold"
               placeholder="e.g. Maya"
             />

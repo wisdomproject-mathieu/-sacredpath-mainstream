@@ -29,6 +29,14 @@ export function Ritual() {
   return (
     <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
       <div className="max-w-xl mx-auto space-y-6">
+        <div className="flex justify-center">
+          <img
+            src="/sacred-path-mark.png"
+            alt="Sacred Path symbol"
+            className="w-28 h-28 mb-4"
+          />
+        </div>
+
         <div className="text-xs tracking-[0.25em] uppercase text-sp-gold">
           {homeCard.eyebrow}
         </div>
@@ -37,13 +45,16 @@ export function Ritual() {
 
         <div className="bg-sp-card border border-slate-800 rounded-3xl p-5 space-y-3">
           <p className="text-xs uppercase tracking-wide text-sp-gold">
-            Tonight’s free ritual
+            Tonight&apos;s free ritual
           </p>
-          <h3 className="text-xl font-serif text-amber-50">{freeRitual.title}</h3>
+          <h3 className="text-xl font-serif text-amber-50">
+            {freeRitual.title}
+          </h3>
           <p className="text-xs text-slate-400">
-            {freeRitual.duration} · {freeRitual.intimacyLevel} · {freeRitual.primaryNeed}
+            {freeRitual.duration} · {freeRitual.intimacyLevel} ·{" "}
+            {freeRitual.primaryNeed}
           </p>
-          <p className="text-sm text-slate-200">{freeRitual.description}</p>
+
           <ol className="mt-3 space-y-2 text-sm text-slate-100 list-decimal list-inside">
             {freeRitual.ritualSteps.map((step, i) => (
               <li key={i}>{step}</li>
@@ -54,8 +65,8 @@ export function Ritual() {
         {premiumRituals.length > 0 && (
           <div className="space-y-3">
             <p className="text-sm text-slate-300">
-              Premium opens more ritual paths aligned with tonight’s weather, plus Sacred
-              Voice guidance.
+              Premium opens more ritual paths aligned with tonight&apos;s
+              weather, plus Sacred Voice guidance for key practices.
             </p>
             <ul className="space-y-2 text-sm text-slate-200">
               {premiumRituals.slice(0, 3).map((r) => (
