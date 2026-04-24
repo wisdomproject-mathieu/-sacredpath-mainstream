@@ -863,11 +863,10 @@ img { max-width: 100%; display: block; }
   --weather-card-tint-one: rgba(88, 68, 118, 0.4);
   --weather-card-tint-two: rgba(24, 17, 33, 0.7);
   --weather-card-glow: rgba(241, 212, 154, 0.22);
-  --weather-card-image: url("/weather-mandala.jpg");
   background:
     linear-gradient(165deg, var(--weather-card-tint-one), var(--weather-card-tint-two)),
     radial-gradient(circle at 18% 10%, rgba(255, 255, 255, 0.14), transparent 38%),
-    var(--weather-card-image);
+    var(--weather-card-image, url("/weather-mandala.jpg"));
   background-size: cover;
   background-position: center;
   background-blend-mode: screen, soft-light, normal;
