@@ -40,11 +40,13 @@ export default function Ritual() {
           <img src={logoSrc} alt="Sacred Path" className="w-24 h-24 mb-2" />
         </div>
 
-        <div className="text-xs tracking-[0.25em] uppercase text-sp-gold">{homeCard.eyebrow}</div>
-        <h2 className="screen-title text-amber-100">{homeCard.title}</h2>
-        <p className="screen-body">{homeCard.body}</p>
+        <div className="ritual-headline-strip">
+          <div className="text-xs tracking-[0.25em] uppercase text-sp-gold">{homeCard.eyebrow}</div>
+          <h2 className="screen-title text-amber-100">{homeCard.title}</h2>
+          <p className="screen-body">{homeCard.body}</p>
+        </div>
 
-        <div className="bg-sp-card border border-slate-800 rounded-3xl p-5 space-y-3">
+        <div className="ritual-main-card space-y-3">
           <p className="text-xs uppercase tracking-wide text-sp-gold font-bold">Tonight&apos;s ritual</p>
           <h3 className="text-xl font-bold text-amber-50">{freeRitual.title}</h3>
           <p className="text-xs text-slate-400">{freeRitual.duration} · {freeRitual.intimacyLevel} · {freeRitual.primaryNeed}</p>
@@ -57,7 +59,7 @@ export default function Ritual() {
         </div>
 
         {firstStep ? (
-          <div className="bg-sp-card border border-sp-gold rounded-3xl p-5 space-y-2">
+          <div className="ritual-first-action-card space-y-2">
             <p className="text-xs uppercase tracking-wide text-sp-gold font-bold">First action</p>
             <p className="text-lg font-semibold text-amber-50">{firstStep}</p>
           </div>
@@ -95,7 +97,7 @@ export default function Ritual() {
         </Link>
 
         {premiumRituals.length > 0 && (
-          <div className="space-y-3 bg-sp-card border border-slate-800 rounded-3xl p-5">
+          <div className="ritual-premium-card space-y-3">
             <p className="text-xs uppercase tracking-wide text-sp-gold font-bold">
               {PREVIEW_PREMIUM_UNLOCKED ? "Premium unlocked for preview" : "Premium paths"}
             </p>

@@ -4,11 +4,11 @@ import { useSession } from "../contexts/SessionContext";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
 
 const options: { id: IntimacyWeather; label: string; icon: string; toneClass: string }[] = [
-  { id: "stormy", label: "Need Gentle Repair", icon: "⛈", toneClass: "weather-tone-stormy" },
-  { id: "cloudy", label: "Hold Me Close", icon: "☁", toneClass: "weather-tone-cloudy" },
-  { id: "warm", label: "Open To Love", icon: "☀", toneClass: "weather-tone-warm" },
-  { id: "electric", label: "I Want You", icon: "⚡", toneClass: "weather-tone-electric" },
-  { id: "radiant", label: "Ready For Us", icon: "🌕", toneClass: "weather-tone-radiant" },
+  { id: "stormy", label: "Need Repair", icon: "⛈", toneClass: "weather-tone-stormy" },
+  { id: "cloudy", label: "Need Tenderness", icon: "☁", toneClass: "weather-tone-cloudy" },
+  { id: "warm", label: "Open Heart", icon: "☀", toneClass: "weather-tone-warm" },
+  { id: "electric", label: "Want You", icon: "⚡", toneClass: "weather-tone-electric" },
+  { id: "radiant", label: "Deeply Connected", icon: "🌕", toneClass: "weather-tone-radiant" },
 ];
 
 export default function Weather() {
@@ -27,12 +27,12 @@ export default function Weather() {
         <CoupleTopbar />
         <div className="weather-headline-strip">
           <p className="weather-kicker">Intimacy weather</p>
-          <h2 className="screen-title text-amber-100">Choose how you arrive tonight.</h2>
-          <p className="screen-body">One tap each. The app finds the ritual that fits the mood between you.</p>
+          <h2 className="screen-title text-amber-100">Meet each other here tonight.</h2>
+          <p className="screen-body">Choose the mood. Follow the path.</p>
         </div>
 
         <div className="space-y-3 weather-section">
-          <p className="text-xs uppercase tracking-wide text-amber-200/90">You</p>
+          <p className="weather-section-title">You</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {options.map((opt) => (
               <button
@@ -50,7 +50,7 @@ export default function Weather() {
         </div>
 
         <div className="space-y-3 weather-section">
-          <p className="text-xs uppercase tracking-wide text-amber-200/90">Partner</p>
+          <p className="weather-section-title">Partner</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {options.map((opt) => (
               <button
@@ -74,7 +74,7 @@ export default function Weather() {
             {" · "}
             Partner: <strong>{state.partnerWeather ? options.find((o) => o.id === state.partnerWeather)?.label : "Not selected"}</strong>
           </p>
-          <p className="weather-summary-sub">Card-based guidance appears right after you continue.</p>
+          <p className="weather-summary-sub">A softer beginning opens deeper connection.</p>
         </div>
 
         <button

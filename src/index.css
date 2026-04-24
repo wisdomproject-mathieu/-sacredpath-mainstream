@@ -472,10 +472,16 @@ img { max-width: 100%; display: block; }
 }
 
 .weather-headline-strip {
-  border-radius: 18px;
-  padding: 12px 14px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: linear-gradient(180deg, rgba(34, 24, 47, 0.72), rgba(18, 14, 27, 0.84));
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  padding: 16px 18px 18px;
+  border: 1px solid rgba(241, 212, 154, 0.22);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(210, 118, 146, 0.14), transparent 42%),
+    radial-gradient(circle at 84% 24%, rgba(241, 212, 154, 0.12), transparent 38%),
+    linear-gradient(170deg, rgba(52, 36, 69, 0.78), rgba(18, 14, 27, 0.9));
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.24);
 }
 
 .weather-kicker {
@@ -487,60 +493,75 @@ img { max-width: 100%; display: block; }
   color: var(--gold);
 }
 
+.weather-section-title {
+  margin: 0;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: rgba(241, 212, 154, 0.92);
+  font-weight: 800;
+}
+
 .weather-section {
-  border-radius: 20px;
-  padding: 12px;
+  border-radius: 22px;
+  padding: 13px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(241, 212, 154, 0.06), transparent 34%),
+    rgba(255, 255, 255, 0.03);
 }
 
 .weather-door-card {
   position: relative;
   overflow: hidden;
-  min-height: 176px;
+  min-height: 156px;
   border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: linear-gradient(165deg, rgba(50, 36, 66, 0.86), rgba(22, 16, 31, 0.94));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(165deg, rgba(50, 36, 66, 0.8), rgba(22, 16, 31, 0.92));
   text-align: left;
-  padding: 18px;
-  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  padding: 16px;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 .weather-door-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.005);
   border-color: rgba(241, 212, 154, 0.4);
+  filter: brightness(1.03);
 }
 
 .weather-door-card-active {
   border-color: rgba(241, 212, 154, 0.68);
-  box-shadow: 0 16px 40px rgba(241, 212, 154, 0.25), inset 0 0 0 1px rgba(241, 212, 154, 0.28);
+  box-shadow: 0 14px 34px rgba(241, 212, 154, 0.24), inset 0 0 0 1px rgba(241, 212, 154, 0.3);
 }
 
 .weather-door-bg-icon {
   position: absolute;
-  inset: 0;
+  right: -16px;
+  bottom: -22px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(8.5rem, 16vw, 12rem);
+  align-items: flex-end;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
+  font-size: clamp(6.8rem, 11vw, 9.2rem);
   line-height: 1;
-  opacity: 0.42;
+  opacity: 0.22;
   filter: saturate(1.2);
-  text-shadow: 0 0 30px rgba(241, 212, 154, 0.24);
+  text-shadow: 0 0 18px rgba(241, 212, 154, 0.18);
   pointer-events: none;
 }
 
 .weather-door-content {
   position: relative;
   z-index: 1;
-  width: min(86%, 16ch);
+  width: min(78%, 14ch);
 }
 
 .weather-door-label {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
-  max-width: 14ch;
-  font-size: clamp(1.42rem, 2.2vw, 1.95rem);
+  max-width: 12ch;
+  font-size: clamp(1.42rem, 2vw, 1.88rem);
   font-weight: 700;
   color: #fff8ef;
   text-shadow: 0 3px 18px rgba(0, 0, 0, 0.5);
@@ -548,32 +569,32 @@ img { max-width: 100%; display: block; }
 
 .weather-tone-stormy {
   background:
-    radial-gradient(circle at 20% 15%, rgba(255, 198, 115, 0.2), transparent 35%),
-    linear-gradient(160deg, rgba(76, 49, 83, 0.9), rgba(24, 17, 33, 0.95));
+    radial-gradient(circle at 16% 16%, rgba(232, 152, 169, 0.16), transparent 36%),
+    linear-gradient(160deg, rgba(77, 48, 78, 0.9), rgba(24, 17, 33, 0.95));
 }
 
 .weather-tone-cloudy {
   background:
-    radial-gradient(circle at 80% 18%, rgba(160, 131, 204, 0.2), transparent 38%),
-    linear-gradient(165deg, rgba(57, 44, 76, 0.9), rgba(23, 17, 33, 0.95));
+    radial-gradient(circle at 78% 14%, rgba(182, 156, 211, 0.2), transparent 38%),
+    linear-gradient(165deg, rgba(60, 46, 78, 0.9), rgba(23, 17, 33, 0.95));
 }
 
 .weather-tone-warm {
   background:
-    radial-gradient(circle at 20% 20%, rgba(241, 212, 154, 0.27), transparent 40%),
-    linear-gradient(165deg, rgba(84, 56, 59, 0.92), rgba(29, 18, 28, 0.95));
+    radial-gradient(circle at 18% 20%, rgba(241, 212, 154, 0.24), transparent 40%),
+    linear-gradient(165deg, rgba(92, 57, 65, 0.92), rgba(29, 18, 28, 0.95));
 }
 
 .weather-tone-electric {
   background:
-    radial-gradient(circle at 78% 18%, rgba(216, 161, 255, 0.24), transparent 36%),
-    linear-gradient(165deg, rgba(65, 41, 86, 0.92), rgba(23, 16, 35, 0.95));
+    radial-gradient(circle at 76% 16%, rgba(223, 176, 255, 0.24), transparent 36%),
+    linear-gradient(165deg, rgba(72, 43, 90, 0.92), rgba(23, 16, 35, 0.95));
 }
 
 .weather-tone-radiant {
   background:
-    radial-gradient(circle at 18% 15%, rgba(241, 212, 154, 0.26), transparent 35%),
-    linear-gradient(165deg, rgba(70, 53, 93, 0.9), rgba(26, 18, 40, 0.95));
+    radial-gradient(circle at 16% 14%, rgba(241, 212, 154, 0.24), transparent 35%),
+    linear-gradient(165deg, rgba(73, 55, 96, 0.9), rgba(26, 18, 40, 0.95));
 }
 
 .weather-summary-card {
@@ -594,6 +615,44 @@ img { max-width: 100%; display: block; }
   margin: 0;
   font-size: 0.88rem;
   color: rgba(246, 240, 255, 0.8);
+}
+
+.ritual-headline-strip {
+  border-radius: 24px;
+  border: 1px solid rgba(241, 212, 154, 0.24);
+  padding: 16px 18px 14px;
+  background:
+    radial-gradient(circle at 12% -4%, rgba(228, 141, 167, 0.15), transparent 44%),
+    radial-gradient(circle at 86% 20%, rgba(241, 212, 154, 0.1), transparent 34%),
+    linear-gradient(170deg, rgba(46, 32, 64, 0.78), rgba(17, 13, 25, 0.9));
+}
+
+.ritual-main-card {
+  border-radius: 24px;
+  border: 1px solid rgba(241, 212, 154, 0.2);
+  padding: 18px;
+  background:
+    radial-gradient(circle at 16% 0%, rgba(241, 212, 154, 0.09), transparent 36%),
+    linear-gradient(170deg, rgba(41, 29, 57, 0.78), rgba(17, 13, 25, 0.9));
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.24);
+}
+
+.ritual-first-action-card {
+  border-radius: 24px;
+  border: 1px solid rgba(241, 212, 154, 0.36);
+  padding: 16px 18px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(241, 212, 154, 0.13), transparent 42%),
+    linear-gradient(180deg, rgba(58, 40, 74, 0.74), rgba(18, 14, 27, 0.9));
+}
+
+.ritual-premium-card {
+  border-radius: 24px;
+  border: 1px solid rgba(241, 212, 154, 0.22);
+  padding: 18px;
+  background:
+    radial-gradient(circle at 84% 0%, rgba(228, 141, 167, 0.1), transparent 38%),
+    linear-gradient(170deg, rgba(44, 31, 62, 0.76), rgba(17, 13, 25, 0.9));
 }
 
 .ritual-origin-card {
