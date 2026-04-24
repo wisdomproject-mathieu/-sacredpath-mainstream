@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CoupleTopbar from "../components/CoupleTopbar";
 import { useSession } from "../contexts/SessionContext";
@@ -27,16 +28,79 @@ const rightOrbits = [
   "weather-v2-orbit-r4",
 ];
 
+const masculineNames = new Set([
+  "alex", "andrew", "antoine", "ben", "charles", "chris", "daniel", "david", "emile", "ethan",
+  "felix", "gabriel", "george", "hugo", "james", "jean", "john", "joseph", "leo", "louis",
+  "luc", "lucas", "marc", "mathieu", "max", "michael", "nicolas", "oliver", "pierre", "paul",
+  "sam", "sebastien", "thomas", "vincent", "william",
+]);
+
+const feminineNames = new Set([
+  "alice", "amelie", "ana", "anna", "bella", "camille", "charlotte", "claire", "diana", "edith",
+  "edita", "elena", "emma", "eva", "gabrielle", "hannah", "isabella", "jade", "julia", "laura",
+  "lea", "lina", "lucie", "maia", "maria", "marie", "maya", "mia", "nina", "olivia",
+  "rose", "sara", "sophia", "victoria", "zoe",
+]);
+
+type Energy = "masculine" | "feminine" | "unknown";
+
+function normalizeName(name: string) {
+  return name.trim().toLowerCase().replace(/[^a-z]/g, "");
+}
+
+function guessEnergy(name: string): Energy {
+  const n = normalizeName(name);
+  if (!n) return "unknown";
+  if (masculineNames.has(n)) return "masculine";
+  if (feminineNames.has(n)) return "feminine";
+  if (n.endsWith("a") || n.endsWith("ia") || n.endsWith("ie")) return "feminine";
+  if (n.endsWith("o") || n.endsWith("an") || n.endsWith("on") || n.endsWith("el")) return "masculine";
+  return "unknown";
+}
+
 export default function Weather() {
   const { state, setState } = useSession();
   const navigate = useNavigate();
   const logoSrc = `${import.meta.env.BASE_URL}sacred-path-mark.png`;
+  const [manualSwap, setManualSwap] = useState(false);
 
   const setWeather = (field: "youWeather" | "partnerWeather", value: IntimacyWeather) => {
     setState({ ...state, [field]: value });
   };
 
   const canContinue = state.youWeather && state.partnerWeather;
+  const youEnergy = useMemo(() => guessEnergy(state.youName), [state.youName]);
+  const partnerEnergy = useMemo(() => guessEnergy(state.partnerName), [state.partnerName]);
+  const inferredMasculineOnLeft = useMemo(() => {
+    if (youEnergy === "masculine" && partnerEnergy === "feminine") return true;
+    if (youEnergy === "feminine" && partnerEnergy === "masculine") return false;
+    return true;
+  }, [youEnergy, partnerEnergy]);
+
+  useEffect(() => {
+    setManualSwap(false);
+  }, [state.youName, state.partnerName]);
+
+  const masculineOnLeft = manualSwap ? !inferredMasculineOnLeft : inferredMasculineOnLeft;
+  const leftIsYou = masculineOnLeft ? youEnergy !== "feminine" : youEnergy === "feminine";
+  const leftField: "youWeather" | "partnerWeather" = leftIsYou ? "youWeather" : "partnerWeather";
+  const rightField: "youWeather" | "partnerWeather" = leftIsYou ? "partnerWeather" : "youWeather";
+
+  const leftSide = {
+    role: masculineOnLeft ? "Shiva" : "Shakti",
+    field: leftField,
+    selected: leftField === "youWeather" ? state.youWeather : state.partnerWeather,
+    name: leftField === "youWeather" ? state.youName || "You" : state.partnerName || "Partner",
+    sideClass: masculineOnLeft ? "weather-v2-side-masculine" : "weather-v2-side-feminine",
+  };
+
+  const rightSide = {
+    role: masculineOnLeft ? "Shakti" : "Shiva",
+    field: rightField,
+    selected: rightField === "youWeather" ? state.youWeather : state.partnerWeather,
+    name: rightField === "youWeather" ? state.youName || "You" : state.partnerName || "Partner",
+    sideClass: masculineOnLeft ? "weather-v2-side-feminine" : "weather-v2-side-masculine",
+  };
 
   return (
     <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
@@ -52,20 +116,20 @@ export default function Weather() {
         </header>
 
         <section className="weather-v2-polarity">
-          <div className="weather-v2-side weather-v2-side-left">
+          <div className={`weather-v2-side ${leftSide.sideClass}`}>
             <div className="weather-v2-side-head">
-              <p className="weather-v2-side-kicker">Shiva</p>
-              <h3 className="weather-v2-side-title">Grounded Presence</h3>
+              <p className="weather-v2-side-kicker">{leftSide.role}</p>
+              <p className="weather-v2-side-name">{leftSide.name}</p>
             </div>
             <div className="weather-v2-orbit-field">
               {options.map((opt, idx) => (
                 <button
                   key={opt.id}
-                  onClick={() => setWeather("youWeather", opt.id)}
-                  className={`value-card weather-v2-card weather-v2-card-left ${opt.toneClass} ${leftOrbits[idx]} ${state.youWeather === opt.id ? "weather-v2-card-active" : ""}`}
+                  onClick={() => setWeather(leftSide.field, opt.id)}
+                  className={`value-card weather-v2-card weather-v2-card-left ${opt.toneClass} ${leftOrbits[idx]} ${leftSide.selected === opt.id ? "weather-v2-card-active" : ""}`}
                 >
                   <span className="weather-v2-card-icon">{opt.icon}</span>
-                  <p className="value-kicker">Your weather</p>
+                  <span className="weather-v2-card-glow" />
                   <h2>{opt.label}</h2>
                 </button>
               ))}
@@ -87,39 +151,37 @@ export default function Weather() {
               </div>
             </div>
 
-            <div className="weather-summary-card">
-              <p className="weather-kicker">Tonight&apos;s mood</p>
-              <p className="weather-summary-line">
-                You: <strong>{state.youWeather ? options.find((o) => o.id === state.youWeather)?.label : "Not selected"}</strong>
-                {" · "}
-                Partner: <strong>{state.partnerWeather ? options.find((o) => o.id === state.partnerWeather)?.label : "Not selected"}</strong>
-              </p>
-              <p className="weather-summary-sub">Your weather creates tonight&apos;s path.</p>
-            </div>
+            <button
+              type="button"
+              onClick={() => setManualSwap((v) => !v)}
+              className="weather-v2-swap-btn"
+            >
+              Swap Shiva ↔ Shakti
+            </button>
 
             <button
               disabled={!canContinue}
               onClick={() => canContinue && navigate("/ritual")}
               className="w-full py-3 rounded-full bg-sp-gold text-black font-bold disabled:opacity-40 weather-continue-btn"
             >
-              Show tonight&apos;s ritual
+              Show Rituals
             </button>
           </div>
 
-          <div className="weather-v2-side weather-v2-side-right">
+          <div className={`weather-v2-side ${rightSide.sideClass}`}>
             <div className="weather-v2-side-head">
-              <p className="weather-v2-side-kicker">Shakti</p>
-              <h3 className="weather-v2-side-title">Flowing Radiance</h3>
+              <p className="weather-v2-side-kicker">{rightSide.role}</p>
+              <p className="weather-v2-side-name">{rightSide.name}</p>
             </div>
             <div className="weather-v2-orbit-field">
               {options.map((opt, idx) => (
                 <button
                   key={opt.id}
-                  onClick={() => setWeather("partnerWeather", opt.id)}
-                  className={`value-card weather-v2-card weather-v2-card-right ${opt.toneClass} ${rightOrbits[idx]} ${state.partnerWeather === opt.id ? "weather-v2-card-active" : ""}`}
+                  onClick={() => setWeather(rightSide.field, opt.id)}
+                  className={`value-card weather-v2-card weather-v2-card-right ${opt.toneClass} ${rightOrbits[idx]} ${rightSide.selected === opt.id ? "weather-v2-card-active" : ""}`}
                 >
                   <span className="weather-v2-card-icon">{opt.icon}</span>
-                  <p className="value-kicker">Partner weather</p>
+                  <span className="weather-v2-card-glow" />
                   <h2>{opt.label}</h2>
                 </button>
               ))}
