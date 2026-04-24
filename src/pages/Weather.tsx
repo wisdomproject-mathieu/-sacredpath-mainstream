@@ -4,12 +4,12 @@ import CoupleTopbar from "../components/CoupleTopbar";
 import { useSession } from "../contexts/SessionContext";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
 
-const options: { id: IntimacyWeather; label: string; icon: string; toneClass: string }[] = [
-  { id: "stormy", label: "Need Repair", icon: "⛈", toneClass: "weather-tone-stormy" },
-  { id: "cloudy", label: "Need Tenderness", icon: "☁", toneClass: "weather-tone-cloudy" },
-  { id: "warm", label: "Open Heart", icon: "☀", toneClass: "weather-tone-warm" },
-  { id: "electric", label: "Magnetic Desire", icon: "⚡", toneClass: "weather-tone-electric" },
-  { id: "radiant", label: "Deeply Connected", icon: "🌕", toneClass: "weather-tone-radiant" },
+const options: { id: IntimacyWeather; title: string; subtitle: string; icon: string; toneClass: string }[] = [
+  { id: "stormy", title: "Stormy", subtitle: "Tense, hurt, or charged with something unspoken.", icon: "⛈", toneClass: "weather-tone-stormy" },
+  { id: "cloudy", title: "Foggy", subtitle: "Unclear, drifting, or frozen in the body.", icon: "☁", toneClass: "weather-tone-cloudy" },
+  { id: "warm", title: "Warm", subtitle: "Soft, tender, and wanting closeness.", icon: "☀", toneClass: "weather-tone-warm" },
+  { id: "electric", title: "Electric", subtitle: "Crackling, drawn, awake in the body.", icon: "⚡", toneClass: "weather-tone-electric" },
+  { id: "radiant", title: "Sunny", subtitle: "Clear, light, easy with my partner today.", icon: "🌕", toneClass: "weather-tone-radiant" },
 ];
 
 const leftOrbits = [
@@ -130,7 +130,8 @@ export default function Weather() {
                 >
                   <span className="weather-v2-card-icon">{opt.icon}</span>
                   <span className="weather-v2-card-glow" />
-                  <h2>{opt.label}</h2>
+                  <h2>{opt.title}</h2>
+                  <p className="weather-v2-card-sub">{opt.subtitle}</p>
                 </button>
               ))}
             </div>
@@ -182,7 +183,8 @@ export default function Weather() {
                 >
                   <span className="weather-v2-card-icon">{opt.icon}</span>
                   <span className="weather-v2-card-glow" />
-                  <h2>{opt.label}</h2>
+                  <h2>{opt.title}</h2>
+                  <p className="weather-v2-card-sub">{opt.subtitle}</p>
                 </button>
               ))}
             </div>

@@ -844,9 +844,9 @@ img { max-width: 100%; display: block; }
 
 .weather-v2-card {
   position: absolute;
-  width: clamp(164px, 62%, 248px);
-  min-height: 124px;
-  padding: 15px 14px 16px;
+  width: clamp(176px, 66%, 264px);
+  min-height: 150px;
+  padding: 16px 14px 16px;
   cursor: pointer;
   text-align: left;
   border: 1px solid rgba(255, 255, 255, 0.13);
@@ -875,8 +875,8 @@ img { max-width: 100%; display: block; }
 .weather-v2-card h2 {
   margin: 0;
   max-width: 10ch;
-  font-size: clamp(1.05rem, 1.35vw, 1.45rem);
-  line-height: 1.08;
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  line-height: 1.05;
 }
 
 .weather-v2-card-icon {
@@ -893,6 +893,15 @@ img { max-width: 100%; display: block; }
   inset: 0;
   pointer-events: none;
   background: radial-gradient(circle at 12% 6%, rgba(241, 212, 154, 0.1), transparent 44%);
+}
+
+.weather-v2-card-sub {
+  margin: 8px 0 0;
+  max-width: 19ch;
+  font-size: 0.9rem;
+  line-height: 1.28;
+  font-weight: 600;
+  color: rgba(248, 242, 255, 0.86);
 }
 
 .weather-v2-center {
@@ -945,16 +954,16 @@ img { max-width: 100%; display: block; }
 }
 
 .weather-v2-orbit-l0 { top: 24px; left: 8px; --weather-orbit-transform: rotate(-4deg); --weather-delay: 0s; }
-.weather-v2-orbit-l1 { top: 156px; left: 78px; --weather-orbit-transform: rotate(2deg); --weather-delay: 0.45s; }
-.weather-v2-orbit-l2 { top: 302px; left: 20px; --weather-orbit-transform: rotate(-2deg); --weather-delay: 0.9s; }
-.weather-v2-orbit-l3 { top: 462px; left: 84px; --weather-orbit-transform: rotate(3deg); --weather-delay: 1.3s; }
-.weather-v2-orbit-l4 { top: 618px; left: 26px; --weather-orbit-transform: rotate(-3deg); --weather-delay: 1.7s; }
+.weather-v2-orbit-l1 { top: 170px; left: 84px; --weather-orbit-transform: rotate(2deg); --weather-delay: 0.45s; }
+.weather-v2-orbit-l2 { top: 336px; left: 20px; --weather-orbit-transform: rotate(-2deg); --weather-delay: 0.9s; }
+.weather-v2-orbit-l3 { top: 514px; left: 86px; --weather-orbit-transform: rotate(3deg); --weather-delay: 1.3s; }
+.weather-v2-orbit-l4 { top: 686px; left: 24px; --weather-orbit-transform: rotate(-3deg); --weather-delay: 1.7s; }
 
 .weather-v2-orbit-r0 { top: 22px; left: 76px; --weather-orbit-transform: rotate(4deg); --weather-delay: 0.2s; }
-.weather-v2-orbit-r1 { top: 160px; left: 18px; --weather-orbit-transform: rotate(-3deg); --weather-delay: 0.6s; }
-.weather-v2-orbit-r2 { top: 306px; left: 90px; --weather-orbit-transform: rotate(2deg); --weather-delay: 1s; }
-.weather-v2-orbit-r3 { top: 466px; left: 18px; --weather-orbit-transform: rotate(-4deg); --weather-delay: 1.35s; }
-.weather-v2-orbit-r4 { top: 622px; left: 82px; --weather-orbit-transform: rotate(3deg); --weather-delay: 1.8s; }
+.weather-v2-orbit-r1 { top: 174px; left: 18px; --weather-orbit-transform: rotate(-3deg); --weather-delay: 0.6s; }
+.weather-v2-orbit-r2 { top: 340px; left: 94px; --weather-orbit-transform: rotate(2deg); --weather-delay: 1s; }
+.weather-v2-orbit-r3 { top: 518px; left: 18px; --weather-orbit-transform: rotate(-4deg); --weather-delay: 1.35s; }
+.weather-v2-orbit-r4 { top: 690px; left: 82px; --weather-orbit-transform: rotate(3deg); --weather-delay: 1.8s; }
 
 .ritual-headline-strip {
   border-radius: 24px;
