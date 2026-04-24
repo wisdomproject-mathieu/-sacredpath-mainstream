@@ -472,16 +472,14 @@ img { max-width: 100%; display: block; }
 }
 
 .weather-headline-strip {
-  position: relative;
-  overflow: hidden;
-  border-radius: 22px;
-  padding: 16px 18px 18px;
+  border-radius: 26px;
+  padding: 18px 20px 20px;
   border: 1px solid rgba(241, 212, 154, 0.22);
   background:
-    radial-gradient(circle at 18% 0%, rgba(210, 118, 146, 0.14), transparent 42%),
-    radial-gradient(circle at 84% 24%, rgba(241, 212, 154, 0.12), transparent 38%),
-    linear-gradient(170deg, rgba(52, 36, 69, 0.78), rgba(18, 14, 27, 0.9));
-  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.24);
+    radial-gradient(circle at 12% 0%, rgba(153, 138, 244, 0.16), transparent 40%),
+    radial-gradient(circle at 88% 12%, rgba(228, 141, 167, 0.16), transparent 35%),
+    linear-gradient(165deg, rgba(44, 30, 64, 0.82), rgba(16, 12, 25, 0.92));
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
 }
 
 .weather-kicker {
@@ -493,78 +491,180 @@ img { max-width: 100%; display: block; }
   color: var(--gold);
 }
 
-.weather-section-title {
+.weather-polarity-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.weather-polarity-side {
+  border-radius: 26px;
+  border: 1px solid rgba(241, 212, 154, 0.14);
+  padding: 14px;
+  background: linear-gradient(180deg, rgba(27, 19, 39, 0.82), rgba(16, 12, 24, 0.88));
+  backdrop-filter: blur(2px);
+}
+
+.weather-polarity-left {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(112, 140, 235, 0.14), transparent 36%),
+    linear-gradient(180deg, rgba(27, 20, 41, 0.86), rgba(16, 12, 24, 0.9));
+}
+
+.weather-polarity-right {
+  background:
+    radial-gradient(circle at 88% 0%, rgba(228, 141, 167, 0.15), transparent 40%),
+    linear-gradient(180deg, rgba(33, 20, 39, 0.86), rgba(16, 12, 24, 0.9));
+}
+
+.weather-side-head {
+  margin-bottom: 12px;
+}
+
+.weather-side-kicker {
   margin: 0;
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  color: rgba(241, 212, 154, 0.92);
+  color: rgba(241, 212, 154, 0.9);
   font-weight: 800;
 }
 
-.weather-section {
-  border-radius: 22px;
-  padding: 13px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background:
-    radial-gradient(circle at 12% 0%, rgba(241, 212, 154, 0.06), transparent 34%),
-    rgba(255, 255, 255, 0.03);
+.weather-side-title {
+  margin: 6px 0 0;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  line-height: 1.2;
+  color: #fff7e7;
+  font-family: Georgia, "Times New Roman", serif;
 }
 
-.weather-door-card {
+.weather-side-sub {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  color: rgba(230, 223, 242, 0.86);
+}
+
+.weather-card-stack {
+  display: grid;
+  gap: 11px;
+}
+
+.weather-polarity-card {
   position: relative;
   overflow: hidden;
-  min-height: 156px;
+  min-height: 114px;
   border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: linear-gradient(165deg, rgba(50, 36, 66, 0.8), rgba(22, 16, 31, 0.92));
+  border: 1px solid rgba(241, 212, 154, 0.17);
+  background: linear-gradient(165deg, rgba(50, 36, 66, 0.76), rgba(22, 16, 31, 0.9));
   text-align: left;
-  padding: 16px;
+  padding: 14px 16px;
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
-.weather-door-card:hover {
+.weather-polarity-card:hover {
   transform: translateY(-2px) scale(1.005);
   border-color: rgba(241, 212, 154, 0.4);
   filter: brightness(1.03);
 }
 
-.weather-door-card-active {
+.weather-polarity-card-active {
   border-color: rgba(241, 212, 154, 0.68);
   box-shadow: 0 14px 34px rgba(241, 212, 154, 0.24), inset 0 0 0 1px rgba(241, 212, 154, 0.3);
 }
 
-.weather-door-bg-icon {
+.weather-polarity-card-left {
+  border-radius: 20px;
+}
+
+.weather-polarity-card-right {
+  border-radius: 28px;
+}
+
+.weather-card-stack-right .weather-polarity-card:nth-child(odd) {
+  transform: translateX(6px);
+}
+
+.weather-card-stack-right .weather-polarity-card:nth-child(even) {
+  transform: translateX(-4px);
+}
+
+.weather-card-icon {
   position: absolute;
-  right: -16px;
-  bottom: -22px;
+  right: -8px;
+  bottom: -18px;
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
   width: 100%;
   height: 100%;
-  font-size: clamp(6.8rem, 11vw, 9.2rem);
+  font-size: clamp(5.6rem, 6.8vw, 7.8rem);
   line-height: 1;
-  opacity: 0.22;
+  opacity: 0.26;
   filter: saturate(1.2);
-  text-shadow: 0 0 18px rgba(241, 212, 154, 0.18);
+  text-shadow: 0 0 22px rgba(241, 212, 154, 0.22);
   pointer-events: none;
 }
 
-.weather-door-content {
+.weather-card-label {
   position: relative;
   z-index: 1;
-  width: min(78%, 14ch);
-}
-
-.weather-door-label {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
   max-width: 12ch;
-  font-size: clamp(1.42rem, 2vw, 1.88rem);
+  font-size: clamp(1.25rem, 1.7vw, 1.56rem);
   font-weight: 700;
-  color: #fff8ef;
-  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.5);
+  line-height: 1.13;
+  color: #fff9f0;
+  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.55);
+}
+
+.weather-center-anchor {
+  border-radius: 28px;
+  padding: 16px;
+  border: 1px solid rgba(241, 212, 154, 0.3);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(241, 212, 154, 0.14), transparent 44%),
+    radial-gradient(circle at 12% 12%, rgba(153, 138, 244, 0.12), transparent 34%),
+    radial-gradient(circle at 88% 14%, rgba(228, 141, 167, 0.14), transparent 36%),
+    linear-gradient(180deg, rgba(38, 27, 54, 0.86), rgba(16, 12, 24, 0.92));
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.3);
+}
+
+.weather-center-icon-wrap {
+  width: 110px;
+  height: 110px;
+  margin: 2px auto 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(241, 212, 154, 0.24);
+  background:
+    radial-gradient(circle at 50% 18%, rgba(241, 212, 154, 0.18), transparent 45%),
+    linear-gradient(180deg, rgba(55, 37, 72, 0.78), rgba(20, 14, 30, 0.86));
+  display: grid;
+  place-items: center;
+}
+
+.weather-center-icon {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(241, 212, 154, 0.3));
+}
+
+.weather-center-title {
+  margin: 6px 0 2px;
+  text-align: center;
+  color: #fff7e9;
+  font-size: clamp(1.26rem, 2vw, 1.64rem);
+  line-height: 1.18;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.weather-center-sub {
+  margin: 0;
+  text-align: center;
+  color: rgba(236, 227, 247, 0.88);
+  font-size: 0.96rem;
 }
 
 .weather-tone-stormy {
@@ -598,10 +698,13 @@ img { max-width: 100%; display: block; }
 }
 
 .weather-summary-card {
-  border-radius: 22px;
+  margin-top: 14px;
+  border-radius: 20px;
   border: 1px solid rgba(241, 212, 154, 0.24);
-  padding: 14px 16px;
-  background: linear-gradient(180deg, rgba(241, 212, 154, 0.08), rgba(24, 18, 34, 0.82));
+  padding: 12px 14px;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(241, 212, 154, 0.1), transparent 38%),
+    linear-gradient(180deg, rgba(241, 212, 154, 0.08), rgba(24, 18, 34, 0.82));
 }
 
 .weather-summary-line {
@@ -666,6 +769,7 @@ img { max-width: 100%; display: block; }
 }
 
 .weather-continue-btn {
+  margin-top: 14px;
   box-shadow: 0 18px 40px rgba(216, 172, 104, 0.32);
 }
 
@@ -690,4 +794,32 @@ img { max-width: 100%; display: block; }
   .home-couple-panel { left: 14px; right: 14px; bottom: 14px; padding: 16px 18px 14px; }
   .home-couple-chip { font-size: 0.98rem; }
   .home-shiny-icon { width: min(54%, 220px); }
+  .weather-polarity-side { padding: 12px; }
+  .weather-polarity-card { min-height: 104px; }
+  .weather-center-anchor { padding: 14px; }
+  .weather-center-icon-wrap {
+    width: 96px;
+    height: 96px;
+  }
+  .weather-center-icon {
+    width: 62px;
+    height: 62px;
+  }
+  .weather-card-icon {
+    font-size: clamp(4.6rem, 18vw, 6rem);
+  }
+}
+
+@media (max-width: 1120px) {
+  .weather-polarity-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .weather-center-anchor { order: 1; }
+  .weather-polarity-left { order: 2; }
+  .weather-polarity-right { order: 3; }
+  .weather-card-stack-right .weather-polarity-card:nth-child(odd),
+  .weather-card-stack-right .weather-polarity-card:nth-child(even) {
+    transform: none;
+  }
 }
