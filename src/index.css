@@ -720,6 +720,162 @@ img { max-width: 100%; display: block; }
   color: rgba(246, 240, 255, 0.8);
 }
 
+/* ===== WEATHER V2 ===== */
+.weather-v2-header {
+  text-align: center;
+  padding: 8px 12px 0;
+}
+
+.weather-v2-title {
+  margin: 0 0 10px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 3.6vw, 3.3rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  color: #fff8ef;
+}
+
+.weather-v2-subtitle {
+  margin: 0 auto;
+  max-width: 56rem;
+  font-size: clamp(1rem, 1.35vw, 1.18rem);
+  line-height: 1.45;
+  font-weight: 700;
+  color: rgba(246, 240, 255, 0.9);
+}
+
+.weather-v2-polarity {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(420px, 0.92fr) minmax(280px, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.weather-v2-side {
+  border-radius: 30px;
+  border: 1px solid rgba(241, 212, 154, 0.16);
+  padding: 18px 14px;
+  min-height: 740px;
+}
+
+.weather-v2-side-left {
+  background:
+    radial-gradient(circle at 8% 8%, rgba(114, 150, 255, 0.16), transparent 36%),
+    linear-gradient(180deg, rgba(21, 17, 37, 0.88), rgba(13, 11, 23, 0.95));
+}
+
+.weather-v2-side-right {
+  background:
+    radial-gradient(circle at 86% 8%, rgba(232, 130, 173, 0.17), transparent 38%),
+    linear-gradient(180deg, rgba(34, 18, 36, 0.9), rgba(14, 11, 23, 0.95));
+}
+
+.weather-v2-side-head {
+  margin: 0 10px 8px;
+}
+
+.weather-v2-side-kicker {
+  margin: 0;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.weather-v2-side-title {
+  margin: 7px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.2rem, 1.95vw, 1.7rem);
+  color: #fff8ef;
+  line-height: 1.05;
+}
+
+.weather-v2-orbit-field {
+  position: relative;
+  min-height: 650px;
+}
+
+.weather-v2-card {
+  position: absolute;
+  width: clamp(190px, 78%, 300px);
+  min-height: 158px;
+  padding: 20px 20px 22px;
+  cursor: pointer;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow: 0 22px 40px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, filter 0.2s ease;
+  transform: var(--weather-orbit-transform);
+  animation: weatherFloat 7s ease-in-out infinite;
+  animation-delay: var(--weather-delay, 0s);
+}
+
+.weather-v2-card:hover {
+  transform: var(--weather-orbit-transform) translateY(-4px) scale(1.01);
+  border-color: rgba(241, 212, 154, 0.5);
+  filter: brightness(1.05);
+}
+
+.weather-v2-card-active {
+  border-color: rgba(241, 212, 154, 0.72);
+  box-shadow: 0 26px 52px rgba(241, 212, 154, 0.2), inset 0 0 0 1px rgba(241, 212, 154, 0.3);
+}
+
+.weather-v2-card .value-kicker {
+  margin-bottom: 8px;
+}
+
+.weather-v2-card h2 {
+  margin: 0;
+  max-width: 8.5ch;
+  font-size: clamp(1.35rem, 1.9vw, 1.95rem);
+  line-height: 1.02;
+}
+
+.weather-v2-card-icon {
+  position: absolute;
+  right: 10px;
+  bottom: -10px;
+  font-size: clamp(3.8rem, 6vw, 5.6rem);
+  opacity: 0.28;
+  text-shadow: 0 0 18px rgba(241, 212, 154, 0.26);
+}
+
+.weather-v2-center {
+  display: flex;
+  flex-direction: column;
+}
+
+.weather-v2-center-card {
+  min-height: 760px;
+}
+
+.weather-v2-center-panel {
+  background: rgba(16, 12, 24, 0.68);
+}
+
+.weather-v2-center .weather-summary-card {
+  margin-top: 18px;
+}
+
+@keyframes weatherFloat {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -4px; }
+}
+
+.weather-v2-orbit-l0 { top: 20px; left: 10px; --weather-orbit-transform: rotate(-4deg); --weather-delay: 0s; }
+.weather-v2-orbit-l1 { top: 132px; left: 96px; --weather-orbit-transform: rotate(2deg); --weather-delay: 0.45s; }
+.weather-v2-orbit-l2 { top: 266px; left: 18px; --weather-orbit-transform: rotate(-2deg); --weather-delay: 0.9s; }
+.weather-v2-orbit-l3 { top: 404px; left: 88px; --weather-orbit-transform: rotate(3deg); --weather-delay: 1.3s; }
+.weather-v2-orbit-l4 { top: 534px; left: 26px; --weather-orbit-transform: rotate(-3deg); --weather-delay: 1.7s; }
+
+.weather-v2-orbit-r0 { top: 18px; left: 78px; --weather-orbit-transform: rotate(4deg); --weather-delay: 0.2s; }
+.weather-v2-orbit-r1 { top: 146px; left: 18px; --weather-orbit-transform: rotate(-3deg); --weather-delay: 0.6s; }
+.weather-v2-orbit-r2 { top: 278px; left: 94px; --weather-orbit-transform: rotate(2deg); --weather-delay: 1s; }
+.weather-v2-orbit-r3 { top: 412px; left: 16px; --weather-orbit-transform: rotate(-4deg); --weather-delay: 1.35s; }
+.weather-v2-orbit-r4 { top: 536px; left: 86px; --weather-orbit-transform: rotate(3deg); --weather-delay: 1.8s; }
+
 .ritual-headline-strip {
   border-radius: 24px;
   border: 1px solid rgba(241, 212, 154, 0.24);
@@ -779,6 +935,30 @@ img { max-width: 100%; display: block; }
   .home-title { margin-left: 0; text-align: left; max-width: none; }
   .home-visual-card { min-height: 480px; }
   .paywall-grid { grid-template-columns: 1fr; }
+  .weather-v2-polarity {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .weather-v2-center { order: 1; }
+  .weather-v2-side-left { order: 2; }
+  .weather-v2-side-right { order: 3; }
+  .weather-v2-center-card { min-height: 640px; }
+  .weather-v2-side { min-height: auto; }
+  .weather-v2-orbit-field {
+    min-height: auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .weather-v2-card {
+    position: relative;
+    width: 100%;
+    min-height: 146px;
+    transform: none !important;
+    animation: none;
+    left: auto;
+    top: auto;
+  }
 }
 
 @media (max-width: 820px) {
@@ -786,6 +966,8 @@ img { max-width: 100%; display: block; }
   .home-value-grid,
   .paywall-grid { grid-template-columns: 1fr; }
   .home-title { font-size: clamp(2.4rem, 9vw, 3.6rem); }
+  .weather-v2-title { font-size: clamp(1.9rem, 8vw, 2.7rem); }
+  .weather-v2-center-card { min-height: 560px; }
 }
 
 @media (max-width: 560px) {
@@ -794,6 +976,16 @@ img { max-width: 100%; display: block; }
   .home-couple-panel { left: 14px; right: 14px; bottom: 14px; padding: 16px 18px 14px; }
   .home-couple-chip { font-size: 0.98rem; }
   .home-shiny-icon { width: min(54%, 220px); }
+  .weather-v2-orbit-field { grid-template-columns: 1fr; }
+  .weather-v2-side { padding: 12px; }
+  .weather-v2-card { min-height: 132px; }
+  .weather-v2-card h2 { font-size: clamp(1.28rem, 7vw, 1.66rem); }
+  .weather-v2-center-card {
+    min-height: 500px;
+    border-radius: 30px;
+  }
+  .weather-v2-header { text-align: left; padding: 4px 4px 0; }
+  .weather-v2-subtitle { font-size: 0.98rem; }
   .weather-polarity-side { padding: 12px; }
   .weather-polarity-card { min-height: 104px; }
   .weather-center-anchor { padding: 14px; }
