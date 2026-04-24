@@ -3,12 +3,12 @@ import CoupleTopbar from "../components/CoupleTopbar";
 import { useSession } from "../contexts/SessionContext";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
 
-const options: { id: IntimacyWeather; label: string; icon: string }[] = [
-  { id: "stormy", label: "Need Gentle Repair", icon: "⛈" },
-  { id: "cloudy", label: "Hold Me Close", icon: "☁" },
-  { id: "warm", label: "Open To Love", icon: "☀" },
-  { id: "electric", label: "I Want You", icon: "⚡" },
-  { id: "radiant", label: "Ready For Us", icon: "🌕" },
+const options: { id: IntimacyWeather; label: string; icon: string; toneClass: string }[] = [
+  { id: "stormy", label: "Need Gentle Repair", icon: "⛈", toneClass: "weather-tone-stormy" },
+  { id: "cloudy", label: "Hold Me Close", icon: "☁", toneClass: "weather-tone-cloudy" },
+  { id: "warm", label: "Open To Love", icon: "☀", toneClass: "weather-tone-warm" },
+  { id: "electric", label: "I Want You", icon: "⚡", toneClass: "weather-tone-electric" },
+  { id: "radiant", label: "Ready For Us", icon: "🌕", toneClass: "weather-tone-radiant" },
 ];
 
 export default function Weather() {
@@ -38,7 +38,7 @@ export default function Weather() {
               <button
                 key={opt.id}
                 onClick={() => setWeather("youWeather", opt.id)}
-                className={`weather-door-card ${state.youWeather === opt.id ? "weather-door-card-active" : ""}`}
+                className={`weather-door-card ${opt.toneClass} ${state.youWeather === opt.id ? "weather-door-card-active" : ""}`}
               >
                 <span className="weather-door-bg-icon">{opt.icon}</span>
                 <div className="weather-door-content">
@@ -56,7 +56,7 @@ export default function Weather() {
               <button
                 key={opt.id}
                 onClick={() => setWeather("partnerWeather", opt.id)}
-                className={`weather-door-card ${state.partnerWeather === opt.id ? "weather-door-card-active" : ""}`}
+                className={`weather-door-card ${opt.toneClass} ${state.partnerWeather === opt.id ? "weather-door-card-active" : ""}`}
               >
                 <span className="weather-door-bg-icon">{opt.icon}</span>
                 <div className="weather-door-content">

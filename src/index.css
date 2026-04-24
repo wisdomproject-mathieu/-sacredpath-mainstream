@@ -497,14 +497,12 @@ img { max-width: 100%; display: block; }
 .weather-door-card {
   position: relative;
   overflow: hidden;
-  min-height: 152px;
+  min-height: 176px;
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  background:
-    radial-gradient(circle at top right, rgba(241, 212, 154, 0.1), transparent 55%),
-    linear-gradient(180deg, rgba(44, 33, 58, 0.7), rgba(21, 16, 30, 0.88));
+  background: linear-gradient(165deg, rgba(50, 36, 66, 0.86), rgba(22, 16, 31, 0.94));
   text-align: left;
-  padding: 16px;
+  padding: 18px;
   transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
@@ -515,37 +513,67 @@ img { max-width: 100%; display: block; }
 
 .weather-door-card-active {
   border-color: rgba(241, 212, 154, 0.68);
-  box-shadow: 0 14px 34px rgba(241, 212, 154, 0.2);
-  background:
-    radial-gradient(circle at top right, rgba(241, 212, 154, 0.2), transparent 52%),
-    linear-gradient(180deg, rgba(60, 45, 74, 0.76), rgba(24, 18, 35, 0.92));
+  box-shadow: 0 16px 40px rgba(241, 212, 154, 0.25), inset 0 0 0 1px rgba(241, 212, 154, 0.28);
 }
 
 .weather-door-bg-icon {
   position: absolute;
-  right: -8px;
-  bottom: -18px;
-  font-size: 8.6rem;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(8.5rem, 16vw, 12rem);
   line-height: 1;
-  opacity: 0.34;
-  filter: saturate(1.1);
-  text-shadow: 0 0 24px rgba(241, 212, 154, 0.16);
+  opacity: 0.42;
+  filter: saturate(1.2);
+  text-shadow: 0 0 30px rgba(241, 212, 154, 0.24);
   pointer-events: none;
 }
 
 .weather-door-content {
   position: relative;
   z-index: 1;
+  width: min(86%, 16ch);
 }
 
 .weather-door-label {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
-  max-width: 11ch;
-  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  max-width: 14ch;
+  font-size: clamp(1.42rem, 2.2vw, 1.95rem);
   font-weight: 700;
   color: #fff8ef;
   text-shadow: 0 3px 18px rgba(0, 0, 0, 0.5);
+}
+
+.weather-tone-stormy {
+  background:
+    radial-gradient(circle at 20% 15%, rgba(255, 198, 115, 0.2), transparent 35%),
+    linear-gradient(160deg, rgba(76, 49, 83, 0.9), rgba(24, 17, 33, 0.95));
+}
+
+.weather-tone-cloudy {
+  background:
+    radial-gradient(circle at 80% 18%, rgba(160, 131, 204, 0.2), transparent 38%),
+    linear-gradient(165deg, rgba(57, 44, 76, 0.9), rgba(23, 17, 33, 0.95));
+}
+
+.weather-tone-warm {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(241, 212, 154, 0.27), transparent 40%),
+    linear-gradient(165deg, rgba(84, 56, 59, 0.92), rgba(29, 18, 28, 0.95));
+}
+
+.weather-tone-electric {
+  background:
+    radial-gradient(circle at 78% 18%, rgba(216, 161, 255, 0.24), transparent 36%),
+    linear-gradient(165deg, rgba(65, 41, 86, 0.92), rgba(23, 16, 35, 0.95));
+}
+
+.weather-tone-radiant {
+  background:
+    radial-gradient(circle at 18% 15%, rgba(241, 212, 154, 0.26), transparent 35%),
+    linear-gradient(165deg, rgba(70, 53, 93, 0.9), rgba(26, 18, 40, 0.95));
 }
 
 .weather-summary-card {
