@@ -689,7 +689,7 @@ img { max-width: 100%; display: block; }
 }
 
 .weather-tone-electric {
-  --weather-card-image: url("/weather-electric.png");
+  --weather-card-image: url("/weather-electric.jpg");
   --weather-card-tint-one: rgba(122, 88, 220, 0.44);
   --weather-card-tint-two: rgba(36, 24, 78, 0.72);
   --weather-card-glow: rgba(200, 155, 255, 0.32);
