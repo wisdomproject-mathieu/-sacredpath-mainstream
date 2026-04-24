@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import CoupleTopbar from "../components/CoupleTopbar";
 import { useSession } from "../contexts/SessionContext";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
 
@@ -13,6 +14,7 @@ const options: { id: IntimacyWeather; label: string; subtitle: string }[] = [
 export default function Weather() {
   const { state, setState } = useSession();
   const navigate = useNavigate();
+  const logoSrc = `${import.meta.env.BASE_URL}sacred-path-mark.png`;
 
   const setWeather = (field: "youWeather" | "partnerWeather", value: IntimacyWeather) => {
     setState({ ...state, [field]: value });
@@ -23,8 +25,9 @@ export default function Weather() {
   return (
     <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
       <div className="max-w-xl mx-auto space-y-8">
+        <CoupleTopbar />
         <div className="flex justify-center">
-          <img src="/sacred-path-mark.png" alt="Sacred Path" className="w-24 h-24 mb-2" />
+          <img src={logoSrc} alt="Sacred Path" className="w-24 h-24 mb-2" />
         </div>
 
         <div className="text-center">

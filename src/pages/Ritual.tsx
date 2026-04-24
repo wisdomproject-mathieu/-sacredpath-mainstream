@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import CoupleTopbar from "../components/CoupleTopbar";
 import { useSession } from "../contexts/SessionContext";
 import { resolveWeatherRitual } from "../lib/ritualRegistry";
 
@@ -8,6 +9,7 @@ const PREVIEW_PREMIUM_UNLOCKED = true;
 export default function Ritual() {
   const { state } = useSession();
   const navigate = useNavigate();
+  const logoSrc = `${import.meta.env.BASE_URL}sacred-path-mark.png`;
 
   useEffect(() => {
     if (!state.youWeather || !state.partnerWeather) navigate("/weather");
@@ -29,8 +31,9 @@ export default function Ritual() {
   return (
     <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
       <div className="max-w-xl mx-auto space-y-6">
+        <CoupleTopbar />
         <div className="flex justify-center">
-          <img src="/sacred-path-mark.png" alt="Sacred Path" className="w-24 h-24 mb-2" />
+          <img src={logoSrc} alt="Sacred Path" className="w-24 h-24 mb-2" />
         </div>
 
         <div className="text-xs tracking-[0.25em] uppercase text-sp-gold">{homeCard.eyebrow}</div>

@@ -1,11 +1,15 @@
 import { Link } from "react-router-dom";
+import CoupleTopbar from "../components/CoupleTopbar";
 
 export default function Deeper() {
+  const logoSrc = `${import.meta.env.BASE_URL}sacred-path-mark.png`;
+
   return (
     <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
       <div className="max-w-xl mx-auto space-y-6">
+        <CoupleTopbar />
         <div className="flex justify-center">
-          <img src="/sacred-path-mark.png" alt="Sacred Path" className="w-24 h-24 mb-2" />
+          <img src={logoSrc} alt="Sacred Path" className="w-24 h-24 mb-2" />
         </div>
 
         <div className="text-xs tracking-[0.25em] uppercase text-sp-gold font-bold">Go deeper</div>

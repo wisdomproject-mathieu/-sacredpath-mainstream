@@ -1,27 +1,18 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import CoupleTopbar from "../components/CoupleTopbar";
+import { useSession } from "../contexts/SessionContext";
 
 export default function AppHome() {
   const navigate = useNavigate();
-  const [yourName, setYourName] = useState("Mathieu");
-  const [partnerName, setPartnerName] = useState("Edita");
+  const { state, setState } = useSession();
+  const logoSrc = `${import.meta.env.BASE_URL}sacred-path-mark.png`;
+  const yourName = state.youName;
+  const partnerName = state.partnerName;
 
   return (
     <main className="min-h-screen bg-sp-bg text-slate-100">
       <div className="home-shell">
-        {/* Top bar */}
-        <div className="home-topbar">
-          <span className="home-topbar-label">Sacred Path for Couples</span>
-          <div className="home-couple-chip-mini">
-            <span className="badge-mini">
-              <img src="/sacred-path-mark.png" alt="" />
-            </span>
-            <span>
-              {yourName || "Mathieu"} <span className="dot">•</span>{" "}
-              {partnerName || "Edita"}
-            </span>
-          </div>
-        </div>
+        <CoupleTopbar />
 
         <section className="home-hero">
           <div className="home-left">
@@ -44,14 +35,14 @@ export default function AppHome() {
                 <span>Your name</span>
                 <input
                   value={yourName}
-                  onChange={(e) => setYourName(e.target.value)}
+                  onChange={(e) => setState({ ...state, youName: e.target.value })}
                 />
               </label>
               <label className="home-field-minimal">
                 <span>Partner name</span>
                 <input
                   value={partnerName}
-                  onChange={(e) => setPartnerName(e.target.value)}
+                  onChange={(e) => setState({ ...state, partnerName: e.target.value })}
                 />
               </label>
             </div>
@@ -64,15 +55,6 @@ export default function AppHome() {
                   <br />
                   Last longer.
                 </h2>
-                <p className="value-body">
-                  Presence, pacing, breath, and steadier erotic energy. Stay
-                  present under arousal instead of rushing the night.
-                </p>
-                <ul>
-                  <li>Learn a calmer way to last longer without losing spark.</li>
-                  <li>Use energy as depth and management, not pressure.</li>
-                  <li>Feel more pleasure in the whole body.</li>
-                </ul>
               </article>
 
               <article className="value-card value-women">
@@ -82,15 +64,6 @@ export default function AppHome() {
                   <br />
                   that feels safer.
                 </h2>
-                <p className="value-body">
-                  Softer pacing, conscious touch, more trust, and the kind of
-                  intimacy the body can actually open to.
-                </p>
-                <ul>
-                  <li>Receive slower touch and clearer pacing.</li>
-                  <li>Build emotional safety and erotic softness together.</li>
-                  <li>Let intimacy feel nourishing, warm, deeply attuned.</li>
-                </ul>
               </article>
 
               <article className="value-card value-couple">
@@ -100,15 +73,6 @@ export default function AppHome() {
                   <br />
                   for both of you.
                 </h2>
-                <p className="value-body">
-                  Shared practices, Sacred Voice, and a stronger reason to keep
-                  coming back together.
-                </p>
-                <ul>
-                  <li>One path unlocks the premium experience for both.</li>
-                  <li>Get richer rituals, deeper teachings, guided voice.</li>
-                  <li>Move from one free card into a real intimacy system.</li>
-                </ul>
               </article>
             </div>
 
@@ -134,21 +98,12 @@ export default function AppHome() {
               <div className="home-visual-beam" />
               <div className="home-visual-icon-area">
                 <img
-                  src="/sacred-path-mark.png"
+                  src={logoSrc}
                   alt="Sacred Path"
                   className="home-shiny-icon"
                 />
               </div>
               <div className="home-couple-panel">
-                <div className="home-couple-chip">
-                  <span className="badge">
-                    <img src="/sacred-path-mark.png" alt="" />
-                  </span>
-                  <span>
-                    {yourName || "Mathieu"} <span className="dot">•</span>{" "}
-                    {partnerName || "Edita"}
-                  </span>
-                </div>
                 <p className="panel-kicker">Tonight starts here</p>
                 <p className="panel-text">
                   One simple ritual. More closeness, more softness, one stronger

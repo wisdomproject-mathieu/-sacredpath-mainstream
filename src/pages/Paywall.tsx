@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
+import CoupleTopbar from "../components/CoupleTopbar";
 
 export default function Paywall() {
   return (
     <main className="min-h-screen bg-sp-bg text-slate-100">
       <div className="home-shell">
+        <CoupleTopbar />
         <h1 className="paywall-title">Go deeper than one card.</h1>
         <p className="paywall-subtitle">
           This is the mainstream upgrade: one fast ritual in under 30 seconds,
@@ -14,12 +16,6 @@ export default function Paywall() {
 
         <div className="paywall-topbar">
           <span className="paywall-topbar-label">One subscription for both partners</span>
-          <div className="home-couple-chip-mini">
-            <span className="badge-mini">
-              <img src="/sacred-path-mark.png" alt="" />
-            </span>
-            <span>Mathieu <span className="dot">•</span> Edita</span>
-          </div>
         </div>
 
         <h2 className="paywall-headline">
@@ -35,8 +31,7 @@ export default function Paywall() {
               Last longer.
             </h2>
             <p className="value-body">
-              Presence, pacing, breath, and semen retention as steadier erotic
-              energy.
+              Presence, pacing, breath, and steadier erotic energy.
             </p>
             <ul>
               <li>Stay present under arousal instead of rushing the night.</li>
@@ -54,8 +49,7 @@ export default function Paywall() {
               feels safer.
             </h2>
             <p className="value-body">
-              Softer pacing, conscious touch, more trust, and the kind of
-              intimacy the body can actually open to.
+              Softer pacing, conscious touch, more trust, and the kind of intimacy the body can actually open to.
             </p>
             <ul>
               <li>Receive slower touch and clearer pacing.</li>
@@ -73,8 +67,7 @@ export default function Paywall() {
               for both of you.
             </h2>
             <p className="value-body">
-              Shared practices, Sacred Voice, and a stronger reason to keep
-              coming back together.
+              Shared practices, Sacred Voice, and a stronger reason to keep coming back together.
             </p>
             <ul>
               <li>One subscription unlocks the premium path for both partners.</li>
