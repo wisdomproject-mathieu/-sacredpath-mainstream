@@ -4,7 +4,7 @@ import CoupleTopbar from "../components/CoupleTopbar";
 import { useSession } from "../contexts/SessionContext";
 import { resolveWeatherRitual } from "../lib/ritualRegistry";
 
-const PREVIEW_PREMIUM_UNLOCKED = true;
+const PREVIEW_PREMIUM_UNLOCKED = false;
 
 export default function Ritual() {
   const { state } = useSession();
@@ -27,6 +27,9 @@ export default function Ritual() {
   }
 
   const { homeCard, freeRitual, premiumRituals } = result;
+  const originTraditions = freeRitual.sourceTraditions?.slice(0, 3) ?? [];
+  const originAuthors = freeRitual.sourceAuthors?.slice(0, 3) ?? [];
+  const originConcepts = freeRitual.sourceConcepts?.slice(0, 4) ?? [];
 
   return (
     <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
@@ -52,8 +55,35 @@ export default function Ritual() {
           </ol>
         </div>
 
+        <div className="ritual-origin-card">
+          <p className="text-xs uppercase tracking-[0.22em] text-sp-gold font-bold">Origin of this ritual</p>
+          <h3 className="mt-2 text-2xl font-bold text-amber-50">Where this practice comes from</h3>
+          <p className="mt-2 text-sm text-slate-200">
+            This ritual is adapted for modern couples from traditional intimacy teachings, focused on emotional safety and embodied connection.
+          </p>
+          {originTraditions.length > 0 ? (
+            <p className="mt-3 text-sm text-slate-200">
+              <strong className="text-amber-100">Traditions:</strong> {originTraditions.join(", ")}
+            </p>
+          ) : null}
+          {originAuthors.length > 0 ? (
+            <p className="mt-2 text-sm text-slate-200">
+              <strong className="text-amber-100">Teachers:</strong> {originAuthors.join(", ")}
+            </p>
+          ) : null}
+          {originConcepts.length > 0 ? (
+            <p className="mt-2 text-sm text-slate-200">
+              <strong className="text-amber-100">Core ideas:</strong> {originConcepts.join(", ")}
+            </p>
+          ) : null}
+        </div>
+
         <Link to="/deeper" className="block w-full py-3 rounded-full bg-sp-gold text-black font-bold text-center">
           Go deeper tonight
+        </Link>
+
+        <Link to="/paywall" className="block w-full py-3 rounded-full border border-sp-gold text-sp-gold font-bold text-center">
+          See premium for both of you
         </Link>
 
         {premiumRituals.length > 0 && (
@@ -75,7 +105,7 @@ export default function Ritual() {
               </Link>
             ) : (
               <Link to="/paywall" className="block w-full py-3 rounded-full border border-sp-gold text-sp-gold font-bold text-center">
-                Unlock more rituals
+                Start subscription
               </Link>
             )}
           </div>

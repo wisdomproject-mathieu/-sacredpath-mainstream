@@ -13,23 +13,23 @@ export default function Deeper() {
         </div>
 
         <div className="text-xs tracking-[0.25em] uppercase text-sp-gold font-bold">Go deeper</div>
-        <h2 className="screen-title text-amber-100">Tonight&apos;s deeper teaching</h2>
-        <p className="screen-body">Move from the ritual into the wisdom beneath it. One practice, one shift in how you meet each other.</p>
+        <h2 className="screen-title text-amber-100">A deeper teaser for men and couples</h2>
+        <p className="screen-body">A practical introduction to semen retention and tantric pacing to build steadier desire, longer lovemaking, and more frequent intimacy over time.</p>
 
         <div className="bg-sp-card border border-slate-800 rounded-3xl p-5 space-y-3">
-          <p className="text-xs uppercase tracking-wide text-sp-gold font-bold">Sacred Path teaching</p>
-          <h3 className="text-xl font-bold text-amber-50">Presence before performance</h3>
-          <p className="text-sm text-slate-300">Most couples rush toward the act. Tantra and Tao teach the opposite: slow down until presence becomes the whole point. When he breathes with her rhythm and she feels truly seen, the body opens on its own.</p>
-          <p className="text-sm text-slate-300">Tonight, practice one minute of eye contact before touch. No speaking. No agenda. Just witness each other.</p>
+          <p className="text-xs uppercase tracking-wide text-sp-gold font-bold">Teaser: semen retention</p>
+          <h3 className="text-xl font-bold text-amber-50">Use arousal as fuel, not pressure</h3>
+          <p className="text-sm text-slate-300">Semen retention in this app means better pacing, stronger breath control, and less rush to finish. The goal is not suppression, it is choice and stamina.</p>
+          <p className="text-sm text-slate-300">When pace is steadier, women usually feel safer, touch becomes more responsive, and couples naturally create more moments of lovemaking week to week.</p>
         </div>
 
         <div className="bg-sp-card border border-slate-800 rounded-3xl p-5 space-y-3">
-          <p className="text-xs uppercase tracking-wide text-sp-gold font-bold">Practice</p>
+          <p className="text-xs uppercase tracking-wide text-sp-gold font-bold">Micro-practice</p>
           <ol className="space-y-2 text-sm text-slate-100 list-decimal list-inside">
-            <li>Sit facing each other, knees touching.</li>
-            <li>Place one hand on your heart, one on your partner&apos;s.</li>
-            <li>Breathe together for 60 seconds.</li>
-            <li>Let the next moment arise, not be forced.</li>
+            <li>Breathe slowly for six rounds before escalation.</li>
+            <li>Pause at 70% arousal and reconnect through touch.</li>
+            <li>Resume only when both partners feel fully present.</li>
+            <li>Track how this changes quality and frequency this week.</li>
           </ol>
         </div>
 

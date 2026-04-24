@@ -12,17 +12,11 @@ export default function AppHome() {
   return (
     <main className="min-h-screen bg-sp-bg text-slate-100">
       <div className="home-shell">
-        <CoupleTopbar />
+        <CoupleTopbar showCoupleChip={false} />
 
         <section className="home-hero">
           <div className="home-left">
-            <h1 className="home-title">
-              Ancient wisdom
-              <br />
-              for modern
-              <br />
-              couples.
-            </h1>
+            <h1 className="home-title">Ancient wisdom for modern couples.</h1>
 
             <p className="home-subtitle">
               Men want to get closer every day and last longer. Women want soft,
@@ -87,7 +81,7 @@ export default function AppHome() {
                 className="home-btn home-btn-ghost"
                 onClick={() => navigate("/paywall")}
               >
-                See premium for both of you
+                Start subscription
               </button>
             </div>
           </div>

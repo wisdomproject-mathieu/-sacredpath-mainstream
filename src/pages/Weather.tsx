@@ -22,7 +22,6 @@ const weatherVisuals: Record<IntimacyWeather, { weatherIcon: string; sacredIcon:
 export default function Weather() {
   const { state, setState } = useSession();
   const navigate = useNavigate();
-  const logoSrc = `${import.meta.env.BASE_URL}sacred-path-mark.png`;
 
   const setWeather = (field: "youWeather" | "partnerWeather", value: IntimacyWeather) => {
     setState({ ...state, [field]: value });
@@ -32,18 +31,12 @@ export default function Weather() {
 
   return (
     <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
-      <div className="max-w-3xl mx-auto space-y-8">
+      <div className="max-w-3xl mx-auto space-y-5">
         <CoupleTopbar />
-        <div className="weather-hero">
-          <div className="weather-hero-glow" />
-          <div className="flex justify-center">
-            <img src={logoSrc} alt="Sacred Path" className="w-24 h-24 mb-2 weather-logo" />
-          </div>
-          <div className="text-center">
-            <p className="weather-kicker">Premium intimacy weather</p>
-            <h2 className="screen-title text-amber-100">Sense tonight&apos;s weather</h2>
-            <p className="screen-body">Feel your inner climate, sense your partner, and unlock a ritual path matched to both energies.</p>
-          </div>
+        <div className="weather-headline-strip">
+          <p className="weather-kicker">Intimacy weather</p>
+          <h2 className="screen-title text-amber-100">How are you both arriving tonight?</h2>
+          <p className="screen-body">Pick one state for you and one for your partner. We&apos;ll match a practical ritual for tonight.</p>
         </div>
 
         <div className="space-y-3 weather-section">
@@ -91,13 +84,13 @@ export default function Weather() {
         </div>
 
         <div className="weather-summary-card">
-          <p className="weather-kicker">Tonight&apos;s premium match preview</p>
+          <p className="weather-kicker">Tonight&apos;s match preview</p>
           <p className="weather-summary-line">
             You: <strong>{state.youWeather ? options.find((o) => o.id === state.youWeather)?.label : "Not selected"}</strong>
             {" · "}
             Partner: <strong>{state.partnerWeather ? options.find((o) => o.id === state.partnerWeather)?.label : "Not selected"}</strong>
           </p>
-          <p className="weather-summary-sub">Beautifully tuned, card-based guidance appears right after you continue.</p>
+          <p className="weather-summary-sub">Card-based guidance appears right after you continue.</p>
         </div>
 
         <button
