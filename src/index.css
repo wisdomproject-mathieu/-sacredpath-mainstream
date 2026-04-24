@@ -497,7 +497,7 @@ img { max-width: 100%; display: block; }
 .weather-door-card {
   position: relative;
   overflow: hidden;
-  min-height: 128px;
+  min-height: 152px;
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background:
@@ -523,11 +523,13 @@ img { max-width: 100%; display: block; }
 
 .weather-door-bg-icon {
   position: absolute;
-  right: 10px;
-  bottom: -8px;
-  font-size: 5.6rem;
+  right: -8px;
+  bottom: -18px;
+  font-size: 8.6rem;
   line-height: 1;
-  opacity: 0.16;
+  opacity: 0.34;
+  filter: saturate(1.1);
+  text-shadow: 0 0 24px rgba(241, 212, 154, 0.16);
   pointer-events: none;
 }
 
@@ -539,7 +541,8 @@ img { max-width: 100%; display: block; }
 .weather-door-label {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(1.65rem, 2.6vw, 2.15rem);
+  max-width: 11ch;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
   font-weight: 700;
   color: #fff8ef;
   text-shadow: 0 3px 18px rgba(0, 0, 0, 0.5);

@@ -4,11 +4,11 @@ import { useSession } from "../contexts/SessionContext";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
 
 const options: { id: IntimacyWeather; label: string; icon: string }[] = [
-  { id: "stormy", label: "Distant", icon: "⛈" },
-  { id: "cloudy", label: "Tired", icon: "☁" },
-  { id: "warm", label: "Warm", icon: "☀" },
-  { id: "electric", label: "Electric", icon: "⚡" },
-  { id: "radiant", label: "Open", icon: "🌕" },
+  { id: "stormy", label: "Need Gentle Repair", icon: "⛈" },
+  { id: "cloudy", label: "Hold Me Close", icon: "☁" },
+  { id: "warm", label: "Open To Love", icon: "☀" },
+  { id: "electric", label: "I Want You", icon: "⚡" },
+  { id: "radiant", label: "Ready For Us", icon: "🌕" },
 ];
 
 export default function Weather() {
