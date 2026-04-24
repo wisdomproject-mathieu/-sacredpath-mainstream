@@ -668,33 +668,33 @@ img { max-width: 100%; display: block; }
 }
 
 .weather-tone-stormy {
-  background:
-    radial-gradient(circle at 16% 16%, rgba(232, 152, 169, 0.16), transparent 36%),
-    linear-gradient(160deg, rgba(77, 48, 78, 0.9), rgba(24, 17, 33, 0.95));
+  --weather-card-tint-one: rgba(64, 106, 186, 0.46);
+  --weather-card-tint-two: rgba(21, 30, 60, 0.74);
+  --weather-card-glow: rgba(168, 208, 255, 0.26);
 }
 
 .weather-tone-cloudy {
-  background:
-    radial-gradient(circle at 78% 14%, rgba(182, 156, 211, 0.2), transparent 38%),
-    linear-gradient(165deg, rgba(60, 46, 78, 0.9), rgba(23, 17, 33, 0.95));
+  --weather-card-tint-one: rgba(137, 151, 176, 0.42);
+  --weather-card-tint-two: rgba(34, 39, 52, 0.72);
+  --weather-card-glow: rgba(210, 226, 244, 0.24);
 }
 
 .weather-tone-warm {
-  background:
-    radial-gradient(circle at 18% 20%, rgba(241, 212, 154, 0.24), transparent 40%),
-    linear-gradient(165deg, rgba(92, 57, 65, 0.92), rgba(29, 18, 28, 0.95));
+  --weather-card-tint-one: rgba(216, 128, 86, 0.42);
+  --weather-card-tint-two: rgba(96, 42, 36, 0.66);
+  --weather-card-glow: rgba(255, 198, 142, 0.3);
 }
 
 .weather-tone-electric {
-  background:
-    radial-gradient(circle at 76% 16%, rgba(223, 176, 255, 0.24), transparent 36%),
-    linear-gradient(165deg, rgba(72, 43, 90, 0.92), rgba(23, 16, 35, 0.95));
+  --weather-card-tint-one: rgba(122, 88, 220, 0.44);
+  --weather-card-tint-two: rgba(36, 24, 78, 0.72);
+  --weather-card-glow: rgba(200, 155, 255, 0.32);
 }
 
 .weather-tone-radiant {
-  background:
-    radial-gradient(circle at 16% 14%, rgba(241, 212, 154, 0.24), transparent 35%),
-    linear-gradient(165deg, rgba(73, 55, 96, 0.9), rgba(26, 18, 40, 0.95));
+  --weather-card-tint-one: rgba(236, 177, 85, 0.44);
+  --weather-card-tint-two: rgba(120, 70, 34, 0.64);
+  --weather-card-glow: rgba(255, 233, 176, 0.34);
 }
 
 .weather-summary-card {
@@ -855,6 +855,16 @@ img { max-width: 100%; display: block; }
   transform: var(--weather-orbit-transform);
   animation: weatherFloat 7s ease-in-out infinite;
   animation-delay: var(--weather-delay, 0s);
+  --weather-card-tint-one: rgba(88, 68, 118, 0.4);
+  --weather-card-tint-two: rgba(24, 17, 33, 0.7);
+  --weather-card-glow: rgba(241, 212, 154, 0.22);
+  background:
+    linear-gradient(165deg, var(--weather-card-tint-one), var(--weather-card-tint-two)),
+    radial-gradient(circle at 18% 10%, rgba(255, 255, 255, 0.14), transparent 38%),
+    url("/weather-mandala.jpg");
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: screen, soft-light, normal;
 }
 
 .weather-v2-card:hover {
@@ -879,20 +889,13 @@ img { max-width: 100%; display: block; }
   line-height: 1.05;
 }
 
-.weather-v2-card-icon {
-  position: absolute;
-  right: 6px;
-  bottom: -16px;
-  font-size: clamp(3.1rem, 4.6vw, 4.6rem);
-  opacity: 0.24;
-  text-shadow: 0 0 18px rgba(241, 212, 154, 0.26);
-}
-
 .weather-v2-card-glow {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(circle at 12% 6%, rgba(241, 212, 154, 0.1), transparent 44%);
+  background:
+    radial-gradient(circle at 12% 6%, var(--weather-card-glow), transparent 44%),
+    linear-gradient(180deg, rgba(5, 8, 16, 0.06), rgba(8, 10, 18, 0.14));
 }
 
 .weather-v2-card-sub {

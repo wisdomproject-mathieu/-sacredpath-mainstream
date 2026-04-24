@@ -4,12 +4,12 @@ import CoupleTopbar from "../components/CoupleTopbar";
 import { useSession } from "../contexts/SessionContext";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
 
-const options: { id: IntimacyWeather; title: string; subtitle: string; icon: string; toneClass: string }[] = [
-  { id: "stormy", title: "Stormy", subtitle: "Tense, hurt, or charged with something unspoken.", icon: "⛈", toneClass: "weather-tone-stormy" },
-  { id: "cloudy", title: "Foggy", subtitle: "Unclear, drifting, or frozen in the body.", icon: "☁", toneClass: "weather-tone-cloudy" },
-  { id: "warm", title: "Warm", subtitle: "Soft, tender, and wanting closeness.", icon: "☀", toneClass: "weather-tone-warm" },
-  { id: "electric", title: "Electric", subtitle: "Crackling, drawn, awake in the body.", icon: "⚡", toneClass: "weather-tone-electric" },
-  { id: "radiant", title: "Sunny", subtitle: "Clear, light, easy with my partner today.", icon: "🌕", toneClass: "weather-tone-radiant" },
+const options: { id: IntimacyWeather; title: string; subtitle: string; toneClass: string }[] = [
+  { id: "stormy", title: "Stormy", subtitle: "Tense, hurt, or charged with something unspoken.", toneClass: "weather-tone-stormy" },
+  { id: "cloudy", title: "Foggy", subtitle: "Unclear, drifting, or frozen in the body.", toneClass: "weather-tone-cloudy" },
+  { id: "warm", title: "Warm", subtitle: "Soft, tender, and wanting closeness.", toneClass: "weather-tone-warm" },
+  { id: "electric", title: "Electric", subtitle: "Crackling, drawn, awake in the body.", toneClass: "weather-tone-electric" },
+  { id: "radiant", title: "Sunny", subtitle: "Clear, light, easy with my partner today.", toneClass: "weather-tone-radiant" },
 ];
 
 const leftOrbits = [
@@ -128,7 +128,6 @@ export default function Weather() {
                   onClick={() => setWeather(leftSide.field, opt.id)}
                   className={`value-card weather-v2-card weather-v2-card-left ${opt.toneClass} ${leftOrbits[idx]} ${leftSide.selected === opt.id ? "weather-v2-card-active" : ""}`}
                 >
-                  <span className="weather-v2-card-icon">{opt.icon}</span>
                   <span className="weather-v2-card-glow" />
                   <h2>{opt.title}</h2>
                   <p className="weather-v2-card-sub">{opt.subtitle}</p>
@@ -181,7 +180,6 @@ export default function Weather() {
                   onClick={() => setWeather(rightSide.field, opt.id)}
                   className={`value-card weather-v2-card weather-v2-card-right ${opt.toneClass} ${rightOrbits[idx]} ${rightSide.selected === opt.id ? "weather-v2-card-active" : ""}`}
                 >
-                  <span className="weather-v2-card-icon">{opt.icon}</span>
                   <span className="weather-v2-card-glow" />
                   <h2>{opt.title}</h2>
                   <p className="weather-v2-card-sub">{opt.subtitle}</p>
