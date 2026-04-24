@@ -668,49 +668,49 @@ img { max-width: 100%; display: block; }
 }
 
 .weather-tone-stormy {
-  --weather-card-image: url("/weather-stormy.jpg");
+  --weather-card-image: url("/weather-stormy.png");
   --weather-card-tint-one: rgba(64, 106, 186, 0.46);
   --weather-card-tint-two: rgba(21, 30, 60, 0.74);
   --weather-card-glow: rgba(168, 208, 255, 0.26);
 }
 
 .weather-tone-cloudy {
-  --weather-card-image: url("/weather-foggy.jpg");
+  --weather-card-image: url("/weather-foggy.png");
   --weather-card-tint-one: rgba(137, 151, 176, 0.42);
   --weather-card-tint-two: rgba(34, 39, 52, 0.72);
   --weather-card-glow: rgba(210, 226, 244, 0.24);
 }
 
 .weather-tone-foggy {
-  --weather-card-image: url("/weather-foggy.jpg");
+  --weather-card-image: url("/weather-foggy.png");
   --weather-card-tint-one: rgba(137, 151, 176, 0.42);
   --weather-card-tint-two: rgba(34, 39, 52, 0.72);
   --weather-card-glow: rgba(210, 226, 244, 0.24);
 }
 
 .weather-tone-frozen {
-  --weather-card-image: url("/weather-frozen.jpg");
+  --weather-card-image: url("/weather-frozen.png");
   --weather-card-tint-one: rgba(170, 205, 255, 0.34);
   --weather-card-tint-two: rgba(74, 104, 142, 0.62);
   --weather-card-glow: rgba(223, 243, 255, 0.3);
 }
 
 .weather-tone-warm {
-  --weather-card-image: url("/weather-warm.jpg");
+  --weather-card-image: url("/weather-warm.png");
   --weather-card-tint-one: rgba(216, 128, 86, 0.42);
   --weather-card-tint-two: rgba(96, 42, 36, 0.66);
   --weather-card-glow: rgba(255, 198, 142, 0.3);
 }
 
 .weather-tone-electric {
-  --weather-card-image: url("/weather-electric.jpg");
+  --weather-card-image: url("/weather-electric-mandala.png");
   --weather-card-tint-one: rgba(122, 88, 220, 0.44);
   --weather-card-tint-two: rgba(36, 24, 78, 0.72);
   --weather-card-glow: rgba(200, 155, 255, 0.32);
 }
 
 .weather-tone-radiant {
-  --weather-card-image: url("/weather-sunny.jpg");
+  --weather-card-image: url("/weather-sunny.png");
   --weather-card-tint-one: rgba(236, 177, 85, 0.44);
   --weather-card-tint-two: rgba(120, 70, 34, 0.64);
   --weather-card-glow: rgba(255, 233, 176, 0.34);
