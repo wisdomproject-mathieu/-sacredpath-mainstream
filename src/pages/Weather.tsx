@@ -3,21 +3,13 @@ import CoupleTopbar from "../components/CoupleTopbar";
 import { useSession } from "../contexts/SessionContext";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
 
-const options: { id: IntimacyWeather; label: string; subtitle: string }[] = [
-  { id: "stormy", label: "Stormy", subtitle: "Tense, charged, something unsaid" },
-  { id: "cloudy", label: "Cloudy", subtitle: "Heavy, low energy, tender" },
-  { id: "warm", label: "Warm", subtitle: "Soft, open, affectionate" },
-  { id: "electric", label: "Electric", subtitle: "Playful, charged, erotic" },
-  { id: "radiant", label: "Radiant", subtitle: "Blessed, devotional, luminous" },
+const options: { id: IntimacyWeather; label: string; icon: string }[] = [
+  { id: "stormy", label: "Distant", icon: "⛈" },
+  { id: "cloudy", label: "Tired", icon: "☁" },
+  { id: "warm", label: "Warm", icon: "☀" },
+  { id: "electric", label: "Electric", icon: "⚡" },
+  { id: "radiant", label: "Open", icon: "🌕" },
 ];
-
-const weatherVisuals: Record<IntimacyWeather, { weatherIcon: string; sacredIcon: string; tone: string }> = {
-  stormy: { weatherIcon: "⛈", sacredIcon: "◈", tone: "Storm release" },
-  cloudy: { weatherIcon: "☁️", sacredIcon: "◍", tone: "Soft restoration" },
-  warm: { weatherIcon: "☀️", sacredIcon: "✿", tone: "Open-hearted" },
-  electric: { weatherIcon: "⚡", sacredIcon: "✦", tone: "Magnetic pulse" },
-  radiant: { weatherIcon: "🌕", sacredIcon: "◎", tone: "Devotional glow" },
-};
 
 export default function Weather() {
   const { state, setState } = useSession();
@@ -35,56 +27,48 @@ export default function Weather() {
         <CoupleTopbar />
         <div className="weather-headline-strip">
           <p className="weather-kicker">Intimacy weather</p>
-          <h2 className="screen-title text-amber-100">How are you both arriving tonight?</h2>
-          <p className="screen-body">Pick one state for you and one for your partner. We&apos;ll match a practical ritual for tonight.</p>
+          <h2 className="screen-title text-amber-100">Choose how you arrive tonight.</h2>
+          <p className="screen-body">One tap each. The app finds the ritual that fits the mood between you.</p>
         </div>
 
         <div className="space-y-3 weather-section">
-          <p className="text-xs uppercase tracking-wide text-amber-200/90">Your inner weather</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <p className="text-xs uppercase tracking-wide text-amber-200/90">You</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {options.map((opt) => (
               <button
                 key={opt.id}
                 onClick={() => setWeather("youWeather", opt.id)}
-                className={`weather-option-card ${state.youWeather === opt.id ? "weather-option-card-active" : ""}`}
+                className={`weather-door-card ${state.youWeather === opt.id ? "weather-door-card-active" : ""}`}
               >
-                <div className="weather-option-head">
-                  <span className="weather-symbol">{weatherVisuals[opt.id].weatherIcon}</span>
-                  <span className="weather-symbol weather-symbol-sacred">{weatherVisuals[opt.id].sacredIcon}</span>
-                  <span className="weather-premium-chip">🔒 Premium</span>
+                <span className="weather-door-bg-icon">{opt.icon}</span>
+                <div className="weather-door-content">
+                  <p className="weather-door-label">{opt.label}</p>
                 </div>
-                <p className="weather-option-title">{opt.label}</p>
-                <p className="weather-option-subtitle">{opt.subtitle}</p>
-                <p className="weather-option-tone">{weatherVisuals[opt.id].tone}</p>
               </button>
             ))}
           </div>
         </div>
 
         <div className="space-y-3 weather-section">
-          <p className="text-xs uppercase tracking-wide text-amber-200/90">Your partner&apos;s weather</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <p className="text-xs uppercase tracking-wide text-amber-200/90">Partner</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {options.map((opt) => (
               <button
                 key={opt.id}
                 onClick={() => setWeather("partnerWeather", opt.id)}
-                className={`weather-option-card ${state.partnerWeather === opt.id ? "weather-option-card-active" : ""}`}
+                className={`weather-door-card ${state.partnerWeather === opt.id ? "weather-door-card-active" : ""}`}
               >
-                <div className="weather-option-head">
-                  <span className="weather-symbol">{weatherVisuals[opt.id].weatherIcon}</span>
-                  <span className="weather-symbol weather-symbol-sacred">{weatherVisuals[opt.id].sacredIcon}</span>
-                  <span className="weather-premium-chip">🔒 Premium</span>
+                <span className="weather-door-bg-icon">{opt.icon}</span>
+                <div className="weather-door-content">
+                  <p className="weather-door-label">{opt.label}</p>
                 </div>
-                <p className="weather-option-title">{opt.label}</p>
-                <p className="weather-option-subtitle">{opt.subtitle}</p>
-                <p className="weather-option-tone">{weatherVisuals[opt.id].tone}</p>
               </button>
             ))}
           </div>
         </div>
 
         <div className="weather-summary-card">
-          <p className="weather-kicker">Tonight&apos;s match preview</p>
+          <p className="weather-kicker">Tonight&apos;s mood</p>
           <p className="weather-summary-line">
             You: <strong>{state.youWeather ? options.find((o) => o.id === state.youWeather)?.label : "Not selected"}</strong>
             {" · "}

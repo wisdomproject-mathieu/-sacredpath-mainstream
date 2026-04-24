@@ -27,6 +27,7 @@ export default function Ritual() {
   }
 
   const { homeCard, freeRitual, premiumRituals } = result;
+  const firstStep = freeRitual.ritualSteps[0];
   const originTraditions = freeRitual.sourceTraditions?.slice(0, 3) ?? [];
   const originAuthors = freeRitual.sourceAuthors?.slice(0, 3) ?? [];
   const originConcepts = freeRitual.sourceConcepts?.slice(0, 4) ?? [];
@@ -54,6 +55,13 @@ export default function Ritual() {
             ))}
           </ol>
         </div>
+
+        {firstStep ? (
+          <div className="bg-sp-card border border-sp-gold rounded-3xl p-5 space-y-2">
+            <p className="text-xs uppercase tracking-wide text-sp-gold font-bold">First action</p>
+            <p className="text-lg font-semibold text-amber-50">{firstStep}</p>
+          </div>
+        ) : null}
 
         <div className="ritual-origin-card">
           <p className="text-xs uppercase tracking-[0.22em] text-sp-gold font-bold">Origin of this ritual</p>
