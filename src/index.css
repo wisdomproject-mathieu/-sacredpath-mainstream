@@ -756,6 +756,9 @@ img { max-width: 100%; display: block; }
   border: 1px solid rgba(241, 212, 154, 0.16);
   padding: 18px 14px;
   min-height: 740px;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
 }
 
 .weather-v2-side-left {
@@ -770,8 +773,51 @@ img { max-width: 100%; display: block; }
     linear-gradient(180deg, rgba(34, 18, 36, 0.9), rgba(14, 11, 23, 0.95));
 }
 
+.weather-v2-side::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url("/shiva-shakti-icon.png");
+  background-size: 210%;
+  background-repeat: no-repeat;
+  opacity: 0.36;
+  filter: saturate(1.05) contrast(1.03) blur(0.4px);
+  pointer-events: none;
+}
+
+.weather-v2-side::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.weather-v2-side-left::before {
+  background-position: 24% center;
+}
+
+.weather-v2-side-right::before {
+  background-position: 76% center;
+}
+
+.weather-v2-side-left::after {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(108, 151, 255, 0.18), transparent 42%),
+    linear-gradient(180deg, rgba(8, 11, 22, 0.28), rgba(8, 10, 19, 0.46));
+}
+
+.weather-v2-side-right::after {
+  background:
+    radial-gradient(circle at 82% 18%, rgba(241, 145, 186, 0.2), transparent 44%),
+    linear-gradient(180deg, rgba(26, 8, 22, 0.2), rgba(19, 9, 18, 0.4));
+}
+
 .weather-v2-side-head {
   margin: 0 10px 8px;
+  position: relative;
+  z-index: 2;
 }
 
 .weather-v2-side-kicker {
@@ -794,6 +840,7 @@ img { max-width: 100%; display: block; }
 .weather-v2-orbit-field {
   position: relative;
   min-height: 650px;
+  z-index: 2;
 }
 
 .weather-v2-card {
