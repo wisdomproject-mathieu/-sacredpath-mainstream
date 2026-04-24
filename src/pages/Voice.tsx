@@ -1,6 +1,6 @@
 import { useLocation, Link } from "react-router-dom";
 
-export function Voice() {
+export default function Voice() {
   const location = useLocation();
   const title = (location.state as { title?: string } | null)?.title ?? "Sacred Voice";
 
@@ -23,7 +23,7 @@ export function Voice() {
           selected ritual.
         </p>
         <Link to="/ritual" className="text-xs text-slate-400 underline">
-          Back to tonight’s ritual
+          Back to tonight&apos;s ritual
         </Link>
       </div>
     </div>

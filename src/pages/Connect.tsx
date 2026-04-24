@@ -2,7 +2,7 @@ import { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSession } from "../contexts/SessionContext";
 
-export function Connect() {
+export default function Connect() {
   const { state, setState } = useSession();
   const navigate = useNavigate();
 

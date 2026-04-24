@@ -3,14 +3,12 @@ import { useNavigate, Link } from "react-router-dom";
 import { useSession } from "../contexts/SessionContext";
 import { resolveWeatherRitual } from "../lib/ritualRegistry";
 
-export function Ritual() {
+export default function Ritual() {
   const { state } = useSession();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!state.youWeather || !state.partnerWeather) {
-      navigate("/weather");
-    }
+    if (!state.youWeather || !state.partnerWeather) navigate("/weather");
   }, [state.youWeather, state.partnerWeather, navigate]);
 
   if (!state.youWeather || !state.partnerWeather) return null;
@@ -19,7 +17,7 @@ export function Ritual() {
   if (!result || !result.freeRitual) {
     return (
       <div className="min-h-screen bg-sp-bg text-slate-100 flex items-center justify-center">
-        <p>No ritual found for this weather. Try a different combination.</p>
+        <p>No ritual found. Try a different combination.</p>
       </div>
     );
   }
@@ -29,6 +27,7 @@ export function Ritual() {
   return (
     <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
       <div className="max-w-xl mx-auto space-y-6">
+<<<<<<< Updated upstream
         <div className="text-xs tracking-[0.25em] uppercase text-sp-gold">
           {homeCard.eyebrow}
         </div>
@@ -44,6 +43,20 @@ export function Ritual() {
             {freeRitual.duration} · {freeRitual.intimacyLevel} · {freeRitual.primaryNeed}
           </p>
           <p className="text-sm text-slate-200">{freeRitual.description}</p>
+=======
+        <div className="flex justify-center">
+          <img src="/sacred-path-mark.png" alt="Sacred Path" className="w-24 h-24 mb-2" />
+        </div>
+
+        <div className="text-xs tracking-[0.25em] uppercase text-sp-gold">{homeCard.eyebrow}</div>
+        <h2 className="screen-title text-amber-100">{homeCard.title}</h2>
+        <p className="screen-body">{homeCard.body}</p>
+
+        <div className="bg-sp-card border border-slate-800 rounded-3xl p-5 space-y-3">
+          <p className="text-xs uppercase tracking-wide text-sp-gold font-bold">Tonight&apos;s ritual</p>
+          <h3 className="text-xl font-bold text-amber-50">{freeRitual.title}</h3>
+          <p className="text-xs text-slate-400">{freeRitual.duration} · {freeRitual.intimacyLevel} · {freeRitual.primaryNeed}</p>
+>>>>>>> Stashed changes
           <ol className="mt-3 space-y-2 text-sm text-slate-100 list-decimal list-inside">
             {freeRitual.ritualSteps.map((step, i) => (
               <li key={i}>{step}</li>
@@ -51,8 +64,13 @@ export function Ritual() {
           </ol>
         </div>
 
+        <Link to="/deeper" className="block w-full py-3 rounded-full bg-sp-gold text-black font-bold text-center">
+          Go deeper tonight
+        </Link>
+
         {premiumRituals.length > 0 && (
           <div className="space-y-3">
+<<<<<<< Updated upstream
             <p className="text-sm text-slate-300">
               Premium opens more ritual paths aligned with tonight’s weather, plus Sacred
               Voice guidance.
@@ -70,6 +88,11 @@ export function Ritual() {
               className="inline-flex justify-center w-full py-3 rounded-full bg-sp-gold text-black font-medium"
             >
               Unlock more rituals & Sacred Voice
+=======
+            <p className="text-sm text-slate-300">Premium unlocks more paths for this weather.</p>
+            <Link to="/paywall" className="block w-full py-3 rounded-full border border-sp-gold text-sp-gold font-bold text-center">
+              Unlock more rituals
+>>>>>>> Stashed changes
             </Link>
           </div>
         )}
