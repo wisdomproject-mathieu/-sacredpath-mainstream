@@ -1,0 +1,277 @@
+{
+  "stormy|stormy": {
+    "archetype": "truth_before_touch",
+    "main": "the_unsaid_voice",
+    "alternates": ["yes_no_exercise", "parts_work_dialogue"],
+    "homeCard": {
+      "eyebrow": "Stormy + Stormy",
+      "title": "The Unsaid Voice",
+      "body": "Tonight wants speak what has been held back. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "stormy|cloudy": {
+    "archetype": "safety_and_boundaries",
+    "main": "yes_no_exercise",
+    "alternates": ["witnessing_breath", "soft_eye"],
+    "homeCard": {
+      "eyebrow": "Stormy + Cloudy",
+      "title": "The Yes / No Exercise",
+      "body": "Tonight wants rebuild consent and trust. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "stormy|warm": {
+    "archetype": "held_softening",
+    "main": "melting_hug",
+    "alternates": ["daily_homecoming_ritual", "appreciation_witness"],
+    "homeCard": {
+      "eyebrow": "Stormy + Warm",
+      "title": "The Melting Hug",
+      "body": "Tonight wants nervous system melt. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "stormy|electric": {
+    "archetype": "discharge_then_choose",
+    "main": "shakti_shaking",
+    "alternates": ["chaotic_breathing", "gibberish_release"],
+    "homeCard": {
+      "eyebrow": "Stormy + Electric",
+      "title": "Shakti Shaking — A Couples Practice",
+      "body": "Tonight wants shake out the day. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "stormy|radiant": {
+    "archetype": "come_home_first",
+    "main": "daily_homecoming_ritual",
+    "alternates": ["melting_hug", "appreciation_witness"],
+    "homeCard": {
+      "eyebrow": "Stormy + Radiant",
+      "title": "Daily Homecoming Ritual",
+      "body": "Tonight wants reunion at doorway. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "cloudy|stormy": {
+    "archetype": "witness_without_fixing",
+    "main": "witnessing_breath",
+    "alternates": ["the_unsaid_voice", "muraqabah"],
+    "homeCard": {
+      "eyebrow": "Cloudy + Stormy",
+      "title": "Witnessing Breath",
+      "body": "Tonight wants be seen without fixing. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "cloudy|cloudy": {
+    "archetype": "gentle_attunement",
+    "main": "synchronized_heart_breathing",
+    "alternates": ["soft_eye", "inner_smile_with_partner"],
+    "homeCard": {
+      "eyebrow": "Cloudy + Cloudy",
+      "title": "Synchronized Heart Breathing",
+      "body": "Tonight wants soft landing before touch. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "cloudy|warm": {
+    "archetype": "rhythm_restore",
+    "main": "spinal_rocking",
+    "alternates": ["synchronized_heart_breathing", "soft_eye"],
+    "homeCard": {
+      "eyebrow": "Cloudy + Warm",
+      "title": "Spinal Rocking — Back to Back",
+      "body": "Tonight wants shared rhythm reset. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "cloudy|electric": {
+    "archetype": "touch_as_bridge",
+    "main": "yoga_of_touch",
+    "alternates": ["soul_gazing", "space_between_breaths"],
+    "homeCard": {
+      "eyebrow": "Cloudy + Electric",
+      "title": "The Yoga of Touch",
+      "body": "Tonight wants listening touch. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "cloudy|radiant": {
+    "archetype": "sacred_arrival",
+    "main": "heart_salutation",
+    "alternates": ["soul_gazing", "one_heart_gazing"],
+    "homeCard": {
+      "eyebrow": "Cloudy + Radiant",
+      "title": "The Heart Salutation",
+      "body": "Tonight wants ritual opening. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "warm|stormy": {
+    "archetype": "appreciation_repair",
+    "main": "appreciation_witness",
+    "alternates": ["daily_homecoming_ritual", "melting_hug"],
+    "homeCard": {
+      "eyebrow": "Warm + Stormy",
+      "title": "Appreciation & Witness",
+      "body": "Tonight wants three appreciations. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "warm|cloudy": {
+    "archetype": "soft_peripheral_love",
+    "main": "soft_eye",
+    "alternates": ["synchronized_heart_breathing", "spinal_rocking"],
+    "homeCard": {
+      "eyebrow": "Warm + Cloudy",
+      "title": "The Soft Eye — A Love Key",
+      "body": "Tonight wants soften visual attention. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "warm|warm": {
+    "archetype": "slow_devotion",
+    "main": "slow_sex",
+    "alternates": ["karezza", "blissful_stillness_after_love"],
+    "homeCard": {
+      "eyebrow": "Warm + Warm",
+      "title": "Slow Sex — Diana Richardson's Core Practice",
+      "body": "Tonight wants cool, still, present union. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "warm|electric": {
+    "archetype": "breath_becomes_desire",
+    "main": "circular_breath_of_love",
+    "alternates": ["karezza", "riding_the_wave_of_bliss"],
+    "homeCard": {
+      "eyebrow": "Warm + Electric",
+      "title": "Circular Breath of Love",
+      "body": "Tonight wants shared energy loop. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "warm|radiant": {
+    "archetype": "sacred_union_open",
+    "main": "yab_yum_embrace",
+    "alternates": ["slow_sex", "conscious_lovemaking"],
+    "homeCard": {
+      "eyebrow": "Warm + Radiant",
+      "title": "Yab-Yum Embrace",
+      "body": "Tonight wants sacred union posture. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "electric|stormy": {
+    "archetype": "clear_the_static",
+    "main": "chaotic_breathing",
+    "alternates": ["gibberish_release", "shakti_shaking"],
+    "homeCard": {
+      "eyebrow": "Electric + Stormy",
+      "title": "Chaotic Breathing — Dynamic Stage One",
+      "body": "Tonight wants shake out charge before contact. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "electric|cloudy": {
+    "archetype": "pause_inside_charge",
+    "main": "space_between_breaths",
+    "alternates": ["yoga_of_touch", "soul_gazing"],
+    "homeCard": {
+      "eyebrow": "Electric + Cloudy",
+      "title": "The Space Between Breaths",
+      "body": "Tonight wants pause as portal. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "electric|warm": {
+    "archetype": "union_without_rush",
+    "main": "karezza",
+    "alternates": ["slow_sex", "valley_orgasm_resting"],
+    "homeCard": {
+      "eyebrow": "Electric + Warm",
+      "title": "Karezza — Union Without Discharge",
+      "body": "Tonight wants long union without climax-goal. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "electric|electric": {
+    "archetype": "dual_alchemy",
+    "main": "microcosmic_orbit_dual",
+    "alternates": ["chakra_breathing_for_two", "big_draw"],
+    "homeCard": {
+      "eyebrow": "Electric + Electric",
+      "title": "Microcosmic Orbit in Dual Cultivation",
+      "body": "Tonight wants shared orbit alchemy. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "electric|radiant": {
+    "archetype": "full_channel_activation",
+    "main": "chakra_breathing_for_two",
+    "alternates": ["riding_the_wave_of_bliss", "inner_flute"],
+    "homeCard": {
+      "eyebrow": "Electric + Radiant",
+      "title": "Chakra Breathing for Two",
+      "body": "Tonight wants 7-chakra shared breath arc. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "radiant|stormy": {
+    "archetype": "smile_into_the_weather",
+    "main": "inner_smile_with_partner",
+    "alternates": ["daily_homecoming_ritual", "melting_hug"],
+    "homeCard": {
+      "eyebrow": "Radiant + Stormy",
+      "title": "Inner Smile with Partner",
+      "body": "Tonight wants gentle organ-smile meditation. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "radiant|cloudy": {
+    "archetype": "elevated_seeing",
+    "main": "one_heart_gazing",
+    "alternates": ["soul_gazing", "muraqabah"],
+    "homeCard": {
+      "eyebrow": "Radiant + Cloudy",
+      "title": "Shakti & Shakta — One Heart Gazing",
+      "body": "Tonight wants elevated eye practice. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "radiant|warm": {
+    "archetype": "devotional_worship",
+    "main": "skydancing_tantric_massage",
+    "alternates": ["heart_salutation", "conscious_lovemaking"],
+    "homeCard": {
+      "eyebrow": "Radiant + Warm",
+      "title": "SkyDancing Tantric Massage",
+      "body": "Tonight wants full-body worship ritual. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "radiant|electric": {
+    "archetype": "three_fires",
+    "main": "three_fires",
+    "alternates": ["riding_the_wave_of_bliss", "fire_water_dual_cultivation"],
+    "homeCard": {
+      "eyebrow": "Radiant + Electric",
+      "title": "Three Fires / Tan Tien Activation",
+      "body": "Tonight wants activate lower belly, kidneys, heart. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  },
+  "radiant|radiant": {
+    "archetype": "wave_of_bliss",
+    "main": "riding_the_wave_of_bliss",
+    "alternates": ["conscious_lovemaking", "yab_yum_embrace"],
+    "homeCard": {
+      "eyebrow": "Radiant + Radiant",
+      "title": "Riding the Wave of Bliss",
+      "body": "Tonight wants ride and extend shared bliss. Let the mood guide the ritual instead of fighting it.",
+      "cta": "Enter Tonight Path"
+    }
+  }
+}

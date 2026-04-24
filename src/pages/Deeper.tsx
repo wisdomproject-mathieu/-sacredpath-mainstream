@@ -29,12 +29,12 @@ export default function Deeper() {
           </ol>
         </div>
 
-        <Link to="/paywall" className="block w-full py-3 rounded-full bg-sp-gold text-black font-bold text-center">
-          Unlock the full library
+        <Link to="/ritual" className="block w-full py-3 rounded-full bg-sp-gold text-black font-bold text-center">
+          Back to tonight&apos;s ritual
         </Link>
 
         <div className="text-center">
-          <Link to="/ritual" className="text-xs text-slate-400 underline">Back to tonight&apos;s ritual</Link>
+          <Link to="/paywall" className="text-xs text-slate-400 underline">Open subscription page</Link>
         </div>
       </div>
     </div>

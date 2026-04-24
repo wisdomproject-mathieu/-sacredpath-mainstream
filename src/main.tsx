@@ -13,7 +13,7 @@ import { SessionProvider } from "./contexts/SessionContext";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <SessionProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, "")}>
         <Routes>
           <Route path="/" element={<AppHome />} />
           <Route path="/weather" element={<Weather />} />
