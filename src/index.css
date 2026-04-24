@@ -681,6 +681,20 @@ img { max-width: 100%; display: block; }
   --weather-card-glow: rgba(210, 226, 244, 0.24);
 }
 
+.weather-tone-foggy {
+  --weather-card-image: url("/weather-foggy.jpg");
+  --weather-card-tint-one: rgba(137, 151, 176, 0.42);
+  --weather-card-tint-two: rgba(34, 39, 52, 0.72);
+  --weather-card-glow: rgba(210, 226, 244, 0.24);
+}
+
+.weather-tone-frozen {
+  --weather-card-image: url("/weather-frozen.jpg");
+  --weather-card-tint-one: rgba(170, 205, 255, 0.34);
+  --weather-card-tint-two: rgba(74, 104, 142, 0.62);
+  --weather-card-glow: rgba(223, 243, 255, 0.3);
+}
+
 .weather-tone-warm {
   --weather-card-image: url("/weather-warm.jpg");
   --weather-card-tint-one: rgba(216, 128, 86, 0.42);
@@ -783,10 +797,10 @@ img { max-width: 100%; display: block; }
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image: url("/shiva-shakti-icon.png");
-  background-size: 210%;
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.36;
+  opacity: 0.34;
   filter: saturate(1.05) contrast(1.03) blur(0.4px);
   pointer-events: none;
 }
@@ -800,11 +814,11 @@ img { max-width: 100%; display: block; }
 }
 
 .weather-v2-side-masculine::before {
-  background-position: 24% center;
+  background-image: url("/weather-shiva-side.png");
 }
 
 .weather-v2-side-feminine::before {
-  background-position: 76% center;
+  background-image: url("/weather-shakti-side.png");
 }
 
 .weather-v2-side-masculine::after {
@@ -843,7 +857,7 @@ img { max-width: 100%; display: block; }
 
 .weather-v2-orbit-field {
   position: relative;
-  min-height: 760px;
+  min-height: 910px;
   z-index: 2;
 }
 
@@ -965,13 +979,15 @@ img { max-width: 100%; display: block; }
 .weather-v2-orbit-l1 { top: 170px; left: 84px; --weather-orbit-transform: rotate(2deg); --weather-delay: 0.45s; }
 .weather-v2-orbit-l2 { top: 336px; left: 20px; --weather-orbit-transform: rotate(-2deg); --weather-delay: 0.9s; }
 .weather-v2-orbit-l3 { top: 514px; left: 86px; --weather-orbit-transform: rotate(3deg); --weather-delay: 1.3s; }
-.weather-v2-orbit-l4 { top: 686px; left: 24px; --weather-orbit-transform: rotate(-3deg); --weather-delay: 1.7s; }
+.weather-v2-orbit-l4 { top: 682px; left: 22px; --weather-orbit-transform: rotate(-3deg); --weather-delay: 1.7s; }
+.weather-v2-orbit-l5 { top: 814px; left: 90px; --weather-orbit-transform: rotate(2deg); --weather-delay: 2s; }
 
 .weather-v2-orbit-r0 { top: 22px; left: 76px; --weather-orbit-transform: rotate(4deg); --weather-delay: 0.2s; }
 .weather-v2-orbit-r1 { top: 174px; left: 18px; --weather-orbit-transform: rotate(-3deg); --weather-delay: 0.6s; }
 .weather-v2-orbit-r2 { top: 340px; left: 94px; --weather-orbit-transform: rotate(2deg); --weather-delay: 1s; }
 .weather-v2-orbit-r3 { top: 518px; left: 18px; --weather-orbit-transform: rotate(-4deg); --weather-delay: 1.35s; }
-.weather-v2-orbit-r4 { top: 690px; left: 82px; --weather-orbit-transform: rotate(3deg); --weather-delay: 1.8s; }
+.weather-v2-orbit-r4 { top: 686px; left: 80px; --weather-orbit-transform: rotate(3deg); --weather-delay: 1.8s; }
+.weather-v2-orbit-r5 { top: 816px; left: 14px; --weather-orbit-transform: rotate(-2deg); --weather-delay: 2.05s; }
 
 .ritual-headline-strip {
   border-radius: 24px;

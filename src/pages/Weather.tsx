@@ -4,12 +4,13 @@ import CoupleTopbar from "../components/CoupleTopbar";
 import { useSession } from "../contexts/SessionContext";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
 
-const options: { id: IntimacyWeather; title: string; subtitle: string; toneClass: string }[] = [
-  { id: "stormy", title: "Stormy", subtitle: "Tense, hurt, or charged with something unspoken.", toneClass: "weather-tone-stormy" },
-  { id: "cloudy", title: "Foggy", subtitle: "Unclear, drifting, or frozen in the body.", toneClass: "weather-tone-cloudy" },
-  { id: "warm", title: "Warm", subtitle: "Soft, tender, and wanting closeness.", toneClass: "weather-tone-warm" },
-  { id: "electric", title: "Electric", subtitle: "Crackling, drawn, awake in the body.", toneClass: "weather-tone-electric" },
-  { id: "radiant", title: "Sunny", subtitle: "Clear, light, easy with my partner today.", toneClass: "weather-tone-radiant" },
+const options: { key: string; id: IntimacyWeather; title: string; subtitle: string; toneClass: string; cloudyVariant?: "foggy" | "frozen" }[] = [
+  { key: "stormy", id: "stormy", title: "Stormy", subtitle: "Tense, hurt, or charged with something unspoken.", toneClass: "weather-tone-stormy" },
+  { key: "foggy", id: "cloudy", title: "Foggy", subtitle: "Unclear, drifting, not quite here.", toneClass: "weather-tone-foggy", cloudyVariant: "foggy" },
+  { key: "frozen", id: "cloudy", title: "Frozen", subtitle: "Numb, tired, shut down in the body.", toneClass: "weather-tone-frozen", cloudyVariant: "frozen" },
+  { key: "warm", id: "warm", title: "Warm", subtitle: "Soft, tender, and wanting closeness.", toneClass: "weather-tone-warm" },
+  { key: "electric", id: "electric", title: "Electric", subtitle: "Crackling, drawn, awake in the body.", toneClass: "weather-tone-electric" },
+  { key: "sunny", id: "radiant", title: "Sunny", subtitle: "Clear, light, easy with my partner today.", toneClass: "weather-tone-radiant" },
 ];
 
 const leftOrbits = [
@@ -18,6 +19,7 @@ const leftOrbits = [
   "weather-v2-orbit-l2",
   "weather-v2-orbit-l3",
   "weather-v2-orbit-l4",
+  "weather-v2-orbit-l5",
 ];
 
 const rightOrbits = [
@@ -26,6 +28,7 @@ const rightOrbits = [
   "weather-v2-orbit-r2",
   "weather-v2-orbit-r3",
   "weather-v2-orbit-r4",
+  "weather-v2-orbit-r5",
 ];
 
 const masculineNames = new Set([
@@ -63,6 +66,7 @@ export default function Weather() {
   const navigate = useNavigate();
   const logoSrc = `${import.meta.env.BASE_URL}sacred-path-mark.png`;
   const [manualSwap, setManualSwap] = useState(false);
+  const [cloudyVariantByField, setCloudyVariantByField] = useState<{ youWeather?: "foggy" | "frozen"; partnerWeather?: "foggy" | "frozen" }>({});
 
   const setWeather = (field: "youWeather" | "partnerWeather", value: IntimacyWeather) => {
     setState({ ...state, [field]: value });
@@ -80,6 +84,17 @@ export default function Weather() {
   useEffect(() => {
     setManualSwap(false);
   }, [state.youName, state.partnerName]);
+
+  const isOptionActive = (
+    selectedWeather: IntimacyWeather | undefined,
+    field: "youWeather" | "partnerWeather",
+    option: (typeof options)[number]
+  ) => {
+    if (selectedWeather !== option.id) return false;
+    if (option.id !== "cloudy") return true;
+    const variant = cloudyVariantByField[field] ?? "foggy";
+    return option.cloudyVariant === variant;
+  };
 
   const masculineOnLeft = manualSwap ? !inferredMasculineOnLeft : inferredMasculineOnLeft;
   const leftIsYou = masculineOnLeft ? youEnergy !== "feminine" : youEnergy === "feminine";
@@ -124,9 +139,14 @@ export default function Weather() {
             <div className="weather-v2-orbit-field">
               {options.map((opt, idx) => (
                 <button
-                  key={opt.id}
-                  onClick={() => setWeather(leftSide.field, opt.id)}
-                  className={`value-card weather-v2-card weather-v2-card-left ${opt.toneClass} ${leftOrbits[idx]} ${leftSide.selected === opt.id ? "weather-v2-card-active" : ""}`}
+                  key={`left-${opt.key}`}
+                  onClick={() => {
+                    setWeather(leftSide.field, opt.id);
+                    if (opt.id === "cloudy" && opt.cloudyVariant) {
+                      setCloudyVariantByField((prev) => ({ ...prev, [leftSide.field]: opt.cloudyVariant }));
+                    }
+                  }}
+                  className={`value-card weather-v2-card weather-v2-card-left ${opt.toneClass} ${leftOrbits[idx]} ${isOptionActive(leftSide.selected, leftSide.field, opt) ? "weather-v2-card-active" : ""}`}
                 >
                   <span className="weather-v2-card-glow" />
                   <h2>{opt.title}</h2>
@@ -176,9 +196,14 @@ export default function Weather() {
             <div className="weather-v2-orbit-field">
               {options.map((opt, idx) => (
                 <button
-                  key={opt.id}
-                  onClick={() => setWeather(rightSide.field, opt.id)}
-                  className={`value-card weather-v2-card weather-v2-card-right ${opt.toneClass} ${rightOrbits[idx]} ${rightSide.selected === opt.id ? "weather-v2-card-active" : ""}`}
+                  key={`right-${opt.key}`}
+                  onClick={() => {
+                    setWeather(rightSide.field, opt.id);
+                    if (opt.id === "cloudy" && opt.cloudyVariant) {
+                      setCloudyVariantByField((prev) => ({ ...prev, [rightSide.field]: opt.cloudyVariant }));
+                    }
+                  }}
+                  className={`value-card weather-v2-card weather-v2-card-right ${opt.toneClass} ${rightOrbits[idx]} ${isOptionActive(rightSide.selected, rightSide.field, opt) ? "weather-v2-card-active" : ""}`}
                 >
                   <span className="weather-v2-card-glow" />
                   <h2>{opt.title}</h2>
