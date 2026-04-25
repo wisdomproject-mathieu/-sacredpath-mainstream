@@ -863,9 +863,9 @@ img { max-width: 100%; display: block; }
 
 .weather-v2-card {
   position: absolute;
-  width: clamp(176px, 66%, 264px);
-  min-height: 150px;
-  padding: 16px 14px 16px;
+  width: clamp(124px, 42%, 174px);
+  min-height: 104px;
+  padding: 10px 10px 10px;
   cursor: pointer;
   text-align: left;
   border: 1px solid rgba(255, 255, 255, 0.13);
@@ -906,6 +906,8 @@ img { max-width: 100%; display: block; }
   max-width: 10ch;
   font-size: clamp(1.6rem, 2.6vw, 2.4rem);
   line-height: 1.05;
+  color: #fffdf6;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.62);
 }
 
 .weather-v2-card-glow {
@@ -914,7 +916,7 @@ img { max-width: 100%; display: block; }
   pointer-events: none;
   background:
     radial-gradient(circle at 12% 6%, var(--weather-card-glow), transparent 44%),
-    linear-gradient(180deg, rgba(5, 8, 16, 0.06), rgba(8, 10, 18, 0.14));
+    linear-gradient(180deg, rgba(4, 6, 12, 0.24), rgba(8, 10, 18, 0.42));
 }
 
 .weather-v2-card-sub {
@@ -923,7 +925,8 @@ img { max-width: 100%; display: block; }
   font-size: 0.9rem;
   line-height: 1.28;
   font-weight: 600;
-  color: rgba(248, 242, 255, 0.86);
+  color: rgba(255, 247, 236, 0.96);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.48);
 }
 
 .weather-v2-center {
