@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSession } from "../contexts/SessionContext";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
+import { getWeatherVisualKey } from "../lib/weatherAssets";
 
 const options: { key: string; id: IntimacyWeather; title: string; subtitle: string; toneClass: string; cloudyVariant?: "foggy" | "frozen" }[] = [
   { key: "stormy", id: "stormy", title: "Stormy", subtitle: "Tense, hurt, or charged with something unspoken.", toneClass: "weather-tone-stormy" },
@@ -49,8 +50,14 @@ export default function Weather() {
   const [manualSwap, setManualSwap] = useState(false);
   const [cloudyVariantByField, setCloudyVariantByField] = useState<{ youWeather?: "foggy" | "frozen"; partnerWeather?: "foggy" | "frozen" }>({});
 
-  const setWeather = (field: "youWeather" | "partnerWeather", value: IntimacyWeather) => {
-    setState({ ...state, [field]: value });
+  const setWeather = (
+    field: "youWeather" | "partnerWeather",
+    value: IntimacyWeather,
+    cloudyVariant?: "foggy" | "frozen"
+  ) => {
+    const toneField = field === "youWeather" ? "youWeatherTone" : "partnerWeatherTone";
+    const tone = getWeatherVisualKey(value, cloudyVariant);
+    setState({ ...state, [field]: value, [toneField]: tone });
   };
 
   const canContinue = state.youWeather && state.partnerWeather;
@@ -128,7 +135,7 @@ export default function Weather() {
                   <button
                     key={`left-top-${opt.key}`}
                     onClick={() => {
-                      setWeather(leftSide.field, opt.id);
+                      setWeather(leftSide.field, opt.id, opt.cloudyVariant);
                       if (opt.id === "cloudy" && opt.cloudyVariant) {
                         setCloudyVariantByField((prev) => ({ ...prev, [leftSide.field]: opt.cloudyVariant }));
                       }
@@ -147,7 +154,7 @@ export default function Weather() {
                   <button
                     key={`left-bottom-${opt.key}`}
                     onClick={() => {
-                      setWeather(leftSide.field, opt.id);
+                      setWeather(leftSide.field, opt.id, opt.cloudyVariant);
                       if (opt.id === "cloudy" && opt.cloudyVariant) {
                         setCloudyVariantByField((prev) => ({ ...prev, [leftSide.field]: opt.cloudyVariant }));
                       }
@@ -206,7 +213,7 @@ export default function Weather() {
                   <button
                     key={`right-top-${opt.key}`}
                     onClick={() => {
-                      setWeather(rightSide.field, opt.id);
+                      setWeather(rightSide.field, opt.id, opt.cloudyVariant);
                       if (opt.id === "cloudy" && opt.cloudyVariant) {
                         setCloudyVariantByField((prev) => ({ ...prev, [rightSide.field]: opt.cloudyVariant }));
                       }
@@ -225,7 +232,7 @@ export default function Weather() {
                   <button
                     key={`right-bottom-${opt.key}`}
                     onClick={() => {
-                      setWeather(rightSide.field, opt.id);
+                      setWeather(rightSide.field, opt.id, opt.cloudyVariant);
                       if (opt.id === "cloudy" && opt.cloudyVariant) {
                         setCloudyVariantByField((prev) => ({ ...prev, [rightSide.field]: opt.cloudyVariant }));
                       }

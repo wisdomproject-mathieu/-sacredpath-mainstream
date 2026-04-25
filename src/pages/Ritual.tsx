@@ -2,31 +2,27 @@ import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSession } from "../contexts/SessionContext";
 import { resolveWeatherRitual } from "../lib/ritualRegistry";
+import {
+  WEATHER_TONE_LABELS,
+  WEATHER_TONE_COPY,
+  getWeatherImageUrlByTone,
+  type WeatherVisualKey,
+} from "../lib/weatherAssets";
 
 const PREVIEW_PREMIUM_UNLOCKED = false;
-
-const weatherLabels: Record<string, { title: string; subtitle: string }> = {
-  stormy: { title: "Stormy", subtitle: "Tense, charged, or carrying something unspoken." },
-  cloudy: { title: "Cloudy", subtitle: "Unclear, drifting, and not quite settled." },
-  warm: { title: "Warm", subtitle: "Soft, tender, and wanting closeness." },
-  electric: { title: "Electric", subtitle: "Crackling, awake, and drawn to one another." },
-  radiant: { title: "Sunny", subtitle: "Clear, light, and easy with each other today." },
-};
-
-function weatherTag(weather: string | undefined) {
-  if (!weather) return "Unknown";
-  return weatherLabels[weather]?.title ?? weather;
-}
-
-function weatherCopy(weather: string | undefined) {
-  if (!weather) return "Not yet set.";
-  return weatherLabels[weather]?.subtitle ?? "A shared weather state.";
-}
 
 function shortTag(name: string | undefined, fallback: string) {
   const value = name?.trim();
   if (!value) return fallback;
   return value.split(/\s+/)[0].slice(0, 3).toUpperCase();
+}
+
+function fallbackTone(weather: string | undefined): WeatherVisualKey {
+  if (weather === "stormy") return "stormy";
+  if (weather === "cloudy") return "foggy";
+  if (weather === "warm") return "warm";
+  if (weather === "electric") return "electric";
+  return "sunny";
 }
 
 export default function Ritual() {
@@ -58,6 +54,10 @@ export default function Ritual() {
   const previewRitual = premiumRituals[0];
   const youTag = shortTag(state.youName, "MAT");
   const partnerTag = shortTag(state.partnerName, "ED");
+  const youTone = state.youWeatherTone ?? fallbackTone(state.youWeather);
+  const partnerTone = state.partnerWeatherTone ?? fallbackTone(state.partnerWeather);
+  const youTitle = WEATHER_TONE_LABELS[youTone];
+  const partnerTitle = WEATHER_TONE_LABELS[partnerTone];
 
   return (
     <main className="min-h-screen bg-sp-bg text-slate-100 ritual-v2-page">
@@ -73,17 +73,18 @@ export default function Ritual() {
           <aside className="ritual-v2-side ritual-v2-side-left">
             <div className="ritual-v2-side-chip">{youTag}</div>
             <div className="ritual-v2-image-card ritual-v2-image-card-left">
-              <img src={`${import.meta.env.BASE_URL}weather-shiva-side.png`} alt="Shiva" />
+              <img src={getWeatherImageUrlByTone("shiva", youTone)} alt={`${youTitle} Shiva`} />
+              <div className="ritual-v2-image-caption">{`${youTitle} Shiva`}</div>
             </div>
             <div className="ritual-v2-state-card">
-              <h2>My Current State ({youTag})</h2>
-              <p>{weatherCopy(state.youWeather)}</p>
+              <h2>{`${youTitle} Shiva`} ({youTag})</h2>
+              <p>{WEATHER_TONE_COPY[youTone]}</p>
             </div>
             <div className="ritual-v2-side-footer">
               <span className="ritual-v2-footer-icon" aria-hidden="true">🧘</span>
               <div>
                 <p>Active</p>
-                <span>{weatherTag(state.youWeather)}</span>
+                <span>{youTitle}</span>
               </div>
               <span className="ritual-v2-footer-ready" aria-hidden="true">☉</span>
             </div>
@@ -171,17 +172,18 @@ export default function Ritual() {
           <aside className="ritual-v2-side ritual-v2-side-right">
             <div className="ritual-v2-side-chip">{partnerTag}</div>
             <div className="ritual-v2-image-card ritual-v2-image-card-right">
-              <img src={`${import.meta.env.BASE_URL}weather-shakti-side.png`} alt="Shakti" />
+              <img src={getWeatherImageUrlByTone("shakti", partnerTone)} alt={`${partnerTitle} Shakti`} />
+              <div className="ritual-v2-image-caption">{`${partnerTitle} Shakti`}</div>
             </div>
             <div className="ritual-v2-state-card">
-              <h2>My Current State ({partnerTag})</h2>
-              <p>{weatherCopy(state.partnerWeather)}</p>
+              <h2>{`${partnerTitle} Shakti`} ({partnerTag})</h2>
+              <p>{WEATHER_TONE_COPY[partnerTone]}</p>
             </div>
             <div className="ritual-v2-side-footer">
               <span className="ritual-v2-footer-icon" aria-hidden="true">🧘</span>
               <div>
                 <p>Active</p>
-                <span>{weatherTag(state.partnerWeather)}</span>
+                <span>{partnerTitle}</span>
               </div>
               <span className="ritual-v2-footer-ready" aria-hidden="true">☉</span>
             </div>

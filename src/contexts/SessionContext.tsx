@@ -1,11 +1,14 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
+import type { WeatherVisualKey } from "../lib/weatherAssets";
 
 interface SessionState {
   youName: string;
   partnerName: string;
   youWeather?: IntimacyWeather;
   partnerWeather?: IntimacyWeather;
+  youWeatherTone?: WeatherVisualKey;
+  partnerWeatherTone?: WeatherVisualKey;
 }
 
 const SessionContext = createContext<{
