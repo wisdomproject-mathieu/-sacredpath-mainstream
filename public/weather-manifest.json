@@ -1,0 +1,86 @@
+{
+  "shiva-stormy": {
+    "id": "shiva-stormy",
+    "archetype": "shiva",
+    "weather": "stormy",
+    "label": "Stormy for Shiva",
+    "file": "/assets/weather/shiva-stormy.png"
+  },
+  "shiva-foggy": {
+    "id": "shiva-foggy",
+    "archetype": "shiva",
+    "weather": "foggy",
+    "label": "Foggy for Shiva",
+    "file": "/assets/weather/shiva-foggy.png"
+  },
+  "shiva-frozen": {
+    "id": "shiva-frozen",
+    "archetype": "shiva",
+    "weather": "frozen",
+    "label": "Frozen for Shiva",
+    "file": "/assets/weather/shiva-frozen.png"
+  },
+  "shiva-warm": {
+    "id": "shiva-warm",
+    "archetype": "shiva",
+    "weather": "warm",
+    "label": "Warm for Shiva",
+    "file": "/assets/weather/shiva-warm.png"
+  },
+  "shiva-electric": {
+    "id": "shiva-electric",
+    "archetype": "shiva",
+    "weather": "electric",
+    "label": "Electric for Shiva",
+    "file": "/assets/weather/shiva-electric.png"
+  },
+  "shiva-sunny": {
+    "id": "shiva-sunny",
+    "archetype": "shiva",
+    "weather": "sunny",
+    "label": "Sunny for Shiva",
+    "file": "/assets/weather/shiva-sunny.png"
+  },
+  "shakti-stormy": {
+    "id": "shakti-stormy",
+    "archetype": "shakti",
+    "weather": "stormy",
+    "label": "Stormy for Shakti",
+    "file": "/assets/weather/shakti-stormy.png"
+  },
+  "shakti-foggy": {
+    "id": "shakti-foggy",
+    "archetype": "shakti",
+    "weather": "foggy",
+    "label": "Foggy for Shakti",
+    "file": "/assets/weather/shakti-foggy.png"
+  },
+  "shakti-frozen": {
+    "id": "shakti-frozen",
+    "archetype": "shakti",
+    "weather": "frozen",
+    "label": "Frozen for Shakti",
+    "file": "/assets/weather/shakti-frozen.png"
+  },
+  "shakti-warm": {
+    "id": "shakti-warm",
+    "archetype": "shakti",
+    "weather": "warm",
+    "label": "Warm for Shakti",
+    "file": "/assets/weather/shakti-warm.png"
+  },
+  "shakti-electric": {
+    "id": "shakti-electric",
+    "archetype": "shakti",
+    "weather": "electric",
+    "label": "Electric for Shakti",
+    "file": "/assets/weather/shakti-electric.png"
+  },
+  "shakti-sunny": {
+    "id": "shakti-sunny",
+    "archetype": "shakti",
+    "weather": "sunny",
+    "label": "Sunny for Shakti",
+    "file": "/assets/weather/shakti-sunny.png"
+  }
+}
