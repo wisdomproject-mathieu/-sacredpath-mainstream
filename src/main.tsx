@@ -10,6 +10,11 @@ import Deeper from "./pages/Deeper";
 import Paywall from "./pages/Paywall";
 import { SessionProvider } from "./contexts/SessionContext";
 
+const redirectParam = new URLSearchParams(window.location.search).get("p");
+if (redirectParam) {
+  window.history.replaceState(null, "", redirectParam);
+}
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <SessionProvider>
