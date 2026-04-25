@@ -9,8 +9,6 @@ import {
   type WeatherVisualKey,
 } from "../lib/weatherAssets";
 
-const PREVIEW_PREMIUM_UNLOCKED = false;
-
 function shortTag(name: string | undefined, fallback: string) {
   const value = name?.trim();
   if (!value) return fallback;
@@ -45,19 +43,17 @@ export default function Ritual() {
     );
   }
 
-  const { freeRitual, premiumRituals } = result;
-  const firstStep = freeRitual.ritualSteps[0];
-  const secondStep = freeRitual.ritualSteps[1];
+  const { freeRitual } = result;
   const originTraditions = freeRitual.sourceTraditions?.slice(0, 3) ?? [];
   const originAuthors = freeRitual.sourceAuthors?.slice(0, 3) ?? [];
   const originConcepts = freeRitual.sourceConcepts?.slice(0, 4) ?? [];
-  const previewRitual = premiumRituals[0];
   const youTag = shortTag(state.youName, "MAT");
   const partnerTag = shortTag(state.partnerName, "ED");
   const youTone = state.youWeatherTone ?? fallbackTone(state.youWeather);
   const partnerTone = state.partnerWeatherTone ?? fallbackTone(state.partnerWeather);
   const youTitle = WEATHER_TONE_LABELS[youTone];
   const partnerTitle = WEATHER_TONE_LABELS[partnerTone];
+  const ritualSteps = freeRitual.ritualSteps.slice(0, 3);
 
   return (
     <main className="min-h-screen bg-sp-bg text-slate-100 ritual-v2-page">
@@ -100,48 +96,44 @@ export default function Ritual() {
             </button>
 
             <div className="ritual-v2-practice-card ritual-v2-practice-card-hero">
-              <p className="ritual-v2-practice-kicker">Explore Tantric Practices</p>
+              <p className="ritual-v2-practice-kicker">Yoga of Touch</p>
               <div className="ritual-v2-practice-image">
                 <img src={logoSrc} alt="Sacred Path" />
               </div>
-              <h3>{freeRitual.title}</h3>
+              <h3>Yoga of Touch</h3>
               <p className="ritual-v2-practice-copy">{freeRitual.description}</p>
               <button className="ritual-v2-practice-btn" onClick={() => navigate("/deeper")}>
                 Begin Embrace
               </button>
             </div>
 
-            <div className="ritual-v2-practice-card">
-              <div className="ritual-v2-mini-visual ritual-v2-mini-eyes" />
-              <h3>The Divine Embrace</h3>
-              <p className="ritual-v2-practice-copy">
-                A shared stillness honoring polarity, contact, and emotional safety.
-              </p>
+            <div className="ritual-v2-step-card">
+              <div className="ritual-v2-step-card-head">
+                <p className="ritual-v2-practice-kicker">Straight steps</p>
+                <h3>Yoga of Touch process</h3>
+              </div>
+              <div className="ritual-v2-step-list">
+                {ritualSteps.length > 0 ? ritualSteps.map((step, index) => (
+                  <div key={step} className="ritual-v2-step-item">
+                    <span className="ritual-v2-step-index">{String(index + 1).padStart(2, "0")}</span>
+                    <p>{step}</p>
+                  </div>
+                )) : (
+                  <div className="ritual-v2-step-item">
+                    <span className="ritual-v2-step-index">01</span>
+                    <p>Begin with presence and let the body slow down together.</p>
+                  </div>
+                )}
+              </div>
               <button className="ritual-v2-practice-btn" onClick={() => navigate("/ritual")}>
-                {firstStep || "Begin ritual"}
-              </button>
-            </div>
-
-            <div className="ritual-v2-practice-card">
-              <div className="ritual-v2-mini-visual ritual-v2-mini-breath" />
-              <h3>Synchronized Breath</h3>
-              <p className="ritual-v2-practice-copy">
-                {previewRitual?.description || secondStep || "Harmonize your breath to fuse energy fields."}
-              </p>
-              <button
-                className="ritual-v2-practice-btn"
-                onClick={() => navigate(PREVIEW_PREMIUM_UNLOCKED ? "/deeper" : "/paywall")}
-              >
-                {PREVIEW_PREMIUM_UNLOCKED ? "Continue" : "View premium path"}
+                Begin ritual
               </button>
             </div>
 
             <div className="ritual-v2-origin-card">
               <p className="ritual-v2-origin-kicker">Origin of this ritual</p>
               <h3>Where this practice comes from</h3>
-              <p>
-                This ritual is adapted for modern couples from traditional intimacy teachings, focused on emotional safety and embodied connection.
-              </p>
+              <p>This ritual is adapted for modern couples from traditional intimacy teachings, focused on emotional safety and embodied connection.</p>
               {originTraditions.length > 0 ? (
                 <p>
                   <strong>Traditions:</strong> {originTraditions.join(", ")}
