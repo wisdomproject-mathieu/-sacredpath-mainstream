@@ -113,6 +113,12 @@ export default function Weather() {
   const rightBottomFloats = ["weather-v2-float-c", "weather-v2-float-b", "weather-v2-float-a"];
   const leftFigureClass = masculineOnLeft ? "weather-v2-side-figure-left" : "weather-v2-side-figure-right";
   const rightFigureClass = masculineOnLeft ? "weather-v2-side-figure-right" : "weather-v2-side-figure-left";
+  const leftFigureStyle = {
+    backgroundImage: `url(${import.meta.env.BASE_URL}weather-shiva-side.png)`,
+  };
+  const rightFigureStyle = {
+    backgroundImage: `url(${import.meta.env.BASE_URL}weather-shakti-side.png)`,
+  };
 
   return (
     <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
@@ -148,7 +154,7 @@ export default function Weather() {
                   </button>
                 ))}
               </div>
-              <div className={`weather-v2-side-figure ${leftFigureClass}`} />
+              <div className={`weather-v2-side-figure ${leftFigureClass}`} style={leftFigureStyle} />
               <div className="weather-v2-card-row">
                 {leftBottom.map((opt, idx) => (
                   <button
@@ -226,7 +232,7 @@ export default function Weather() {
                   </button>
                 ))}
               </div>
-              <div className={`weather-v2-side-figure ${rightFigureClass}`} />
+              <div className={`weather-v2-side-figure ${rightFigureClass}`} style={rightFigureStyle} />
               <div className="weather-v2-card-row">
                 {rightBottom.map((opt, idx) => (
                   <button

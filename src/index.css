@@ -933,11 +933,9 @@ img { max-width: 100%; display: block; }
 }
 
 .weather-v2-side-figure-left {
-  background-image: url("/weather-shiva-side.png");
 }
 
 .weather-v2-side-figure-right {
-  background-image: url("/weather-shakti-side.png");
 }
 
 .weather-v2-card {

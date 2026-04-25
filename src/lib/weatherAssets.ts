@@ -3,22 +3,26 @@ import type { IntimacyWeather } from "./ritualRegistry";
 export type WeatherVisualKey = "stormy" | "foggy" | "frozen" | "warm" | "electric" | "sunny";
 export type WeatherRole = "shiva" | "shakti";
 
+function assetPath(file: string) {
+  return `${import.meta.env.BASE_URL}assets/weather/${file}`;
+}
+
 export const WEATHER_IMAGE_MAP: Record<WeatherRole, Record<WeatherVisualKey, string>> = {
   shiva: {
-    stormy: "/assets/weather/shiva-stormy.png",
-    foggy: "/assets/weather/shiva-foggy.png",
-    frozen: "/assets/weather/shiva-frozen.png",
-    warm: "/assets/weather/shiva-warm.png",
-    electric: "/assets/weather/shiva-electric.png",
-    sunny: "/assets/weather/shiva-sunny.png",
+    stormy: assetPath("shiva-stormy.png"),
+    foggy: assetPath("shiva-foggy.png"),
+    frozen: assetPath("shiva-frozen.png"),
+    warm: assetPath("shiva-warm.png"),
+    electric: assetPath("shiva-electric.png"),
+    sunny: assetPath("shiva-sunny.png"),
   },
   shakti: {
-    stormy: "/assets/weather/shakti-stormy.png",
-    foggy: "/assets/weather/shakti-foggy.png",
-    frozen: "/assets/weather/shakti-frozen.png",
-    warm: "/assets/weather/shakti-warm.png",
-    electric: "/assets/weather/shakti-electric.png",
-    sunny: "/assets/weather/shakti-sunny.png",
+    stormy: assetPath("shakti-stormy.png"),
+    foggy: assetPath("shakti-foggy.png"),
+    frozen: assetPath("shakti-frozen.png"),
+    warm: assetPath("shakti-warm.png"),
+    electric: assetPath("shakti-electric.png"),
+    sunny: assetPath("shakti-sunny.png"),
   },
 };
 
