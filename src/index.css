@@ -805,11 +805,11 @@ img { max-width: 100%; display: block; }
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-size: 130% auto;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.64;
-  filter: saturate(1.16) contrast(1.12) brightness(1.06);
+  opacity: 0.34;
+  filter: saturate(1.05) contrast(1.03) blur(0.4px);
   pointer-events: none;
 }
 
@@ -831,14 +831,14 @@ img { max-width: 100%; display: block; }
 
 .weather-v2-side-masculine::after {
   background:
-    radial-gradient(circle at 20% 20%, rgba(108, 151, 255, 0.14), transparent 44%),
-    linear-gradient(180deg, rgba(8, 11, 22, 0.08), rgba(8, 10, 19, 0.16));
+    radial-gradient(circle at 20% 20%, rgba(108, 151, 255, 0.18), transparent 42%),
+    linear-gradient(180deg, rgba(8, 11, 22, 0.28), rgba(8, 10, 19, 0.46));
 }
 
 .weather-v2-side-feminine::after {
   background:
-    radial-gradient(circle at 82% 18%, rgba(241, 145, 186, 0.14), transparent 46%),
-    linear-gradient(180deg, rgba(26, 8, 22, 0.06), rgba(19, 9, 18, 0.14));
+    radial-gradient(circle at 82% 18%, rgba(241, 145, 186, 0.2), transparent 44%),
+    linear-gradient(180deg, rgba(26, 8, 22, 0.2), rgba(19, 9, 18, 0.4));
 }
 
 .weather-v2-side-head {
@@ -952,10 +952,6 @@ img { max-width: 100%; display: block; }
 
 .weather-v2-center-panel {
   background: rgba(16, 12, 24, 0.68);
-}
-
-.weather-v2-center-panel .panel-text {
-  color: #000000;
 }
 
 .weather-v2-center-card .home-visual-icon-area {
