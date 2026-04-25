@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSession } from "../contexts/SessionContext";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
-import { getWeatherVisualKey } from "../lib/weatherAssets";
+import { getWeatherImageUrlByTone, getWeatherVisualKey, type WeatherVisualKey } from "../lib/weatherAssets";
 
 const options: { key: string; id: IntimacyWeather; title: string; subtitle: string; toneClass: string; cloudyVariant?: "foggy" | "frozen" }[] = [
   { key: "stormy", id: "stormy", title: "Stormy", subtitle: "Tense, hurt, or charged with something unspoken.", toneClass: "weather-tone-stormy" },
@@ -103,6 +103,17 @@ export default function Weather() {
     sideClass: masculineOnLeft ? "weather-v2-side-feminine" : "weather-v2-side-masculine",
   };
 
+  const getSideTone = (field: "youWeather" | "partnerWeather", selected: IntimacyWeather | undefined): WeatherVisualKey | undefined => {
+    if (!selected) return undefined;
+    if (field === "youWeather") return state.youWeatherTone ?? getWeatherVisualKey(selected, cloudyVariantByField.youWeather);
+    return state.partnerWeatherTone ?? getWeatherVisualKey(selected, cloudyVariantByField.partnerWeather);
+  };
+
+  const leftTone = getSideTone(leftSide.field, leftSide.selected);
+  const rightTone = getSideTone(rightSide.field, rightSide.selected);
+  const leftFigureSrc = leftTone ? getWeatherImageUrlByTone("shiva", leftTone) : undefined;
+  const rightFigureSrc = rightTone ? getWeatherImageUrlByTone("shakti", rightTone) : undefined;
+
   const leftTop = options.slice(0, 3);
   const leftBottom = options.slice(3);
   const rightTop = options.slice(0, 3);
@@ -113,12 +124,6 @@ export default function Weather() {
   const rightBottomFloats = ["weather-v2-float-c", "weather-v2-float-b", "weather-v2-float-a"];
   const leftFigureClass = masculineOnLeft ? "weather-v2-side-figure-left" : "weather-v2-side-figure-right";
   const rightFigureClass = masculineOnLeft ? "weather-v2-side-figure-right" : "weather-v2-side-figure-left";
-  const leftFigureStyle = {
-    backgroundImage: `url(${import.meta.env.BASE_URL}weather-shiva-side.png)`,
-  };
-  const rightFigureStyle = {
-    backgroundImage: `url(${import.meta.env.BASE_URL}weather-shakti-side.png)`,
-  };
 
   return (
     <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
@@ -154,7 +159,10 @@ export default function Weather() {
                   </button>
                 ))}
               </div>
-              <div className={`weather-v2-side-figure ${leftFigureClass}`} style={leftFigureStyle} />
+              <div className={`weather-v2-side-figure ${leftFigureClass} ${leftFigureSrc ? "weather-v2-side-figure-has-image" : ""}`}>
+                <div className="weather-v2-side-figure-question">?</div>
+                {leftFigureSrc ? <img className="weather-v2-side-figure-image" src={leftFigureSrc} alt={`${leftTone ?? "weather"} Shiva`} /> : null}
+              </div>
               <div className="weather-v2-card-row">
                 {leftBottom.map((opt, idx) => (
                   <button
@@ -232,7 +240,10 @@ export default function Weather() {
                   </button>
                 ))}
               </div>
-              <div className={`weather-v2-side-figure ${rightFigureClass}`} style={rightFigureStyle} />
+              <div className={`weather-v2-side-figure ${rightFigureClass} ${rightFigureSrc ? "weather-v2-side-figure-has-image" : ""}`}>
+                <div className="weather-v2-side-figure-question">?</div>
+                {rightFigureSrc ? <img className="weather-v2-side-figure-image" src={rightFigureSrc} alt={`${rightTone ?? "weather"} Shakti`} /> : null}
+              </div>
               <div className="weather-v2-card-row">
                 {rightBottom.map((opt, idx) => (
                   <button
