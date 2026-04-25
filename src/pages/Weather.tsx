@@ -103,10 +103,6 @@ export default function Weather() {
   const leftBottom = options.slice(3);
   const rightTop = options.slice(0, 3);
   const rightBottom = options.slice(3);
-  const leftTopFloatClasses = ["weather-v2-float-a", "weather-v2-float-b", "weather-v2-float-c"];
-  const leftBottomFloatClasses = ["weather-v2-float-d", "weather-v2-float-e", "weather-v2-float-f"];
-  const rightTopFloatClasses = ["weather-v2-float-f", "weather-v2-float-e", "weather-v2-float-d"];
-  const rightBottomFloatClasses = ["weather-v2-float-c", "weather-v2-float-b", "weather-v2-float-a"];
 
   return (
     <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
@@ -114,6 +110,7 @@ export default function Weather() {
         <CoupleTopbar showCoupleChip={false} />
 
         <header className="weather-v2-header">
+          <p className="weather-kicker">Sacred Path for Couples</p>
           <h1 className="weather-v2-title">Intimacy Weather</h1>
           <p className="weather-v2-subtitle">
             Choose calmly. Sense honestly. Ask gently. Let your partner choose with respect.
@@ -136,7 +133,7 @@ export default function Weather() {
                         setCloudyVariantByField((prev) => ({ ...prev, [leftSide.field]: opt.cloudyVariant }));
                       }
                     }}
-                    className={`value-card weather-v2-card weather-v2-card-left ${leftTopFloatClasses[idx]} ${opt.toneClass} ${isOptionActive(leftSide.selected, leftSide.field, opt) ? "weather-v2-card-active" : ""}`}
+                    className={`value-card weather-v2-card weather-v2-card-left ${opt.toneClass} ${isOptionActive(leftSide.selected, leftSide.field, opt) ? "weather-v2-card-active" : ""}`}
                   >
                     <span className="weather-v2-card-glow" />
                     <h2>{opt.title}</h2>
@@ -155,7 +152,7 @@ export default function Weather() {
                         setCloudyVariantByField((prev) => ({ ...prev, [leftSide.field]: opt.cloudyVariant }));
                       }
                     }}
-                    className={`value-card weather-v2-card weather-v2-card-left ${leftBottomFloatClasses[idx]} ${opt.toneClass} ${isOptionActive(leftSide.selected, leftSide.field, opt) ? "weather-v2-card-active" : ""}`}
+                    className={`value-card weather-v2-card weather-v2-card-left ${opt.toneClass} ${isOptionActive(leftSide.selected, leftSide.field, opt) ? "weather-v2-card-active" : ""}`}
                   >
                     <span className="weather-v2-card-glow" />
                     <h2>{opt.title}</h2>
@@ -213,7 +210,7 @@ export default function Weather() {
                         setCloudyVariantByField((prev) => ({ ...prev, [rightSide.field]: opt.cloudyVariant }));
                       }
                     }}
-                    className={`value-card weather-v2-card weather-v2-card-right ${rightTopFloatClasses[idx]} ${opt.toneClass} ${isOptionActive(rightSide.selected, rightSide.field, opt) ? "weather-v2-card-active" : ""}`}
+                    className={`value-card weather-v2-card weather-v2-card-right ${opt.toneClass} ${isOptionActive(rightSide.selected, rightSide.field, opt) ? "weather-v2-card-active" : ""}`}
                   >
                     <span className="weather-v2-card-glow" />
                     <h2>{opt.title}</h2>
@@ -232,7 +229,7 @@ export default function Weather() {
                         setCloudyVariantByField((prev) => ({ ...prev, [rightSide.field]: opt.cloudyVariant }));
                       }
                     }}
-                    className={`value-card weather-v2-card weather-v2-card-right ${rightBottomFloatClasses[idx]} ${opt.toneClass} ${isOptionActive(rightSide.selected, rightSide.field, opt) ? "weather-v2-card-active" : ""}`}
+                    className={`value-card weather-v2-card weather-v2-card-right ${opt.toneClass} ${isOptionActive(rightSide.selected, rightSide.field, opt) ? "weather-v2-card-active" : ""}`}
                   >
                     <span className="weather-v2-card-glow" />
                     <h2>{opt.title}</h2>
