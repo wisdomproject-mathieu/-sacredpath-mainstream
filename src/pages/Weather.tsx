@@ -175,7 +175,7 @@ export default function Weather() {
                 <img src={logoSrc} alt="Sacred Path" className="home-shiny-icon" />
               </div>
               <div className="home-couple-panel weather-v2-center-panel">
-                <p className="panel-kicker">Two energies. One path.</p>
+                <p className="panel-kicker weather-center-kicker">Two hearts. One path.</p>
                 <p className="panel-text">
                   Pause. Feel. Choose your truth, then welcome your partner&apos;s weather with respect.
                 </p>
