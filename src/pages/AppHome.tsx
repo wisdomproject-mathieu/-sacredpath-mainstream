@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import CoupleTopbar from "../components/CoupleTopbar";
 import { useSession } from "../contexts/SessionContext";
 
 export default function AppHome() {
@@ -12,8 +11,6 @@ export default function AppHome() {
   return (
     <main className="min-h-screen bg-sp-bg text-slate-100">
       <div className="home-shell">
-        <CoupleTopbar showCoupleChip={true} />
-
         <section className="home-hero">
           <div className="home-left">
             <h1 className="home-title">
@@ -102,17 +99,19 @@ export default function AppHome() {
                 Sense both weather
               </button>
               <button
-                className="home-btn home-btn-ghost home-btn-trial"
+                className="home-btn home-btn-ghost"
                 onClick={() => navigate("/paywall")}
               >
-                <span>Start subscription</span>
-                <small>Free 7-Day Trial</small>
+                Send a code
               </button>
             </div>
           </div>
 
           <aside className="home-visual-wrap">
             <div className="home-visual-card">
+              <div className="home-visual-caption">
+                <p className="home-visual-caption-kicker">Sacred Path for Couples</p>
+              </div>
               <div className="home-visual-glow" />
               <div className="home-visual-beam" />
               <div className="home-visual-icon-area">

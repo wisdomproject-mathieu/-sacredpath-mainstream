@@ -371,6 +371,26 @@ img { max-width: 100%; display: block; }
   border: 1px solid rgba(255, 255, 255, 0.09);
 }
 
+.home-visual-caption {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  right: 18px;
+  z-index: 3;
+  text-align: center;
+  pointer-events: none;
+}
+
+.home-visual-caption-kicker {
+  margin: 0;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+
 .home-visual-glow {
   position: absolute;
   inset: 10% 16% auto;
@@ -476,9 +496,10 @@ img { max-width: 100%; display: block; }
 .panel-text {
   margin: 0;
   max-width: 28rem;
-  font-size: 1.05rem;
+  font-size: 1.18rem;
   line-height: 1.5;
   font-weight: 700;
+  text-align: center;
   color: rgba(246, 240, 255, 0.94);
 }
 
@@ -1062,6 +1083,9 @@ img { max-width: 100%; display: block; }
 .weather-v2-center {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 34px;
 }
 
 .weather-v2-center-card {
@@ -1123,6 +1147,12 @@ img { max-width: 100%; display: block; }
   line-height: 1.5;
   font-weight: 700;
   color: rgba(246, 240, 255, 0.92);
+}
+
+@media (max-width: 1180px) {
+  .weather-v2-center {
+    padding-top: 18px;
+  }
 }
 
 .weather-v2-swap-btn {
