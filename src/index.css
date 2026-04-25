@@ -196,59 +196,6 @@ img { max-width: 100%; display: block; }
   color: #fff8ef;
 }
 
-.home-connection-panel {
-  margin: 0 0 24px;
-  padding: 18px 18px 20px;
-  border-radius: 24px;
-  border: 1px solid rgba(241, 212, 154, 0.18);
-  background:
-    radial-gradient(circle at 12% 0%, rgba(241, 212, 154, 0.1), transparent 42%),
-    linear-gradient(170deg, rgba(36, 27, 46, 0.9), rgba(18, 14, 24, 0.94));
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.24);
-}
-
-.home-connection-kicker {
-  margin: 0 0 12px;
-  font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--gold);
-}
-
-.home-connection-code {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin-bottom: 14px;
-  flex-wrap: wrap;
-}
-
-.home-connection-code span {
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(241, 212, 154, 0.9);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(241, 212, 154, 0.12);
-  font-size: 0.9rem;
-  line-height: 1;
-}
-
-.home-connection-btn {
-  width: 100%;
-  min-height: 52px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #f5d9a8 0%, #dcb068 100%);
-  color: #21140c;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  box-shadow: 0 18px 36px rgba(216, 172, 104, 0.28);
-}
-
 .home-subtitle {
   margin: 0 0 24px;
   max-width: 48rem;
@@ -373,7 +320,7 @@ img { max-width: 100%; display: block; }
 
 .home-visual-caption {
   position: absolute;
-  top: 18px;
+  top: 16px;
   left: 18px;
   right: 18px;
   z-index: 3;
@@ -383,7 +330,7 @@ img { max-width: 100%; display: block; }
 
 .home-visual-caption-kicker {
   margin: 0;
-  font-size: 0.76rem;
+  font-size: 0.92rem;
   font-weight: 800;
   letter-spacing: 0.28em;
   text-transform: uppercase;
@@ -496,7 +443,7 @@ img { max-width: 100%; display: block; }
 .panel-text {
   margin: 0;
   max-width: 28rem;
-  font-size: 1.18rem;
+  font-size: 1.28rem;
   line-height: 1.5;
   font-weight: 700;
   text-align: center;
@@ -1085,7 +1032,7 @@ img { max-width: 100%; display: block; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-top: 34px;
+  padding-top: 48px;
 }
 
 .weather-v2-center-card {

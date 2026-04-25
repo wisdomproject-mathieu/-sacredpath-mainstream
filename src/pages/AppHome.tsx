@@ -7,6 +7,12 @@ export default function AppHome() {
   const logoSrc = `${import.meta.env.BASE_URL}shiva-shakti-icon.png`;
   const yourName = state.youName;
   const partnerName = state.partnerName;
+  const sendCodeToWhatsApp = () => {
+    const message = encodeURIComponent(
+      `Sacred Path for Couples: ${yourName || "I"} and ${partnerName || "my partner"} are ready for our shared intimacy weather.`
+    );
+    window.open(`https://wa.me/?text=${message}`, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <main className="min-h-screen bg-sp-bg text-slate-100">
@@ -42,21 +48,6 @@ export default function AppHome() {
                   onChange={(e) => setState({ ...state, partnerName: e.target.value })}
                 />
               </label>
-            </div>
-
-            <div className="home-connection-panel">
-              <p className="home-connection-kicker">Partner Connection Panel</p>
-              <div className="home-connection-code" aria-hidden="true">
-                <span>✦</span>
-                <span>✦</span>
-                <span>✦</span>
-                <span>✦</span>
-                <span>✦</span>
-                <span>✦</span>
-              </div>
-              <button className="home-connection-btn" onClick={() => navigate("/weather")}>
-                Send code to your partner
-              </button>
             </div>
 
             <div className="home-value-grid">
@@ -100,9 +91,9 @@ export default function AppHome() {
               </button>
               <button
                 className="home-btn home-btn-ghost"
-                onClick={() => navigate("/paywall")}
+                onClick={sendCodeToWhatsApp}
               >
-                Send a code
+                Send code on WhatsApp
               </button>
             </div>
           </div>
