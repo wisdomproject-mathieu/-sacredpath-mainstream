@@ -174,12 +174,6 @@ export default function Weather() {
               <div className="home-visual-icon-area">
                 <img src={logoSrc} alt="Sacred Path" className="home-shiny-icon" />
               </div>
-              <div className="home-couple-panel weather-v2-center-panel">
-                <p className="panel-kicker weather-center-kicker">Two energies. One path.</p>
-                <p className="panel-text">
-                  Pause. Feel. Choose your truth, then welcome your partner&apos;s weather with respect.
-                </p>
-              </div>
             </div>
 
             <button
@@ -197,6 +191,13 @@ export default function Weather() {
             >
               Show Rituals
             </button>
+
+            <div className="weather-v2-summary-card">
+              <p className="panel-kicker weather-center-kicker">Two energies. One path.</p>
+              <p className="weather-v2-summary-text">
+                Pause. Feel. Choose your truth, then welcome your partner&apos;s weather with respect.
+              </p>
+            </div>
           </div>
 
           <div className={`weather-v2-side ${rightSide.sideClass}`}>
