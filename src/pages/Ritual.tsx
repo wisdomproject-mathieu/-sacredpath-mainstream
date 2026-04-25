@@ -1,15 +1,38 @@
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import CoupleTopbar from "../components/CoupleTopbar";
 import { useSession } from "../contexts/SessionContext";
 import { resolveWeatherRitual } from "../lib/ritualRegistry";
 
 const PREVIEW_PREMIUM_UNLOCKED = false;
 
+const weatherLabels: Record<string, { title: string; subtitle: string }> = {
+  stormy: { title: "Stormy", subtitle: "Tense, charged, or carrying something unspoken." },
+  cloudy: { title: "Cloudy", subtitle: "Unclear, drifting, and not quite settled." },
+  warm: { title: "Warm", subtitle: "Soft, tender, and wanting closeness." },
+  electric: { title: "Electric", subtitle: "Crackling, awake, and drawn to one another." },
+  radiant: { title: "Sunny", subtitle: "Clear, light, and easy with each other today." },
+};
+
+function weatherTag(weather: string | undefined) {
+  if (!weather) return "Unknown";
+  return weatherLabels[weather]?.title ?? weather;
+}
+
+function weatherCopy(weather: string | undefined) {
+  if (!weather) return "Not yet set.";
+  return weatherLabels[weather]?.subtitle ?? "A shared weather state.";
+}
+
+function shortTag(name: string | undefined, fallback: string) {
+  const value = name?.trim();
+  if (!value) return fallback;
+  return value.split(/\s+/)[0].slice(0, 3).toUpperCase();
+}
+
 export default function Ritual() {
   const { state } = useSession();
   const navigate = useNavigate();
-  const logoSrc = `${import.meta.env.BASE_URL}sacred-path-mark.png`;
+  const logoSrc = `${import.meta.env.BASE_URL}shiva-shakti-icon.png`;
 
   useEffect(() => {
     if (!state.youWeather || !state.partnerWeather) navigate("/weather");
@@ -20,107 +43,151 @@ export default function Ritual() {
   const result = resolveWeatherRitual(state.youWeather, state.partnerWeather);
   if (!result || !result.freeRitual) {
     return (
-      <div className="min-h-screen bg-sp-bg text-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-sp-bg text-slate-100 flex items-center justify-center px-6">
         <p>No ritual found. Try a different combination.</p>
       </div>
     );
   }
 
-  const { homeCard, freeRitual, premiumRituals } = result;
+  const { freeRitual, premiumRituals } = result;
   const firstStep = freeRitual.ritualSteps[0];
+  const secondStep = freeRitual.ritualSteps[1];
   const originTraditions = freeRitual.sourceTraditions?.slice(0, 3) ?? [];
   const originAuthors = freeRitual.sourceAuthors?.slice(0, 3) ?? [];
   const originConcepts = freeRitual.sourceConcepts?.slice(0, 4) ?? [];
+  const previewRitual = premiumRituals[0];
+  const youTag = shortTag(state.youName, "MAT");
+  const partnerTag = shortTag(state.partnerName, "ED");
 
   return (
-    <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
-      <div className="max-w-xl mx-auto space-y-6">
-        <CoupleTopbar />
-        <div className="flex justify-center">
-          <img src={logoSrc} alt="Sacred Path" className="w-24 h-24 mb-2" />
-        </div>
-
-        <div className="ritual-headline-strip">
-          <div className="text-xs tracking-[0.25em] uppercase text-sp-gold">{homeCard.eyebrow}</div>
-          <h2 className="screen-title text-amber-100">{homeCard.title}</h2>
-          <p className="screen-body">{homeCard.body}</p>
-        </div>
-
-        <div className="ritual-main-card space-y-3">
-          <p className="text-xs uppercase tracking-wide text-sp-gold font-bold">Tonight&apos;s ritual</p>
-          <h3 className="text-xl font-bold text-amber-50">{freeRitual.title}</h3>
-          <p className="text-xs text-slate-400">{freeRitual.duration} · {freeRitual.intimacyLevel} · {freeRitual.primaryNeed}</p>
-          <p className="text-sm text-slate-200">{freeRitual.description}</p>
-          <ol className="mt-3 space-y-2 text-sm text-slate-100 list-decimal list-inside">
-            {freeRitual.ritualSteps.map((step, i) => (
-              <li key={i}>{step}</li>
-            ))}
-          </ol>
-        </div>
-
-        {firstStep ? (
-          <div className="ritual-first-action-card space-y-2">
-            <p className="text-xs uppercase tracking-wide text-sp-gold font-bold">First action</p>
-            <p className="text-lg font-semibold text-amber-50">{firstStep}</p>
-          </div>
-        ) : null}
-
-        <div className="ritual-origin-card">
-          <p className="text-xs uppercase tracking-[0.22em] text-sp-gold font-bold">Origin of this ritual</p>
-          <h3 className="mt-2 text-2xl font-bold text-amber-50">Where this practice comes from</h3>
-          <p className="mt-2 text-sm text-slate-200">
-            This ritual is adapted for modern couples from traditional intimacy teachings, focused on emotional safety and embodied connection.
+    <main className="min-h-screen bg-sp-bg text-slate-100 ritual-v2-page">
+      <div className="ritual-v2-shell">
+        <header className="ritual-v2-header">
+          <h1 className="ritual-v2-title">Sacred Rituals for Coupled Presence</h1>
+          <p className="ritual-v2-subtitle">
+            Explore practices to cultivate deeper connection, flow, and energetic awareness.
           </p>
-          {originTraditions.length > 0 ? (
-            <p className="mt-3 text-sm text-slate-200">
-              <strong className="text-amber-100">Traditions:</strong> {originTraditions.join(", ")}
-            </p>
-          ) : null}
-          {originAuthors.length > 0 ? (
-            <p className="mt-2 text-sm text-slate-200">
-              <strong className="text-amber-100">Teachers:</strong> {originAuthors.join(", ")}
-            </p>
-          ) : null}
-          {originConcepts.length > 0 ? (
-            <p className="mt-2 text-sm text-slate-200">
-              <strong className="text-amber-100">Core ideas:</strong> {originConcepts.join(", ")}
-            </p>
-          ) : null}
-        </div>
+        </header>
 
-        <Link to="/deeper" className="block w-full py-3 rounded-full bg-sp-gold text-black font-bold text-center">
-          Go deeper tonight
-        </Link>
+        <section className="ritual-v2-grid">
+          <aside className="ritual-v2-side ritual-v2-side-left">
+            <div className="ritual-v2-side-chip">{youTag}</div>
+            <div className="ritual-v2-image-card ritual-v2-image-card-left">
+              <img src={`${import.meta.env.BASE_URL}weather-shiva-side.png`} alt="Shiva" />
+            </div>
+            <div className="ritual-v2-state-card">
+              <h2>My Current State ({youTag})</h2>
+              <p>{weatherCopy(state.youWeather)}</p>
+            </div>
+            <div className="ritual-v2-side-footer">
+              <span className="ritual-v2-footer-icon" aria-hidden="true">🧘</span>
+              <div>
+                <p>Active</p>
+                <span>{weatherTag(state.youWeather)}</span>
+              </div>
+              <span className="ritual-v2-footer-ready" aria-hidden="true">☉</span>
+            </div>
+          </aside>
 
-        <Link to="/paywall" className="block w-full py-3 rounded-full border border-sp-gold text-sp-gold font-bold text-center">
-          See premium for both of you
-        </Link>
+          <section className="ritual-v2-center">
+            <button
+              type="button"
+              onClick={() => navigate("/weather")}
+              className="ritual-v2-swap-pill"
+            >
+              Swap Shiva ↔ Shakti
+            </button>
 
-        {premiumRituals.length > 0 && (
-          <div className="ritual-premium-card space-y-3">
-            <p className="text-xs uppercase tracking-wide text-sp-gold font-bold">
-              {PREVIEW_PREMIUM_UNLOCKED ? "Premium unlocked for preview" : "Premium paths"}
-            </p>
-            <ul className="space-y-2 text-sm text-slate-200">
-              {premiumRituals.slice(0, 3).map((r) => (
-                <li key={r.id} className="flex items-center justify-between">
-                  <span>{r.title}</span>
-                  <span className="text-xs text-slate-500">{r.duration}</span>
-                </li>
-              ))}
-            </ul>
-            {PREVIEW_PREMIUM_UNLOCKED ? (
-              <Link to="/deeper" className="block w-full py-3 rounded-full border border-sp-gold text-sp-gold font-bold text-center">
-                Continue with full access
+            <div className="ritual-v2-practice-card ritual-v2-practice-card-hero">
+              <p className="ritual-v2-practice-kicker">Explore Tantric Practices</p>
+              <div className="ritual-v2-practice-image">
+                <img src={logoSrc} alt="Sacred Path" />
+              </div>
+              <h3>{freeRitual.title}</h3>
+              <p className="ritual-v2-practice-copy">{freeRitual.description}</p>
+              <button className="ritual-v2-practice-btn" onClick={() => navigate("/deeper")}>
+                Begin Embrace
+              </button>
+            </div>
+
+            <div className="ritual-v2-practice-card">
+              <div className="ritual-v2-mini-visual ritual-v2-mini-eyes" />
+              <h3>The Divine Embrace</h3>
+              <p className="ritual-v2-practice-copy">
+                A shared stillness honoring polarity, contact, and emotional safety.
+              </p>
+              <button className="ritual-v2-practice-btn" onClick={() => navigate("/ritual")}>
+                {firstStep || "Begin ritual"}
+              </button>
+            </div>
+
+            <div className="ritual-v2-practice-card">
+              <div className="ritual-v2-mini-visual ritual-v2-mini-breath" />
+              <h3>Synchronized Breath</h3>
+              <p className="ritual-v2-practice-copy">
+                {previewRitual?.description || secondStep || "Harmonize your breath to fuse energy fields."}
+              </p>
+              <button
+                className="ritual-v2-practice-btn"
+                onClick={() => navigate(PREVIEW_PREMIUM_UNLOCKED ? "/deeper" : "/paywall")}
+              >
+                {PREVIEW_PREMIUM_UNLOCKED ? "Continue" : "View premium path"}
+              </button>
+            </div>
+
+            <div className="ritual-v2-origin-card">
+              <p className="ritual-v2-origin-kicker">Origin of this ritual</p>
+              <h3>Where this practice comes from</h3>
+              <p>
+                This ritual is adapted for modern couples from traditional intimacy teachings, focused on emotional safety and embodied connection.
+              </p>
+              {originTraditions.length > 0 ? (
+                <p>
+                  <strong>Traditions:</strong> {originTraditions.join(", ")}
+                </p>
+              ) : null}
+              {originAuthors.length > 0 ? (
+                <p>
+                  <strong>Teachers:</strong> {originAuthors.join(", ")}
+                </p>
+              ) : null}
+              {originConcepts.length > 0 ? (
+                <p>
+                  <strong>Core ideas:</strong> {originConcepts.join(", ")}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="ritual-v2-actions">
+              <Link to="/deeper" className="ritual-v2-action-primary">
+                Go deeper tonight
               </Link>
-            ) : (
-              <Link to="/paywall" className="block w-full py-3 rounded-full border border-sp-gold text-sp-gold font-bold text-center">
-                Start subscription
+              <Link to="/paywall" className="ritual-v2-action-secondary">
+                See premium for both of you
               </Link>
-            )}
-          </div>
-        )}
+            </div>
+          </section>
+
+          <aside className="ritual-v2-side ritual-v2-side-right">
+            <div className="ritual-v2-side-chip">{partnerTag}</div>
+            <div className="ritual-v2-image-card ritual-v2-image-card-right">
+              <img src={`${import.meta.env.BASE_URL}weather-shakti-side.png`} alt="Shakti" />
+            </div>
+            <div className="ritual-v2-state-card">
+              <h2>My Current State ({partnerTag})</h2>
+              <p>{weatherCopy(state.partnerWeather)}</p>
+            </div>
+            <div className="ritual-v2-side-footer">
+              <span className="ritual-v2-footer-icon" aria-hidden="true">🧘</span>
+              <div>
+                <p>Active</p>
+                <span>{weatherTag(state.partnerWeather)}</span>
+              </div>
+              <span className="ritual-v2-footer-ready" aria-hidden="true">☉</span>
+            </div>
+          </aside>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
