@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CoupleTopbar from "../components/CoupleTopbar";
 import { useSession } from "../contexts/SessionContext";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
 
@@ -84,7 +83,6 @@ export default function Weather() {
   const rightField: "youWeather" | "partnerWeather" = leftIsYou ? "partnerWeather" : "youWeather";
 
   const leftSide = {
-    role: "Your weather",
     field: leftField,
     selected: leftField === "youWeather" ? state.youWeather : state.partnerWeather,
     name: leftField === "youWeather" ? state.youName || "You" : state.partnerName || "Partner",
@@ -92,7 +90,6 @@ export default function Weather() {
   };
 
   const rightSide = {
-    role: "Partner's weather",
     field: rightField,
     selected: rightField === "youWeather" ? state.youWeather : state.partnerWeather,
     name: rightField === "youWeather" ? state.youName || "You" : state.partnerName || "Partner",
@@ -113,8 +110,6 @@ export default function Weather() {
   return (
     <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
       <div className="max-w-[1320px] mx-auto space-y-7">
-        <CoupleTopbar />
-
         <header className="weather-v2-header">
           <h1 className="weather-v2-title">Your shared intimacy weather</h1>
           <p className="weather-v2-subtitle">
@@ -125,7 +120,6 @@ export default function Weather() {
         <section className="weather-v2-polarity">
           <div className={`weather-v2-side ${leftSide.sideClass}`}>
             <div className="weather-v2-side-head">
-              <p className="weather-v2-side-kicker">{leftSide.role}</p>
               <p className="weather-v2-side-name">{leftSide.name}</p>
             </div>
             <div className="weather-v2-side-stack">
@@ -204,7 +198,6 @@ export default function Weather() {
 
           <div className={`weather-v2-side ${rightSide.sideClass}`}>
             <div className="weather-v2-side-head">
-              <p className="weather-v2-side-kicker">{rightSide.role}</p>
               <p className="weather-v2-side-name">{rightSide.name}</p>
             </div>
             <div className="weather-v2-side-stack">
