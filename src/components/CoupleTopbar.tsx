@@ -19,7 +19,7 @@ export default function CoupleTopbar({ showCoupleChip = true }: CoupleTopbarProp
             <img src={logoSrc} alt="" />
           </span>
           <span>
-            {yourName} <span className="dot">•</span> {partnerName}
+            {yourName} <span className="dot">&amp;</span> {partnerName}
           </span>
         </div>
       ) : null}

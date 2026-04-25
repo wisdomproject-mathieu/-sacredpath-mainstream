@@ -46,7 +46,7 @@ function guessEnergy(name: string): Energy {
 export default function Weather() {
   const { state, setState } = useSession();
   const navigate = useNavigate();
-  const logoSrc = `${import.meta.env.BASE_URL}sacred-path-mark.png`;
+  const logoSrc = `${import.meta.env.BASE_URL}shiva-shakti-icon.png`;
   const [manualSwap, setManualSwap] = useState(false);
   const [cloudyVariantByField, setCloudyVariantByField] = useState<{ youWeather?: "foggy" | "frozen"; partnerWeather?: "foggy" | "frozen" }>({});
 
@@ -84,7 +84,7 @@ export default function Weather() {
   const rightField: "youWeather" | "partnerWeather" = leftIsYou ? "partnerWeather" : "youWeather";
 
   const leftSide = {
-    role: masculineOnLeft ? "Shiva" : "Shakti",
+    role: "Your weather",
     field: leftField,
     selected: leftField === "youWeather" ? state.youWeather : state.partnerWeather,
     name: leftField === "youWeather" ? state.youName || "You" : state.partnerName || "Partner",
@@ -92,7 +92,7 @@ export default function Weather() {
   };
 
   const rightSide = {
-    role: masculineOnLeft ? "Shakti" : "Shiva",
+    role: "Partner's weather",
     field: rightField,
     selected: rightField === "youWeather" ? state.youWeather : state.partnerWeather,
     name: rightField === "youWeather" ? state.youName || "You" : state.partnerName || "Partner",
@@ -114,9 +114,9 @@ export default function Weather() {
         <CoupleTopbar />
 
         <header className="weather-v2-header">
-          <h1 className="weather-v2-title">Intimacy Weather</h1>
+          <h1 className="weather-v2-title">Your shared intimacy weather</h1>
           <p className="weather-v2-subtitle">
-            Choose calmly. Sense honestly. Ask gently. Let your partner choose with respect.
+            Take a moment. Breathe. Share your current state and welcome your partner&apos;s weather with love and respect.
           </p>
         </header>
 
@@ -175,7 +175,7 @@ export default function Weather() {
                 <img src={logoSrc} alt="Sacred Path" className="home-shiny-icon" />
               </div>
               <div className="home-couple-panel weather-v2-center-panel">
-                <p className="panel-kicker weather-center-kicker">Two hearts. One path.</p>
+                <p className="panel-kicker weather-center-kicker">Two energies. One path.</p>
                 <p className="panel-text">
                   Pause. Feel. Choose your truth, then welcome your partner&apos;s weather with respect.
                 </p>

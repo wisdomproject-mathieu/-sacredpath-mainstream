@@ -5,23 +5,29 @@ import { useSession } from "../contexts/SessionContext";
 export default function AppHome() {
   const navigate = useNavigate();
   const { state, setState } = useSession();
-  const logoSrc = `${import.meta.env.BASE_URL}sacred-path-mark.png`;
+  const logoSrc = `${import.meta.env.BASE_URL}shiva-shakti-icon.png`;
   const yourName = state.youName;
   const partnerName = state.partnerName;
 
   return (
     <main className="min-h-screen bg-sp-bg text-slate-100">
       <div className="home-shell">
-        <CoupleTopbar showCoupleChip={false} />
+        <CoupleTopbar showCoupleChip={true} />
 
         <section className="home-hero">
           <div className="home-left">
-            <h1 className="home-title">Ancient wisdom for modern couples.</h1>
+            <h1 className="home-title">
+              Deep connection &amp;
+              <br />
+              renewed intimacy
+              <br />
+              for every couple.
+            </h1>
 
             <p className="home-subtitle">
-              Men want to get closer every day and last longer. Women want soft,
-              conscious touch, real presence, and to feel deeply respected.
-              Sacred Path brings that into your lives.
+              Understand your unique needs and desires. Bring deep presence, safe
+              touch, and renewed closeness into your relationship. Start your journey
+              together.
             </p>
 
             <div className="home-name-row">
@@ -41,32 +47,50 @@ export default function AppHome() {
               </label>
             </div>
 
+            <div className="home-connection-panel">
+              <p className="home-connection-kicker">Partner Connection Panel</p>
+              <div className="home-connection-code" aria-hidden="true">
+                <span>✦</span>
+                <span>✦</span>
+                <span>✦</span>
+                <span>✦</span>
+                <span>✦</span>
+                <span>✦</span>
+              </div>
+              <button className="home-connection-btn" onClick={() => navigate("/weather")}>
+                Send code to your partner
+              </button>
+            </div>
+
             <div className="home-value-grid">
               <article className="value-card value-men">
-                <p className="value-kicker">For men</p>
+                <p className="value-kicker">Card for men</p>
                 <h2>
-                  Hold charge.
+                  Focus:
                   <br />
-                  Last longer.
+                  Presence.
                 </h2>
+                <p className="value-body">Learn to hold a stable and present space for your partner.</p>
               </article>
 
               <article className="value-card value-women">
-                <p className="value-kicker">For women</p>
+                <p className="value-kicker">Card for women</p>
                 <h2>
-                  Slow touch
+                  Focus:
                   <br />
-                  that feels safer.
+                  Softness.
                 </h2>
+                <p className="value-body">Experience deeply respected and gentle touch.</p>
               </article>
 
               <article className="value-card value-couple">
-                <p className="value-kicker">For the couple</p>
+                <p className="value-kicker">Card for couple</p>
                 <h2>
-                  Richer rituals
+                  Focus:
                   <br />
-                  for both of you.
+                  Rituals.
                 </h2>
+                <p className="value-body">Build deep affection with shared, mindful practices.</p>
               </article>
             </div>
 
@@ -75,13 +99,14 @@ export default function AppHome() {
                 className="home-btn home-btn-gold"
                 onClick={() => navigate("/weather")}
               >
-                Intimacy weather
+                Sense both weather
               </button>
               <button
-                className="home-btn home-btn-ghost"
+                className="home-btn home-btn-ghost home-btn-trial"
                 onClick={() => navigate("/paywall")}
               >
-                Start subscription
+                <span>Start subscription</span>
+                <small>Free 7-Day Trial</small>
               </button>
             </div>
           </div>
@@ -100,8 +125,7 @@ export default function AppHome() {
               <div className="home-couple-panel">
                 <p className="panel-kicker">Tonight starts here</p>
                 <p className="panel-text">
-                  One simple ritual. More closeness, more softness, one stronger
-                  night together.
+                  One simple ritual. More closeness, more softness, one stronger night together.
                 </p>
               </div>
             </div>
