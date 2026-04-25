@@ -26,7 +26,6 @@ function fallbackTone(weather: string | undefined): WeatherVisualKey {
 export default function Ritual() {
   const { state } = useSession();
   const navigate = useNavigate();
-  const logoSrc = `${import.meta.env.BASE_URL}shiva-shakti-icon.png`;
 
   useEffect(() => {
     if (!state.youWeather || !state.partnerWeather) navigate("/weather");
@@ -44,9 +43,6 @@ export default function Ritual() {
   }
 
   const { freeRitual } = result;
-  const originTraditions = freeRitual.sourceTraditions?.slice(0, 3) ?? [];
-  const originAuthors = freeRitual.sourceAuthors?.slice(0, 3) ?? [];
-  const originConcepts = freeRitual.sourceConcepts?.slice(0, 4) ?? [];
   const youTag = shortTag(state.youName, "MAT");
   const partnerTag = shortTag(state.partnerName, "ED");
   const youTone = state.youWeatherTone ?? fallbackTone(state.youWeather);
@@ -95,18 +91,6 @@ export default function Ritual() {
               Swap Shiva ↔ Shakti
             </button>
 
-            <div className="ritual-v2-practice-card ritual-v2-practice-card-hero">
-              <p className="ritual-v2-practice-kicker">Yoga of Touch</p>
-              <div className="ritual-v2-practice-image">
-                <img src={logoSrc} alt="Sacred Path" />
-              </div>
-              <h3>Yoga of Touch</h3>
-              <p className="ritual-v2-practice-copy">{freeRitual.description}</p>
-              <button className="ritual-v2-practice-btn" onClick={() => navigate("/deeper")}>
-                Begin Embrace
-              </button>
-            </div>
-
             <div className="ritual-v2-step-card">
               <div className="ritual-v2-step-card-head">
                 <p className="ritual-v2-practice-kicker">Straight steps</p>
@@ -128,27 +112,6 @@ export default function Ritual() {
               <button className="ritual-v2-practice-btn" onClick={() => navigate("/ritual")}>
                 Begin ritual
               </button>
-            </div>
-
-            <div className="ritual-v2-origin-card">
-              <p className="ritual-v2-origin-kicker">Origin of this ritual</p>
-              <h3>Where this practice comes from</h3>
-              <p>This ritual is adapted for modern couples from traditional intimacy teachings, focused on emotional safety and embodied connection.</p>
-              {originTraditions.length > 0 ? (
-                <p>
-                  <strong>Traditions:</strong> {originTraditions.join(", ")}
-                </p>
-              ) : null}
-              {originAuthors.length > 0 ? (
-                <p>
-                  <strong>Teachers:</strong> {originAuthors.join(", ")}
-                </p>
-              ) : null}
-              {originConcepts.length > 0 ? (
-                <p>
-                  <strong>Core ideas:</strong> {originConcepts.join(", ")}
-                </p>
-              ) : null}
             </div>
 
             <div className="ritual-v2-actions">
