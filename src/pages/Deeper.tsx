@@ -10,17 +10,14 @@ const practicePoints = [
 ];
 
 export default function Deeper() {
-  const logoSrc = `${import.meta.env.BASE_URL}sacred-path-mark.png`;
-
   return (
     <div className="min-h-screen bg-sp-bg text-slate-100 deeper-page">
       <div className="deeper-shell">
-        <CoupleTopbar />
+        <div className="deeper-brand-row">
+          <CoupleTopbar />
+        </div>
 
         <header className="deeper-header">
-          <div className="deeper-logo">
-            <img src={logoSrc} alt="Sacred Path" />
-          </div>
           <div className="deeper-kicker">Go deeper</div>
           <h1 className="deeper-title">Beyond the Physical</h1>
           <p className="deeper-subtitle">

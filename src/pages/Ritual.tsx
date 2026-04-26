@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSession } from "../contexts/SessionContext";
+import CoupleTopbar from "../components/CoupleTopbar";
 import { resolveWeatherRitual } from "../lib/ritualRegistry";
 import {
   WEATHER_TONE_LABELS,
@@ -90,11 +91,16 @@ export default function Ritual() {
   return (
     <main className="min-h-screen bg-sp-bg text-slate-100 ritual-v2-page">
       <div className="ritual-v2-shell">
-        <header className="ritual-v2-header">
-          <h1 className="ritual-v2-title">Sacred Rituals for Coupled Presence</h1>
-          <p className="ritual-v2-subtitle">
-            Explore practices to cultivate deeper connection, flow, and energetic awareness.
-          </p>
+        <header className="ritual-v2-header ritual-v2-header-split">
+          <div className="ritual-v2-header-brand">
+            <CoupleTopbar />
+          </div>
+          <div className="ritual-v2-header-copy">
+            <h1 className="ritual-v2-title">Sacred Rituals for Coupled Presence</h1>
+            <p className="ritual-v2-subtitle">
+              Explore practices to cultivate deeper connection, flow, and energetic awareness.
+            </p>
+          </div>
         </header>
 
         <section className="ritual-v2-grid">

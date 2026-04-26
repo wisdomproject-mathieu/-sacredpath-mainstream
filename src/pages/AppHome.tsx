@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useSession } from "../contexts/SessionContext";
+import CoupleTopbar from "../components/CoupleTopbar";
 
 export default function AppHome() {
   const navigate = useNavigate();
@@ -100,8 +101,8 @@ export default function AppHome() {
 
           <aside className="home-visual-wrap">
             <div className="home-visual-card">
-              <div className="home-visual-caption">
-                <p className="home-visual-caption-kicker">Sacred Path for Couples</p>
+              <div className="home-visual-brand">
+                <CoupleTopbar />
               </div>
               <div className="home-visual-glow" />
               <div className="home-visual-beam" />

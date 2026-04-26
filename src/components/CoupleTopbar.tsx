@@ -1,28 +1,19 @@
-import { useSession } from "../contexts/SessionContext";
-
-type CoupleTopbarProps = {
-  showCoupleChip?: boolean;
-};
-
-export default function CoupleTopbar({ showCoupleChip = true }: CoupleTopbarProps) {
-  const { state } = useSession();
+export default function CoupleTopbar() {
   const logoSrc = `${import.meta.env.BASE_URL}sacred-path-mark.png`;
-  const yourName = state.youName?.trim() || "Mathieu";
-  const partnerName = state.partnerName?.trim() || "Edita";
 
   return (
-    <div className="home-topbar">
-      <span className="home-topbar-label">Sacred Path for Couples</span>
-      {showCoupleChip ? (
-        <div className="home-couple-chip-mini">
-          <span className="badge-mini">
-            <img src={logoSrc} alt="" />
-          </span>
-          <span>
-            {yourName} <span className="dot">&amp;</span> {partnerName}
-          </span>
-        </div>
-      ) : null}
+    <div className="sacred-brand-card">
+      <span className="sacred-brand-mark">
+        <img src={logoSrc} alt="" />
+      </span>
+      <span className="sacred-brand-copy">
+        <span className="sacred-brand-kicker">SACRED PATH</span>
+        <span className="sacred-brand-title">for Couples</span>
+      </span>
+      <span className="sacred-brand-note">
+        Ancient wisdom for modern love. Home for orientation, Sacred Library for insight,
+        Sacred Temple for embodied shared practice.
+      </span>
     </div>
   );
 }
