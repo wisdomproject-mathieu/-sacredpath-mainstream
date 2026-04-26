@@ -137,6 +137,13 @@ export default function Weather() {
 
         <section className="weather-v2-polarity">
           <div className={`weather-v2-side ${leftSide.sideClass}`}>
+            <div className="home-visual-card weather-v2-side-hero-card">
+              <div className="home-visual-glow" />
+              <div className="home-visual-beam" />
+              <div className="home-visual-icon-area">
+                <img src={logoSrc} alt="Sacred Path" className="home-shiny-icon" />
+              </div>
+            </div>
             <div className="weather-v2-side-head">
               <p className="weather-v2-side-name">{leftSide.name}</p>
             </div>
@@ -185,14 +192,6 @@ export default function Weather() {
           </div>
 
           <div className="weather-v2-center">
-            <div className="home-visual-card weather-v2-center-card">
-              <div className="home-visual-glow" />
-              <div className="home-visual-beam" />
-              <div className="home-visual-icon-area">
-                <img src={logoSrc} alt="Sacred Path" className="home-shiny-icon" />
-              </div>
-            </div>
-
             <button
               type="button"
               onClick={() => setManualSwap((v) => !v)}

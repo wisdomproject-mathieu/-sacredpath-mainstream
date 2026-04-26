@@ -914,6 +914,22 @@ img { max-width: 100%; display: block; }
   z-index: 2;
 }
 
+.weather-v2-side-hero-card {
+  width: min(100%, 230px);
+  min-height: 168px;
+  margin: 0 0 18px;
+  align-self: flex-start;
+}
+
+.weather-v2-side-hero-card .home-visual-icon-area {
+  padding-bottom: 0;
+}
+
+.weather-v2-side-hero-card .home-shiny-icon {
+  width: min(84%, 160px);
+  max-width: 160px;
+}
+
 .weather-v2-card-row {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1064,13 +1080,6 @@ img { max-width: 100%; display: block; }
   align-items: center;
   justify-content: center;
   padding-top: 56px;
-}
-
-.weather-v2-center-card {
-  min-height: 266px;
-  width: min(100%, 220px);
-  align-self: center;
-  justify-self: center;
 }
 
 .weather-v2-center-panel {
