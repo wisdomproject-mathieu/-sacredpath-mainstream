@@ -2808,3 +2808,256 @@ img { max-width: 100%; display: block; }
     min-height: 72px;
   }
 }
+
+/* ===== DEEPER PAGE ===== */
+.deeper-page {
+  position: relative;
+  overflow: hidden;
+}
+
+.deeper-page::before,
+.deeper-page::after {
+  content: "";
+  position: fixed;
+  inset: auto;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.deeper-page::before {
+  top: -8%;
+  left: -12%;
+  width: 42vw;
+  height: 42vw;
+  background: radial-gradient(circle, rgba(99, 145, 255, 0.18), transparent 68%);
+  filter: blur(10px);
+}
+
+.deeper-page::after {
+  right: -8%;
+  bottom: -10%;
+  width: 46vw;
+  height: 46vw;
+  background: radial-gradient(circle, rgba(239, 181, 110, 0.16), transparent 68%);
+  filter: blur(18px);
+}
+
+.deeper-shell {
+  position: relative;
+  z-index: 1;
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 18px 0 48px;
+  display: grid;
+  gap: 18px;
+}
+
+.deeper-header {
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 10px 12px 4px;
+}
+
+.deeper-logo img {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.22));
+}
+
+.deeper-kicker {
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.deeper-title {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.4rem, 4vw, 4.3rem);
+  line-height: 0.98;
+  color: #f7efe2;
+  text-wrap: balance;
+}
+
+.deeper-subtitle {
+  margin: 0;
+  max-width: 860px;
+  font-size: clamp(0.98rem, 1.3vw, 1.12rem);
+  line-height: 1.55;
+  color: rgba(236, 227, 247, 0.9);
+  text-wrap: balance;
+}
+
+.deeper-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.95fr 0.95fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.deeper-notes,
+.deeper-practice-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.deeper-card {
+  position: relative;
+  border-radius: 26px;
+  border: 1px solid rgba(241, 212, 154, 0.16);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(241, 212, 154, 0.12), transparent 36%),
+    linear-gradient(180deg, rgba(28, 20, 37, 0.94), rgba(12, 10, 18, 0.98));
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(14px);
+}
+
+.deeper-card-feature {
+  padding: 22px 20px 20px;
+}
+
+.deeper-card-feature h2,
+.deeper-card-steps h3,
+.deeper-card-tips h3,
+.deeper-card-note h3 {
+  margin: 0 0 14px;
+  font-family: Georgia, "Times New Roman", serif;
+  color: #f5ead9;
+  line-height: 1.12;
+}
+
+.deeper-card-feature h2 {
+  font-size: clamp(1.45rem, 2vw, 2.1rem);
+}
+
+.deeper-copy,
+.deeper-card-steps,
+.deeper-card-tips,
+.deeper-card-note {
+  padding: 22px 20px;
+}
+
+.deeper-copy {
+  display: grid;
+  gap: 14px;
+}
+
+.deeper-copy p,
+.deeper-card-steps p,
+.deeper-card-tips p,
+.deeper-card-note p {
+  margin: 0;
+  color: rgba(236, 227, 247, 0.9);
+  line-height: 1.65;
+  font-size: 0.98rem;
+}
+
+.deeper-card-steps,
+.deeper-card-tips {
+  display: grid;
+  gap: 14px;
+}
+
+.deeper-card-steps h3,
+.deeper-card-tips h3,
+.deeper-card-note h3 {
+  font-size: 1.1rem;
+  color: #f1d49a;
+}
+
+.deeper-card-tips ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.deeper-note-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.deeper-practice-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.deeper-practice-pill {
+  min-height: 100px;
+  border-radius: 22px;
+  border: 1px solid rgba(241, 212, 154, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(245, 236, 220, 0.94);
+  padding: 16px 14px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.16);
+}
+
+.deeper-footer {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-top: 6px;
+}
+
+.deeper-primary-btn,
+.deeper-secondary-btn {
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deeper-primary-btn {
+  background: linear-gradient(135deg, #f5d9a8 0%, #dcb068 100%);
+  color: #21140c;
+  box-shadow: 0 18px 34px rgba(216, 172, 104, 0.22);
+}
+
+.deeper-secondary-btn {
+  border: 1px solid rgba(241, 212, 154, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  color: #f8ecda;
+}
+
+@media (max-width: 1100px) {
+  .deeper-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .deeper-practice-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .deeper-shell {
+    width: min(100vw - 24px, 1180px);
+    padding-top: 14px;
+  }
+
+  .deeper-title {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+
+  .deeper-practice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .deeper-card-feature,
+  .deeper-card-steps,
+  .deeper-card-tips,
+  .deeper-card-note {
+    padding: 18px 16px;
+  }
+}
