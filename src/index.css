@@ -1613,6 +1613,57 @@ img { max-width: 100%; display: block; }
   align-items: center;
 }
 
+.ritual-v2-article-card {
+  margin-top: 6px;
+  width: 100%;
+  border-radius: 24px;
+  border: 1px solid rgba(241, 212, 154, 0.16);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(241, 212, 154, 0.11), transparent 38%),
+    linear-gradient(180deg, rgba(25, 18, 32, 0.96), rgba(13, 10, 18, 0.98));
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.24);
+  padding: 20px 18px 18px;
+}
+
+.ritual-v2-article-card h3 {
+  margin: 0 0 14px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.15rem, 1.6vw, 1.5rem);
+  line-height: 1.12;
+  color: #f5ead9;
+}
+
+.ritual-v2-article-body {
+  display: grid;
+  gap: 12px;
+  color: rgba(244, 236, 244, 0.92);
+  font-size: 0.94rem;
+  line-height: 1.6;
+}
+
+.ritual-v2-article-body p {
+  margin: 0;
+}
+
+.ritual-v2-article-body h4 {
+  margin: 4px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  line-height: 1.25;
+  color: #f1d49a;
+}
+
+.ritual-v2-article-body ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.ritual-v2-article-body li {
+  margin: 0;
+}
+
 .ritual-v2-action-primary,
 .ritual-v2-action-secondary {
   min-height: 50px;
