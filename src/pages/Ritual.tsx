@@ -4,6 +4,7 @@ import { useSession } from "../contexts/SessionContext";
 import { resolveWeatherRitual } from "../lib/ritualRegistry";
 import {
   WEATHER_TONE_LABELS,
+  WEATHER_TONE_COPY,
   getWeatherImageUrlByTone,
   type WeatherVisualKey,
 } from "../lib/weatherAssets";
@@ -101,7 +102,10 @@ export default function Ritual() {
           <aside className="ritual-v2-side ritual-v2-side-left">
             <div className="ritual-v2-image-card ritual-v2-image-card-left">
               <img src={getWeatherImageUrlByTone("shiva", youTone)} alt={youTitle} />
-              <div className="ritual-v2-image-caption">{youTitle}</div>
+            </div>
+            <div className="ritual-v2-state-card">
+              <h2>{youTitle}</h2>
+              <p>{WEATHER_TONE_COPY[youTone]}</p>
             </div>
           </aside>
 
@@ -146,7 +150,10 @@ export default function Ritual() {
           <aside className="ritual-v2-side ritual-v2-side-right">
             <div className="ritual-v2-image-card ritual-v2-image-card-right">
               <img src={getWeatherImageUrlByTone("shakti", partnerTone)} alt={partnerTitle} />
-              <div className="ritual-v2-image-caption">{partnerTitle}</div>
+            </div>
+            <div className="ritual-v2-state-card">
+              <h2>{partnerTitle}</h2>
+              <p>{WEATHER_TONE_COPY[partnerTone]}</p>
             </div>
           </aside>
         </section>
