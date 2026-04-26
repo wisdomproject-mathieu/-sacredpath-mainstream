@@ -784,6 +784,17 @@ img { max-width: 100%; display: block; }
   padding: 8px 12px 0;
 }
 
+.weather-v2-top-left-shell {
+  display: flex;
+  justify-content: flex-start;
+  margin: 0 0 16px;
+}
+
+.weather-v2-top-left-card {
+  width: min(100%, 220px);
+  min-height: 168px;
+}
+
 .weather-v2-title {
   margin: 0 0 10px;
   font-family: Georgia, "Times New Roman", serif;
@@ -912,22 +923,6 @@ img { max-width: 100%; display: block; }
   gap: 16px;
   position: relative;
   z-index: 2;
-}
-
-.weather-v2-side-hero-card {
-  width: min(100%, 230px);
-  min-height: 168px;
-  margin: 0 0 18px;
-  align-self: flex-start;
-}
-
-.weather-v2-side-hero-card .home-visual-icon-area {
-  padding-bottom: 0;
-}
-
-.weather-v2-side-hero-card .home-shiny-icon {
-  width: min(84%, 160px);
-  max-width: 160px;
 }
 
 .weather-v2-card-row {

@@ -128,6 +128,16 @@ export default function Weather() {
   return (
     <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
       <div className="max-w-[1320px] mx-auto space-y-7">
+        <div className="weather-v2-top-left-shell">
+          <div className="home-visual-card weather-v2-top-left-card">
+            <div className="home-visual-glow" />
+            <div className="home-visual-beam" />
+            <div className="home-visual-icon-area">
+              <img src={logoSrc} alt="Sacred Path" className="home-shiny-icon" />
+            </div>
+          </div>
+        </div>
+
         <header className="weather-v2-header">
           <h1 className="weather-v2-title">Your shared intimacy weather</h1>
           <p className="weather-v2-subtitle">
@@ -137,13 +147,6 @@ export default function Weather() {
 
         <section className="weather-v2-polarity">
           <div className={`weather-v2-side ${leftSide.sideClass}`}>
-            <div className="home-visual-card weather-v2-side-hero-card">
-              <div className="home-visual-glow" />
-              <div className="home-visual-beam" />
-              <div className="home-visual-icon-area">
-                <img src={logoSrc} alt="Sacred Path" className="home-shiny-icon" />
-              </div>
-            </div>
             <div className="weather-v2-side-head">
               <p className="weather-v2-side-name">{leftSide.name}</p>
             </div>
