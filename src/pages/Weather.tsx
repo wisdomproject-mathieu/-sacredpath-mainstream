@@ -1,271 +1,272 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSession } from "../contexts/SessionContext";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
-import { getWeatherImageUrlByTone, getWeatherVisualKey, type WeatherVisualKey } from "../lib/weatherAssets";
+import {
+  WEATHER_TONE_COPY,
+  WEATHER_TONE_LABELS,
+  getWeatherImageUrlByTone,
+  getWeatherVisualKey,
+  type WeatherVisualKey,
+} from "../lib/weatherAssets";
 
-const options: { key: string; id: IntimacyWeather; title: string; subtitle: string; toneClass: string; cloudyVariant?: "foggy" | "frozen" }[] = [
-  { key: "stormy", id: "stormy", title: "Stormy", subtitle: "Tense, hurt, or charged with something unspoken.", toneClass: "weather-tone-stormy" },
-  { key: "foggy", id: "cloudy", title: "Foggy", subtitle: "Unclear, drifting, not quite here.", toneClass: "weather-tone-foggy", cloudyVariant: "foggy" },
-  { key: "frozen", id: "cloudy", title: "Frozen", subtitle: "Numb, tired, shut down in the body.", toneClass: "weather-tone-frozen", cloudyVariant: "frozen" },
-  { key: "warm", id: "warm", title: "Warm", subtitle: "Soft, tender, and wanting closeness.", toneClass: "weather-tone-warm" },
-  { key: "electric", id: "electric", title: "Electric", subtitle: "Crackling, drawn, awake in the body.", toneClass: "weather-tone-electric" },
-  { key: "sunny", id: "radiant", title: "Sunny", subtitle: "Clear, light, easy with my partner today.", toneClass: "weather-tone-radiant" },
+type WeatherRole = "shiva" | "shakti";
+type WeatherField = "youWeather" | "partnerWeather";
+
+type WeatherOption = {
+  key: WeatherVisualKey;
+  id: IntimacyWeather;
+  title: string;
+  subtitle: string;
+  toneClass: string;
+  cloudyVariant?: "foggy" | "frozen";
+};
+
+const WEATHER_OPTIONS: WeatherOption[] = [
+  { key: "stormy", id: "stormy", title: "Stormy", subtitle: "Heavy, tumultuous...", toneClass: "weather-ref-stormy" },
+  { key: "foggy", id: "cloudy", title: "Foggy", subtitle: "Detached, confused...", toneClass: "weather-ref-foggy", cloudyVariant: "foggy" },
+  { key: "frozen", id: "cloudy", title: "Frozen", subtitle: "Numb, tired, shut down...", toneClass: "weather-ref-frozen", cloudyVariant: "frozen" },
+  { key: "warm", id: "warm", title: "Warm", subtitle: "Soft, tender...", toneClass: "weather-ref-warm" },
+  { key: "electric", id: "electric", title: "Electric", subtitle: "Crackling, awake...", toneClass: "weather-ref-electric" },
+  { key: "sunny", id: "radiant", title: "Sunny", subtitle: "Clear, light...", toneClass: "weather-ref-sunny" },
 ];
 
-const masculineNames = new Set([
-  "alex", "andrew", "antoine", "ben", "charles", "chris", "daniel", "david", "emile", "ethan",
-  "felix", "gabriel", "george", "hugo", "james", "jean", "john", "joseph", "leo", "louis",
-  "luc", "lucas", "marc", "mathieu", "max", "michael", "nicolas", "oliver", "pierre", "paul",
-  "sam", "sebastien", "thomas", "vincent", "william",
-]);
+const TOP_OPTIONS = WEATHER_OPTIONS.slice(0, 3);
+const BOTTOM_OPTIONS = WEATHER_OPTIONS.slice(3);
 
-const feminineNames = new Set([
-  "alice", "amelie", "ana", "anna", "bella", "camille", "charlotte", "claire", "diana", "edith",
-  "edita", "elena", "emma", "eva", "gabrielle", "hannah", "isabella", "jade", "julia", "laura",
-  "lea", "lina", "lucie", "maia", "maria", "marie", "maya", "mia", "nina", "olivia",
-  "rose", "sara", "sophia", "victoria", "zoe",
-]);
-
-type Energy = "masculine" | "feminine" | "unknown";
-
-function normalizeName(name: string) {
-  return name.trim().toLowerCase().replace(/[^a-z]/g, "");
+function toneForWeather(weather: IntimacyWeather | undefined, explicitTone?: WeatherVisualKey): WeatherVisualKey {
+  if (explicitTone) return explicitTone;
+  return getWeatherVisualKey(weather);
 }
 
-function guessEnergy(name: string): Energy {
-  const n = normalizeName(name);
-  if (!n) return "unknown";
-  if (masculineNames.has(n)) return "masculine";
-  if (feminineNames.has(n)) return "feminine";
-  if (n.endsWith("a") || n.endsWith("ia") || n.endsWith("ie")) return "feminine";
-  if (n.endsWith("o") || n.endsWith("an") || n.endsWith("on") || n.endsWith("el")) return "masculine";
-  return "unknown";
+function panelTitle(role: WeatherRole, tone: WeatherVisualKey) {
+  if (role === "shiva") return `${WEATHER_TONE_LABELS[tone]} Shiva`;
+  return "Partner Shakti";
+}
+
+function panelStrip(role: WeatherRole, tone: WeatherVisualKey) {
+  if (role === "shiva") return `${WEATHER_TONE_LABELS[tone]} for Shiva`;
+  return `${WEATHER_TONE_LABELS[tone]} for Shakti`;
+}
+
+function panelSubtitle(role: WeatherRole, tone: WeatherVisualKey) {
+  if (role === "shiva") return WEATHER_TONE_COPY[tone];
+  return WEATHER_TONE_COPY[tone];
+}
+
+function WeatherOptionCard({
+  role,
+  option,
+  selected,
+  onClick,
+}: {
+  role: WeatherRole;
+  option: WeatherOption;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  const image = getWeatherImageUrlByTone(role, option.key);
+
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      onClick={onClick}
+      className={`weather-ref-option-card ${option.toneClass} ${selected ? "is-selected" : ""}`}
+    >
+      <span className="weather-ref-option-art" style={{ backgroundImage: `url(${image})` }} aria-hidden="true" />
+      <span className="weather-ref-option-overlay" aria-hidden="true" />
+      <span className="weather-ref-option-content">
+        <span className="weather-ref-option-title">{option.title}.</span>
+        <span className="weather-ref-option-subtitle">{option.subtitle}</span>
+        <span className="weather-ref-select-chip">SELECT</span>
+      </span>
+    </button>
+  );
+}
+
+function WeatherPreviewCard({
+  role,
+  tone,
+  title,
+  subtitle,
+}: {
+  role: WeatherRole;
+  tone: WeatherVisualKey;
+  title: string;
+  subtitle: string;
+}) {
+  const image = getWeatherImageUrlByTone(role, tone);
+
+  return (
+    <div className={`weather-ref-preview-card ${role === "shiva" ? "weather-ref-preview-shiva" : "weather-ref-preview-shakti"}`}>
+      <div className="weather-ref-preview-media">
+        <img src={image} alt={title} />
+        <div className="weather-ref-preview-strip">{panelStrip(role, tone)}</div>
+      </div>
+      <div className="weather-ref-preview-copy">
+        <h3>{title}</h3>
+        <p>{subtitle}</p>
+        <button type="button" className="weather-ref-preview-select">SELECT</button>
+      </div>
+    </div>
+  );
+}
+
+function WeatherPanel({
+  role,
+  label,
+  selectedWeather,
+  selectedTone,
+  onSelect,
+}: {
+  role: WeatherRole;
+  label: string;
+  selectedWeather: IntimacyWeather | undefined;
+  selectedTone: WeatherVisualKey;
+  onSelect: (option: WeatherOption) => void;
+}) {
+  const previewTitle = panelTitle(role, selectedTone);
+  const previewSubtitle = panelSubtitle(role, selectedTone);
+
+  return (
+    <aside className={`weather-ref-panel ${role === "shiva" ? "weather-ref-panel-shiva" : "weather-ref-panel-shakti"}`}>
+      <p className="weather-ref-side-label">{label}</p>
+
+      <div className="weather-ref-option-row">
+        {TOP_OPTIONS.map((option) => (
+          <WeatherOptionCard
+            key={`top-${role}-${option.key}`}
+            role={role}
+            option={option}
+            selected={selectedTone === option.key}
+            onClick={() => onSelect(option)}
+          />
+        ))}
+      </div>
+
+      <WeatherPreviewCard role={role} tone={selectedTone} title={previewTitle} subtitle={previewSubtitle} />
+
+      <div className="weather-ref-preview-meta">
+        <div className="weather-ref-preview-heading">{previewTitle}</div>
+        <p className="weather-ref-preview-text">{previewSubtitle}</p>
+        <button
+          type="button"
+          className={`weather-ref-preview-select weather-ref-preview-select-wide ${selectedWeather ? "" : "is-disabled"}`}
+          disabled={!selectedWeather}
+          onClick={() => selectedWeather && onSelect(WEATHER_OPTIONS.find((option) => option.key === selectedTone) ?? WEATHER_OPTIONS[5])}
+        >
+          SELECT
+        </button>
+      </div>
+
+      <div className="weather-ref-option-row">
+        {BOTTOM_OPTIONS.map((option) => (
+          <WeatherOptionCard
+            key={`bottom-${role}-${option.key}`}
+            role={role}
+            option={option}
+            selected={selectedTone === option.key}
+            onClick={() => onSelect(option)}
+          />
+        ))}
+      </div>
+    </aside>
+  );
 }
 
 export default function Weather() {
   const { state, setState } = useSession();
   const navigate = useNavigate();
   const logoSrc = `${import.meta.env.BASE_URL}shiva-shakti-icon.png`;
-  const [manualSwap, setManualSwap] = useState(false);
-  const [cloudyVariantByField, setCloudyVariantByField] = useState<{ youWeather?: "foggy" | "frozen"; partnerWeather?: "foggy" | "frozen" }>({});
 
-  const setWeather = (
-    field: "youWeather" | "partnerWeather",
-    value: IntimacyWeather,
-    cloudyVariant?: "foggy" | "frozen"
-  ) => {
+  const setWeather = (field: WeatherField, value: IntimacyWeather, cloudyVariant?: "foggy" | "frozen") => {
     const toneField = field === "youWeather" ? "youWeatherTone" : "partnerWeatherTone";
     const tone = getWeatherVisualKey(value, cloudyVariant);
     setState({ ...state, [field]: value, [toneField]: tone });
   };
 
-  const canContinue = state.youWeather && state.partnerWeather;
-  const youEnergy = useMemo(() => guessEnergy(state.youName), [state.youName]);
-  const partnerEnergy = useMemo(() => guessEnergy(state.partnerName), [state.partnerName]);
-  const inferredMasculineOnLeft = useMemo(() => {
-    if (youEnergy === "masculine" && partnerEnergy === "feminine") return true;
-    if (youEnergy === "feminine" && partnerEnergy === "masculine") return false;
-    return true;
-  }, [youEnergy, partnerEnergy]);
-
-  useEffect(() => {
-    setManualSwap(false);
-  }, [state.youName, state.partnerName]);
-
-  const isOptionActive = (
-    selectedWeather: IntimacyWeather | undefined,
-    field: "youWeather" | "partnerWeather",
-    option: (typeof options)[number]
-  ) => {
-    if (selectedWeather !== option.id) return false;
-    if (option.id !== "cloudy") return true;
-    const variant = cloudyVariantByField[field] ?? "foggy";
-    return option.cloudyVariant === variant;
+  const swapWeather = () => {
+    setState({
+      ...state,
+      youWeather: state.partnerWeather,
+      partnerWeather: state.youWeather,
+      youWeatherTone: state.partnerWeatherTone,
+      partnerWeatherTone: state.youWeatherTone,
+    });
   };
 
-  const masculineOnLeft = manualSwap ? !inferredMasculineOnLeft : inferredMasculineOnLeft;
-  const leftIsYou = masculineOnLeft ? youEnergy !== "feminine" : youEnergy === "feminine";
-  const leftField: "youWeather" | "partnerWeather" = leftIsYou ? "youWeather" : "partnerWeather";
-  const rightField: "youWeather" | "partnerWeather" = leftIsYou ? "partnerWeather" : "youWeather";
-
-  const leftSide = {
-    field: leftField,
-    selected: leftField === "youWeather" ? state.youWeather : state.partnerWeather,
-    name: leftField === "youWeather" ? state.youName || "You" : state.partnerName || "Partner",
-    sideClass: masculineOnLeft ? "weather-v2-side-masculine" : "weather-v2-side-feminine",
-  };
-
-  const rightSide = {
-    field: rightField,
-    selected: rightField === "youWeather" ? state.youWeather : state.partnerWeather,
-    name: rightField === "youWeather" ? state.youName || "You" : state.partnerName || "Partner",
-    sideClass: masculineOnLeft ? "weather-v2-side-feminine" : "weather-v2-side-masculine",
-  };
-
-  const getSideTone = (field: "youWeather" | "partnerWeather", selected: IntimacyWeather | undefined): WeatherVisualKey | undefined => {
-    if (!selected) return undefined;
-    if (field === "youWeather") return state.youWeatherTone ?? getWeatherVisualKey(selected, cloudyVariantByField.youWeather);
-    return state.partnerWeatherTone ?? getWeatherVisualKey(selected, cloudyVariantByField.partnerWeather);
-  };
-
-  const leftTone = getSideTone(leftSide.field, leftSide.selected);
-  const rightTone = getSideTone(rightSide.field, rightSide.selected);
-  const leftFigureSrc = leftTone ? getWeatherImageUrlByTone("shiva", leftTone) : undefined;
-  const rightFigureSrc = rightTone ? getWeatherImageUrlByTone("shakti", rightTone) : undefined;
-
-  const leftTop = options.slice(0, 3);
-  const leftBottom = options.slice(3);
-  const rightTop = options.slice(0, 3);
-  const rightBottom = options.slice(3);
-  const leftTopFloats = ["weather-v2-float-a", "weather-v2-float-b", "weather-v2-float-c"];
-  const leftBottomFloats = ["weather-v2-float-d", "weather-v2-float-e", "weather-v2-float-f"];
-  const rightTopFloats = ["weather-v2-float-f", "weather-v2-float-e", "weather-v2-float-d"];
-  const rightBottomFloats = ["weather-v2-float-c", "weather-v2-float-b", "weather-v2-float-a"];
-  const leftFigureClass = masculineOnLeft ? "weather-v2-side-figure-left" : "weather-v2-side-figure-right";
-  const rightFigureClass = masculineOnLeft ? "weather-v2-side-figure-right" : "weather-v2-side-figure-left";
+  const canContinue = Boolean(state.youWeather && state.partnerWeather);
+  const leftTone = toneForWeather(state.youWeather, state.youWeatherTone);
+  const rightTone = toneForWeather(state.partnerWeather, state.partnerWeatherTone);
 
   return (
-    <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
-      <div className="max-w-[1320px] mx-auto space-y-7">
-        <div className="weather-v2-top-left-shell">
-          <div className="home-visual-card weather-v2-top-left-card">
-            <div className="home-visual-glow" />
-            <div className="home-visual-beam" />
-            <div className="home-visual-icon-area">
-              <img src={logoSrc} alt="Sacred Path" className="home-shiny-icon" />
+    <div className="weather-ref-page">
+      <div className="weather-ref-shell">
+        <div className="weather-ref-topbar">
+          <div className="weather-ref-brand-card">
+            <div className="weather-ref-brand-mark">
+              <img src={logoSrc} alt="Sacred Path" />
             </div>
+            <div className="weather-ref-brand-copy">
+              <div className="weather-ref-brand-kicker">SACRED PATH</div>
+              <div className="weather-ref-brand-title">for Couples</div>
+            </div>
+            <div className="weather-ref-brand-note">Ancient wisdom for modern love.</div>
+          </div>
+
+          <div className="weather-ref-heading">
+            <h1>Your shared intimacy weather</h1>
+            <p>
+              Take a moment. Breathe. Share your current state and welcome your partner&apos;s weather with love and respect.
+            </p>
           </div>
         </div>
 
-        <header className="weather-v2-header">
-          <h1 className="weather-v2-title">Your shared intimacy weather</h1>
-          <p className="weather-v2-subtitle">
-            Take a moment. Breathe. Share your current state and welcome your partner&apos;s weather with love and respect.
-          </p>
-        </header>
+        <section className="weather-ref-grid">
+          <WeatherPanel
+            role="shiva"
+            label="You"
+            selectedWeather={state.youWeather}
+            selectedTone={leftTone}
+            onSelect={(option) => setWeather("youWeather", option.id, option.cloudyVariant)}
+          />
 
-        <section className="weather-v2-polarity">
-          <div className={`weather-v2-side ${leftSide.sideClass}`}>
-            <div className="weather-v2-side-head">
-              <p className="weather-v2-side-name">{leftSide.name}</p>
-            </div>
-            <div className="weather-v2-side-stack">
-              <div className="weather-v2-card-row">
-                {leftTop.map((opt, idx) => (
-                  <button
-                    key={`left-top-${opt.key}`}
-                    onClick={() => {
-                      setWeather(leftSide.field, opt.id, opt.cloudyVariant);
-                      if (opt.id === "cloudy" && opt.cloudyVariant) {
-                        setCloudyVariantByField((prev) => ({ ...prev, [leftSide.field]: opt.cloudyVariant }));
-                      }
-                    }}
-                    className={`value-card weather-v2-card weather-v2-card-left ${leftTopFloats[idx]} ${opt.toneClass} ${isOptionActive(leftSide.selected, leftSide.field, opt) ? "weather-v2-card-active" : ""}`}
-                  >
-                    <span className="weather-v2-card-glow" />
-                    <h2>{opt.title}</h2>
-                    <p className="weather-v2-card-sub">{opt.subtitle}</p>
-                  </button>
-                ))}
-              </div>
-              <div className={`weather-v2-side-figure ${leftFigureClass} ${leftFigureSrc ? "weather-v2-side-figure-has-image" : ""}`}>
-                <div className="weather-v2-side-figure-question">?</div>
-                {leftFigureSrc ? <img className="weather-v2-side-figure-image" src={leftFigureSrc} alt={`${leftTone ?? "weather"} Shiva`} /> : null}
-              </div>
-              <div className="weather-v2-card-row">
-                {leftBottom.map((opt, idx) => (
-                  <button
-                    key={`left-bottom-${opt.key}`}
-                    onClick={() => {
-                      setWeather(leftSide.field, opt.id, opt.cloudyVariant);
-                      if (opt.id === "cloudy" && opt.cloudyVariant) {
-                        setCloudyVariantByField((prev) => ({ ...prev, [leftSide.field]: opt.cloudyVariant }));
-                      }
-                    }}
-                    className={`value-card weather-v2-card weather-v2-card-left ${leftBottomFloats[idx]} ${opt.toneClass} ${isOptionActive(leftSide.selected, leftSide.field, opt) ? "weather-v2-card-active" : ""}`}
-                  >
-                    <span className="weather-v2-card-glow" />
-                    <h2>{opt.title}</h2>
-                    <p className="weather-v2-card-sub">{opt.subtitle}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="weather-v2-center">
-            <button
-              type="button"
-              onClick={() => setManualSwap((v) => !v)}
-              className="weather-v2-swap-btn"
-            >
+          <div className="weather-ref-center">
+            <button type="button" onClick={swapWeather} className="weather-ref-swap-pill">
               Swap Shiva ↔ Shakti
             </button>
 
-            <button
-              disabled={!canContinue}
-              onClick={() => canContinue && navigate("/ritual")}
-              className="w-full py-3 rounded-full bg-sp-gold text-black font-bold disabled:opacity-40 weather-continue-btn"
-            >
-              Show Rituals
+            <div className="weather-ref-guidance-card">
+              <h2>
+                TWO ENERGIES.
+                <br />
+                ONE PATH.
+              </h2>
+              <ol>
+                <li>Pause. Feel. Choose your truth.</li>
+                <li>Then welcome your partner&apos;s weather with love and respect.</li>
+              </ol>
+            </div>
+
+            <div className="weather-ref-sacred-block">SACRED RITUALS FOR COUPLED PRESENCE</div>
+
+            <button type="button" disabled={!canContinue} onClick={() => canContinue && navigate("/ritual")} className="weather-ref-primary-btn">
+              Go to Sacred Rituals
             </button>
 
-            <div className="weather-v2-summary-card">
-              <p className="panel-kicker weather-center-kicker">Two energies. One path.</p>
-              <p className="weather-v2-summary-text">
-                Pause. Feel. Choose your truth, then welcome your partner&apos;s weather with respect.
-              </p>
-            </div>
+            <button type="button" onClick={() => navigate("/paywall")} className="weather-ref-secondary-btn">
+              Explore premium features
+            </button>
           </div>
 
-          <div className={`weather-v2-side ${rightSide.sideClass}`}>
-            <div className="weather-v2-side-head">
-              <p className="weather-v2-side-name">{rightSide.name}</p>
-            </div>
-            <div className="weather-v2-side-stack">
-              <div className="weather-v2-card-row">
-                {rightTop.map((opt, idx) => (
-                  <button
-                    key={`right-top-${opt.key}`}
-                    onClick={() => {
-                      setWeather(rightSide.field, opt.id, opt.cloudyVariant);
-                      if (opt.id === "cloudy" && opt.cloudyVariant) {
-                        setCloudyVariantByField((prev) => ({ ...prev, [rightSide.field]: opt.cloudyVariant }));
-                      }
-                    }}
-                    className={`value-card weather-v2-card weather-v2-card-right ${rightTopFloats[idx]} ${opt.toneClass} ${isOptionActive(rightSide.selected, rightSide.field, opt) ? "weather-v2-card-active" : ""}`}
-                  >
-                    <span className="weather-v2-card-glow" />
-                    <h2>{opt.title}</h2>
-                    <p className="weather-v2-card-sub">{opt.subtitle}</p>
-                  </button>
-                ))}
-              </div>
-              <div className={`weather-v2-side-figure ${rightFigureClass} ${rightFigureSrc ? "weather-v2-side-figure-has-image" : ""}`}>
-                <div className="weather-v2-side-figure-question">?</div>
-                {rightFigureSrc ? <img className="weather-v2-side-figure-image" src={rightFigureSrc} alt={`${rightTone ?? "weather"} Shakti`} /> : null}
-              </div>
-              <div className="weather-v2-card-row">
-                {rightBottom.map((opt, idx) => (
-                  <button
-                    key={`right-bottom-${opt.key}`}
-                    onClick={() => {
-                      setWeather(rightSide.field, opt.id, opt.cloudyVariant);
-                      if (opt.id === "cloudy" && opt.cloudyVariant) {
-                        setCloudyVariantByField((prev) => ({ ...prev, [rightSide.field]: opt.cloudyVariant }));
-                      }
-                    }}
-                    className={`value-card weather-v2-card weather-v2-card-right ${rightBottomFloats[idx]} ${opt.toneClass} ${isOptionActive(rightSide.selected, rightSide.field, opt) ? "weather-v2-card-active" : ""}`}
-                  >
-                    <span className="weather-v2-card-glow" />
-                    <h2>{opt.title}</h2>
-                    <p className="weather-v2-card-sub">{opt.subtitle}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+          <WeatherPanel
+            role="shakti"
+            label="Partner"
+            selectedWeather={state.partnerWeather}
+            selectedTone={rightTone}
+            onSelect={(option) => setWeather("partnerWeather", option.id, option.cloudyVariant)}
+          />
         </section>
       </div>
     </div>
