@@ -4,16 +4,9 @@ import { useSession } from "../contexts/SessionContext";
 import { resolveWeatherRitual } from "../lib/ritualRegistry";
 import {
   WEATHER_TONE_LABELS,
-  WEATHER_TONE_COPY,
   getWeatherImageUrlByTone,
   type WeatherVisualKey,
 } from "../lib/weatherAssets";
-
-function shortTag(name: string | undefined, fallback: string) {
-  const value = name?.trim();
-  if (!value) return fallback;
-  return value.split(/\s+/)[0].slice(0, 3).toUpperCase();
-}
 
 function fallbackTone(weather: string | undefined): WeatherVisualKey {
   if (weather === "stormy") return "stormy";
@@ -60,12 +53,12 @@ export default function Ritual() {
   }
 
   const { freeRitual } = result;
-  const youTag = shortTag(state.youName, "MAT");
-  const partnerTag = shortTag(state.partnerName, "ED");
   const youTone = state.youWeatherTone ?? fallbackTone(state.youWeather);
   const partnerTone = state.partnerWeatherTone ?? fallbackTone(state.partnerWeather);
-  const youTitle = WEATHER_TONE_LABELS[youTone];
-  const partnerTitle = WEATHER_TONE_LABELS[partnerTone];
+  const youName = state.youName?.trim() || "You";
+  const partnerName = state.partnerName?.trim() || "Partner";
+  const youTitle = `${WEATHER_TONE_LABELS[youTone]} ${youName}`;
+  const partnerTitle = `${WEATHER_TONE_LABELS[partnerTone]} ${partnerName}`;
   const ritualSteps = freeRitual.ritualSteps.slice(0, 3);
   const ritualDuration = useMemo(() => formatElapsed(elapsedSeconds), [elapsedSeconds]);
 
@@ -106,22 +99,9 @@ export default function Ritual() {
 
         <section className="ritual-v2-grid">
           <aside className="ritual-v2-side ritual-v2-side-left">
-            <div className="ritual-v2-side-chip">{youTag}</div>
             <div className="ritual-v2-image-card ritual-v2-image-card-left">
-              <img src={getWeatherImageUrlByTone("shiva", youTone)} alt={`${youTitle} Shiva`} />
-              <div className="ritual-v2-image-caption">{`${youTitle} Shiva`}</div>
-            </div>
-            <div className="ritual-v2-state-card">
-              <h2>{`${youTitle} Shiva`} ({youTag})</h2>
-              <p>{WEATHER_TONE_COPY[youTone]}</p>
-            </div>
-            <div className="ritual-v2-side-footer">
-              <span className="ritual-v2-footer-icon" aria-hidden="true">🧘</span>
-              <div>
-                <p>Active</p>
-                <span>{youTitle}</span>
-              </div>
-              <span className="ritual-v2-footer-ready" aria-hidden="true">☉</span>
+              <img src={getWeatherImageUrlByTone("shiva", youTone)} alt={youTitle} />
+              <div className="ritual-v2-image-caption">{youTitle}</div>
             </div>
           </aside>
 
@@ -153,7 +133,7 @@ export default function Ritual() {
               </button>
             </div>
 
-            <div className="ritual-v2-actions">
+            <div className="ritual-v2-actions mt-auto">
               <Link to="/deeper" className="ritual-v2-action-primary">
                 Go deeper tonight
               </Link>
@@ -164,22 +144,9 @@ export default function Ritual() {
           </section>
 
           <aside className="ritual-v2-side ritual-v2-side-right">
-            <div className="ritual-v2-side-chip">{partnerTag}</div>
             <div className="ritual-v2-image-card ritual-v2-image-card-right">
-              <img src={getWeatherImageUrlByTone("shakti", partnerTone)} alt={`${partnerTitle} Shakti`} />
-              <div className="ritual-v2-image-caption">{`${partnerTitle} Shakti`}</div>
-            </div>
-            <div className="ritual-v2-state-card">
-              <h2>{`${partnerTitle} Shakti`} ({partnerTag})</h2>
-              <p>{WEATHER_TONE_COPY[partnerTone]}</p>
-            </div>
-            <div className="ritual-v2-side-footer">
-              <span className="ritual-v2-footer-icon" aria-hidden="true">🧘</span>
-              <div>
-                <p>Active</p>
-                <span>{partnerTitle}</span>
-              </div>
-              <span className="ritual-v2-footer-ready" aria-hidden="true">☉</span>
+              <img src={getWeatherImageUrlByTone("shakti", partnerTone)} alt={partnerTitle} />
+              <div className="ritual-v2-image-caption">{partnerTitle}</div>
             </div>
           </aside>
         </section>
