@@ -1571,6 +1571,14 @@ img { max-width: 100%; display: block; }
   box-shadow: 0 16px 34px rgba(216, 172, 104, 0.24);
 }
 
+.ritual-v2-practice-btn-sm {
+  width: min(58%, 220px);
+  min-height: 34px;
+  margin-inline: auto;
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+}
+
 .ritual-v2-mini-visual {
   height: 88px;
   border-radius: 18px;
@@ -1602,6 +1610,7 @@ img { max-width: 100%; display: block; }
   display: flex;
   flex-direction: column;
   gap: 12px;
+  align-items: center;
 }
 
 .ritual-v2-action-primary,
@@ -1614,12 +1623,22 @@ img { max-width: 100%; display: block; }
   font-weight: 800;
 }
 
+.ritual-v2-action-primary-sm {
+  width: min(58%, 220px);
+  min-height: 34px;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  align-self: center;
+}
+
 .ritual-v2-action-primary {
   background: linear-gradient(135deg, #f5d9a8 0%, #dcb068 100%);
   color: #21140c;
 }
 
 .ritual-v2-action-secondary {
+  width: 100%;
+  max-width: 320px;
   border: 1px solid rgba(241, 212, 154, 0.24);
   background: rgba(255, 255, 255, 0.04);
   color: #f8ecda;
