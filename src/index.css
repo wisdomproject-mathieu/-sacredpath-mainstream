@@ -787,12 +787,24 @@ img { max-width: 100%; display: block; }
 .weather-v2-top-left-shell {
   display: flex;
   justify-content: flex-start;
-  margin: 0 0 16px;
+  margin: 0 0 12px;
 }
 
 .weather-v2-top-left-card {
-  width: min(100%, 220px);
-  min-height: 168px;
+  width: 168px;
+  min-height: 124px;
+  transform: scale(0.92);
+  transform-origin: top left;
+  margin-left: 2px;
+}
+
+.weather-v2-top-left-card .home-visual-icon-area {
+  padding-bottom: 0;
+}
+
+.weather-v2-top-left-card .home-shiny-icon {
+  width: min(82%, 124px);
+  max-width: 124px;
 }
 
 .weather-v2-title {
