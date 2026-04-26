@@ -180,12 +180,12 @@ img { max-width: 100%; display: block; }
 }
 
 .sacred-brand-note {
-  margin-left: auto;
-  max-width: 18rem;
-  font-size: 0.94rem;
+  margin-left: 0;
+  max-width: 22rem;
+  font-size: 0.88rem;
   line-height: 1.35;
   color: rgba(236, 227, 247, 0.86);
-  text-align: right;
+  text-align: left;
 }
 
 .home-hero {
