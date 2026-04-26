@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
 import type { WeatherVisualKey } from "../lib/weatherAssets";
 
