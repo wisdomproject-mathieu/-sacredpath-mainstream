@@ -44,6 +44,19 @@ export const WEATHER_TONE_COPY: Record<WeatherVisualKey, string> = {
   sunny: "Clear, light, and easy with each other today.",
 };
 
+export function getDisplayName(name: string | undefined, fallback: string) {
+  const value = name?.trim();
+  return value || fallback;
+}
+
+export function getWeatherTitle(tone: WeatherVisualKey, displayName: string) {
+  return `${WEATHER_TONE_LABELS[tone]} ${displayName}`;
+}
+
+export function getWeatherForTitle(tone: WeatherVisualKey, displayName: string) {
+  return `${WEATHER_TONE_LABELS[tone]} for ${displayName}`;
+}
+
 export function getWeatherVisualKey(
   weather: IntimacyWeather | undefined,
   cloudyVariant?: "foggy" | "frozen"

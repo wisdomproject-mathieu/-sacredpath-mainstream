@@ -4,7 +4,10 @@ import { useSession } from "../contexts/SessionContext";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
 import {
   getWeatherImageUrlByTone,
+  getDisplayName,
+  getWeatherForTitle,
   getWeatherVisualKey,
+  getWeatherTitle,
   type WeatherVisualKey,
 } from "../lib/weatherAssets";
 
@@ -71,16 +74,20 @@ function WeatherOptionCard({
 function WeatherPreviewCard({
   role,
   tone,
+  displayName,
 }: {
   role: WeatherRole;
   tone: WeatherVisualKey;
+  displayName: string;
 }) {
   const image = getWeatherImageUrlByTone(role, tone);
+  const title = getWeatherForTitle(tone, displayName);
 
   return (
     <div className={`weather-ref-preview-card ${role === "shiva" ? "weather-ref-preview-shiva" : "weather-ref-preview-shakti"}`}>
       <div className="weather-ref-preview-media">
         <img src={image} alt={`${tone} weather`} />
+        <div className="weather-ref-preview-badge">{title}</div>
       </div>
     </div>
   );
@@ -90,11 +97,13 @@ function WeatherPanel({
   role,
   label,
   selectedTone,
+  displayName,
   onSelect,
 }: {
   role: WeatherRole;
   label: string;
   selectedTone: WeatherVisualKey;
+  displayName: string;
   onSelect: (option: WeatherOption) => void;
 }) {
   return (
@@ -113,7 +122,7 @@ function WeatherPanel({
         ))}
       </div>
 
-      <WeatherPreviewCard role={role} tone={selectedTone} />
+      <WeatherPreviewCard role={role} tone={selectedTone} displayName={displayName} />
 
       <div className="weather-ref-option-row">
         {BOTTOM_OPTIONS.map((option) => (
@@ -134,6 +143,8 @@ export default function Weather() {
   const { state, setState } = useSession();
   const navigate = useNavigate();
   const logoSrc = `${import.meta.env.BASE_URL}shiva-shakti-icon.png`;
+  const myName = getDisplayName(state.youName, "You");
+  const partnerName = getDisplayName(state.partnerName, "Partner");
 
   const setWeather = (field: WeatherField, value: IntimacyWeather, cloudyVariant?: "foggy" | "frozen") => {
     const toneField = field === "youWeather" ? "youWeatherTone" : "partnerWeatherTone";
@@ -144,16 +155,24 @@ export default function Weather() {
   const swapWeather = () => {
     setState({
       ...state,
-      youWeather: state.partnerWeather,
-      partnerWeather: state.youWeather,
-      youWeatherTone: state.partnerWeatherTone,
-      partnerWeatherTone: state.youWeatherTone,
+      weatherSidesSwapped: !state.weatherSidesSwapped,
     });
   };
 
   const canContinue = Boolean(state.youWeather && state.partnerWeather);
   const leftTone = toneForWeather(state.youWeather, state.youWeatherTone);
   const rightTone = toneForWeather(state.partnerWeather, state.partnerWeatherTone);
+  const leftIsShakti = Boolean(state.weatherSidesSwapped);
+  const leftRole: WeatherRole = leftIsShakti ? "shakti" : "shiva";
+  const rightRole: WeatherRole = leftIsShakti ? "shiva" : "shakti";
+  const leftDisplayName = leftIsShakti ? partnerName : myName;
+  const rightDisplayName = leftIsShakti ? myName : partnerName;
+  const leftSelectedTone = leftIsShakti ? rightTone : leftTone;
+  const rightSelectedTone = leftIsShakti ? leftTone : rightTone;
+  const leftSelectedWeather = leftIsShakti ? state.partnerWeather : state.youWeather;
+  const rightSelectedWeather = leftIsShakti ? state.youWeather : state.partnerWeather;
+  const leftPanelTitle = getWeatherTitle(leftSelectedTone, leftDisplayName);
+  const rightPanelTitle = getWeatherTitle(rightSelectedTone, rightDisplayName);
 
   return (
     <div className="weather-ref-page">
@@ -173,17 +192,18 @@ export default function Weather() {
           <div className="weather-ref-heading">
             <h1>Your shared intimacy weather</h1>
             <p>
-              Take a moment. Breathe. Share your current state and welcome your partner&apos;s weather with love and respect.
+              Take a moment. Breathe. Share your current state, then welcome your partner&apos;s weather with love, respect, and curiosity.
             </p>
           </div>
         </div>
 
         <section className="weather-ref-grid">
           <WeatherPanel
-            role="shiva"
-            label="You"
-            selectedTone={leftTone}
-            onSelect={(option) => setWeather("youWeather", option.id, option.cloudyVariant)}
+            role={leftRole}
+            label={leftDisplayName}
+            selectedTone={leftSelectedTone}
+            displayName={leftDisplayName}
+            onSelect={(option) => setWeather(leftIsShakti ? "partnerWeather" : "youWeather", option.id, option.cloudyVariant)}
           />
 
           <div className="weather-ref-center">
@@ -203,22 +223,31 @@ export default function Weather() {
               </ol>
             </div>
 
-            <div className="weather-ref-sacred-block">SACRED RITUALS FOR COUPLED PRESENCE</div>
-
-            <button type="button" disabled={!canContinue} onClick={() => canContinue && navigate("/ritual")} className="weather-ref-primary-btn">
-              Go to Sacred Rituals
+            <button
+              type="button"
+              disabled={!canContinue}
+              onClick={() => canContinue && navigate("/ritual")}
+              className="weather-ref-sacred-button"
+            >
+              <span>SACRED RITUALS FOR COUPLED PRESENCE</span>
             </button>
 
-            <button type="button" onClick={() => navigate("/paywall")} className="weather-ref-secondary-btn">
-              Explore premium features
+            <button
+              type="button"
+              onClick={() => navigate("/paywall")}
+              className="weather-ref-premium-button"
+            >
+              <span>Explore premium for both of you</span>
+              <small>One subscription. One path for both of you.</small>
             </button>
           </div>
 
           <WeatherPanel
-            role="shakti"
-            label="Partner"
-            selectedTone={rightTone}
-            onSelect={(option) => setWeather("partnerWeather", option.id, option.cloudyVariant)}
+            role={rightRole}
+            label={rightDisplayName}
+            selectedTone={rightSelectedTone}
+            displayName={rightDisplayName}
+            onSelect={(option) => setWeather(leftIsShakti ? "youWeather" : "partnerWeather", option.id, option.cloudyVariant)}
           />
         </section>
       </div>

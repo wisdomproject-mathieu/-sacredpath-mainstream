@@ -14,6 +14,7 @@ interface SessionState {
   partnerWeather?: IntimacyWeather;
   youWeatherTone?: WeatherVisualKey;
   partnerWeatherTone?: WeatherVisualKey;
+  weatherSidesSwapped?: boolean;
   savedRitual?: SavedRitualSession;
 }
 
@@ -39,6 +40,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         partnerWeather: parsed.partnerWeather,
         youWeatherTone: parsed.youWeatherTone,
         partnerWeatherTone: parsed.partnerWeatherTone,
+        weatherSidesSwapped: parsed.weatherSidesSwapped,
         savedRitual: parsed.savedRitual,
       };
     } catch {
