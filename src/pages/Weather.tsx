@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import CoupleTopbar from "../components/CoupleTopbar";
 import { useSession } from "../contexts/SessionContext";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
 import {
@@ -142,7 +143,6 @@ function WeatherPanel({
 export default function Weather() {
   const { state, setState } = useSession();
   const navigate = useNavigate();
-  const logoSrc = `${import.meta.env.BASE_URL}shiva-shakti-icon.png`;
   const myName = getDisplayName(state.youName, "You");
   const partnerName = getDisplayName(state.partnerName, "Partner");
 
@@ -178,16 +178,7 @@ export default function Weather() {
     <div className="weather-ref-page">
       <div className="weather-ref-shell">
         <div className="weather-ref-topbar">
-          <div className="weather-ref-brand-card">
-            <div className="weather-ref-brand-mark">
-              <img src={logoSrc} alt="Sacred Path" />
-            </div>
-            <div className="weather-ref-brand-copy">
-              <div className="weather-ref-brand-kicker">SACRED PATH</div>
-              <div className="weather-ref-brand-title">for Couples</div>
-            </div>
-            <div className="weather-ref-brand-note">Ancient wisdom for modern love.</div>
-          </div>
+          <CoupleTopbar />
 
           <div className="weather-ref-heading">
             <h1>Your shared intimacy weather</h1>
