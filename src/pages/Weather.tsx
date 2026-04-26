@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useSession } from "../contexts/SessionContext";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
 import {
-  WEATHER_TONE_COPY,
-  WEATHER_TONE_LABELS,
   getWeatherImageUrlByTone,
   getWeatherVisualKey,
   type WeatherVisualKey,
@@ -39,21 +37,6 @@ function toneForWeather(weather: IntimacyWeather | undefined, explicitTone?: Wea
   return getWeatherVisualKey(weather);
 }
 
-function panelTitle(role: WeatherRole, tone: WeatherVisualKey) {
-  if (role === "shiva") return `${WEATHER_TONE_LABELS[tone]} Shiva`;
-  return "Partner Shakti";
-}
-
-function panelStrip(role: WeatherRole, tone: WeatherVisualKey) {
-  if (role === "shiva") return `${WEATHER_TONE_LABELS[tone]} for Shiva`;
-  return `${WEATHER_TONE_LABELS[tone]} for Shakti`;
-}
-
-function panelSubtitle(role: WeatherRole, tone: WeatherVisualKey) {
-  if (role === "shiva") return WEATHER_TONE_COPY[tone];
-  return WEATHER_TONE_COPY[tone];
-}
-
 function WeatherOptionCard({
   role,
   option,
@@ -79,7 +62,7 @@ function WeatherOptionCard({
       <span className="weather-ref-option-content">
         <span className="weather-ref-option-title">{option.title}.</span>
         <span className="weather-ref-option-subtitle">{option.subtitle}</span>
-        <span className="weather-ref-select-chip">SELECT</span>
+        <span className="weather-ref-select-chip">Select</span>
       </span>
     </button>
   );
@@ -88,26 +71,16 @@ function WeatherOptionCard({
 function WeatherPreviewCard({
   role,
   tone,
-  title,
-  subtitle,
 }: {
   role: WeatherRole;
   tone: WeatherVisualKey;
-  title: string;
-  subtitle: string;
 }) {
   const image = getWeatherImageUrlByTone(role, tone);
 
   return (
     <div className={`weather-ref-preview-card ${role === "shiva" ? "weather-ref-preview-shiva" : "weather-ref-preview-shakti"}`}>
       <div className="weather-ref-preview-media">
-        <img src={image} alt={title} />
-        <div className="weather-ref-preview-strip">{panelStrip(role, tone)}</div>
-      </div>
-      <div className="weather-ref-preview-copy">
-        <h3>{title}</h3>
-        <p>{subtitle}</p>
-        <button type="button" className="weather-ref-preview-select">SELECT</button>
+        <img src={image} alt={`${tone} weather`} />
       </div>
     </div>
   );
@@ -116,19 +89,14 @@ function WeatherPreviewCard({
 function WeatherPanel({
   role,
   label,
-  selectedWeather,
   selectedTone,
   onSelect,
 }: {
   role: WeatherRole;
   label: string;
-  selectedWeather: IntimacyWeather | undefined;
   selectedTone: WeatherVisualKey;
   onSelect: (option: WeatherOption) => void;
 }) {
-  const previewTitle = panelTitle(role, selectedTone);
-  const previewSubtitle = panelSubtitle(role, selectedTone);
-
   return (
     <aside className={`weather-ref-panel ${role === "shiva" ? "weather-ref-panel-shiva" : "weather-ref-panel-shakti"}`}>
       <p className="weather-ref-side-label">{label}</p>
@@ -145,20 +113,7 @@ function WeatherPanel({
         ))}
       </div>
 
-      <WeatherPreviewCard role={role} tone={selectedTone} title={previewTitle} subtitle={previewSubtitle} />
-
-      <div className="weather-ref-preview-meta">
-        <div className="weather-ref-preview-heading">{previewTitle}</div>
-        <p className="weather-ref-preview-text">{previewSubtitle}</p>
-        <button
-          type="button"
-          className={`weather-ref-preview-select weather-ref-preview-select-wide ${selectedWeather ? "" : "is-disabled"}`}
-          disabled={!selectedWeather}
-          onClick={() => selectedWeather && onSelect(WEATHER_OPTIONS.find((option) => option.key === selectedTone) ?? WEATHER_OPTIONS[5])}
-        >
-          SELECT
-        </button>
-      </div>
+      <WeatherPreviewCard role={role} tone={selectedTone} />
 
       <div className="weather-ref-option-row">
         {BOTTOM_OPTIONS.map((option) => (
@@ -227,7 +182,6 @@ export default function Weather() {
           <WeatherPanel
             role="shiva"
             label="You"
-            selectedWeather={state.youWeather}
             selectedTone={leftTone}
             onSelect={(option) => setWeather("youWeather", option.id, option.cloudyVariant)}
           />
@@ -263,7 +217,6 @@ export default function Weather() {
           <WeatherPanel
             role="shakti"
             label="Partner"
-            selectedWeather={state.partnerWeather}
             selectedTone={rightTone}
             onSelect={(option) => setWeather("partnerWeather", option.id, option.cloudyVariant)}
           />

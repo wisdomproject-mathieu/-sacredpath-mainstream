@@ -2308,8 +2308,8 @@ img { max-width: 100%; display: block; }
 
 .weather-ref-panel {
   position: relative;
-  min-height: 978px;
-  padding: 18px;
+  min-height: 0;
+  padding: 16px;
   border-radius: 30px;
   border: 1px solid rgba(241, 212, 154, 0.16);
   background: linear-gradient(180deg, rgba(23, 18, 35, 0.8), rgba(14, 11, 23, 0.93));
@@ -2342,9 +2342,9 @@ img { max-width: 100%; display: block; }
 }
 
 .weather-ref-side-label {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   color: rgba(236, 200, 136, 0.92);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -2352,15 +2352,15 @@ img { max-width: 100%; display: block; }
 .weather-ref-option-row {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .weather-ref-option-card {
   position: relative;
   display: flex;
-  min-height: 156px;
-  padding: 12px 11px 10px;
-  border-radius: 20px;
+  min-height: 126px;
+  padding: 9px 9px 8px;
+  border-radius: 18px;
   overflow: hidden;
   border: 1px solid rgba(241, 212, 154, 0.16);
   background:
@@ -2423,12 +2423,12 @@ img { max-width: 100%; display: block; }
   width: 100%;
   flex-direction: column;
   justify-content: flex-end;
-  gap: 4px;
+  gap: 2px;
 }
 
 .weather-ref-option-title {
   font-family: "Cormorant Garamond", serif;
-  font-size: 1.34rem;
+  font-size: 1.18rem;
   line-height: 0.92;
   color: #fbf2e6;
   font-weight: 700;
@@ -2436,9 +2436,9 @@ img { max-width: 100%; display: block; }
 }
 
 .weather-ref-option-subtitle {
-  min-height: 3.2rem;
-  font-size: 0.82rem;
-  line-height: 1.18;
+  min-height: 1.8rem;
+  font-size: 0.72rem;
+  line-height: 1.12;
   color: rgba(247, 242, 235, 0.9);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.42);
 }
@@ -2446,22 +2446,22 @@ img { max-width: 100%; display: block; }
 .weather-ref-select-chip {
   display: inline-flex;
   align-self: flex-start;
-  margin-top: 6px;
-  padding: 7px 12px;
+  margin-top: 2px;
+  padding: 4px 8px;
   border-radius: 999px;
   border: 1px solid rgba(236, 200, 136, 0.22);
   background: rgba(18, 14, 23, 0.54);
   color: rgba(236, 200, 136, 0.98);
-  font-size: 0.72rem;
+  font-size: 0.58rem;
   font-weight: 800;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
 }
 
 .weather-ref-preview-card {
   position: relative;
-  margin: 12px 0 10px;
-  padding: 14px 14px 12px;
-  border-radius: 24px;
+  margin: 10px 0 8px;
+  padding: 10px;
+  border-radius: 22px;
   border: 1px solid rgba(241, 212, 154, 0.18);
   background: linear-gradient(180deg, rgba(28, 20, 36, 0.92), rgba(15, 11, 23, 0.96));
   box-shadow:
@@ -2472,9 +2472,9 @@ img { max-width: 100%; display: block; }
 .weather-ref-preview-media {
   position: relative;
   overflow: hidden;
-  border-radius: 20px;
+  border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  aspect-ratio: 0.88;
+  aspect-ratio: 0.8;
   background:
     radial-gradient(circle at 50% 18%, rgba(241, 212, 154, 0.12), transparent 42%),
     linear-gradient(180deg, rgba(28, 20, 36, 0.8), rgba(12, 10, 18, 0.96));
@@ -2557,14 +2557,14 @@ img { max-width: 100%; display: block; }
 .weather-ref-center {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
   align-items: stretch;
   justify-content: center;
-  padding-top: 22px;
+  padding-top: 14px;
 }
 
 .weather-ref-swap-pill {
-  min-height: 44px;
+  min-height: 40px;
   padding: 0 18px;
   border-radius: 999px;
   border: 1px solid rgba(236, 200, 136, 0.34);
@@ -2577,7 +2577,7 @@ img { max-width: 100%; display: block; }
 }
 
 .weather-ref-guidance-card {
-  padding: 18px 18px 20px;
+  padding: 16px 16px 18px;
   border-radius: 24px;
   border: 1px solid rgba(241, 212, 154, 0.16);
   background:
@@ -2587,10 +2587,10 @@ img { max-width: 100%; display: block; }
 }
 
 .weather-ref-guidance-card h2 {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
   text-align: center;
   color: #f7e2b0;
-  font-size: 2rem;
+  font-size: 1.8rem;
   line-height: 0.92;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -2602,21 +2602,21 @@ img { max-width: 100%; display: block; }
 }
 
 .weather-ref-guidance-card li {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   color: rgba(246, 240, 233, 0.9);
-  font-size: 0.96rem;
-  line-height: 1.42;
+  font-size: 0.92rem;
+  line-height: 1.35;
 }
 
 .weather-ref-sacred-block {
-  min-height: 96px;
-  padding: 18px 16px;
-  border-radius: 22px;
+  min-height: 80px;
+  padding: 14px 14px;
+  border-radius: 20px;
   background: linear-gradient(180deg, rgba(243, 215, 154, 0.98), rgba(219, 194, 128, 0.96));
   color: #19120c;
   text-align: center;
   font-family: "Cormorant Garamond", serif;
-  font-size: 1.35rem;
+  font-size: 1.16rem;
   line-height: 0.96;
   font-weight: 700;
   text-transform: uppercase;
@@ -2628,7 +2628,7 @@ img { max-width: 100%; display: block; }
 
 .weather-ref-primary-btn,
 .weather-ref-secondary-btn {
-  min-height: 46px;
+  min-height: 42px;
   width: 100%;
   border-radius: 999px;
   font-size: 0.94rem;
@@ -2666,7 +2666,7 @@ img { max-width: 100%; display: block; }
 
   .weather-ref-center {
     order: 2;
-    width: min(100%, 420px);
+    width: min(100%, 380px);
     margin: 0 auto;
   }
 
@@ -2693,7 +2693,7 @@ img { max-width: 100%; display: block; }
   }
 
   .weather-ref-panel {
-    padding: 14px;
+    padding: 12px;
   }
 
   .weather-ref-option-row {
@@ -2701,7 +2701,7 @@ img { max-width: 100%; display: block; }
   }
 
   .weather-ref-option-card {
-    min-height: 146px;
+    min-height: 120px;
   }
 
   .weather-ref-heading h1 {
@@ -2709,11 +2709,11 @@ img { max-width: 100%; display: block; }
   }
 
   .weather-ref-guidance-card h2 {
-    font-size: 1.54rem;
+    font-size: 1.4rem;
   }
 
   .weather-ref-sacred-block {
-    font-size: 1.12rem;
+    font-size: 1rem;
   }
 }
 
@@ -2723,11 +2723,11 @@ img { max-width: 100%; display: block; }
   }
 
   .weather-ref-option-card {
-    min-height: 132px;
+    min-height: 110px;
   }
 
   .weather-ref-preview-media {
-    aspect-ratio: 0.96;
+    aspect-ratio: 0.86;
   }
 
   .weather-ref-center {
@@ -2735,6 +2735,6 @@ img { max-width: 100%; display: block; }
   }
 
   .weather-ref-sacred-block {
-    min-height: 82px;
+    min-height: 72px;
   }
 }
