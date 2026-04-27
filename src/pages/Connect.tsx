@@ -1,6 +1,9 @@
 import { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSession } from "../contexts/SessionContext";
+import Layout from "../components/Layout";
+import Card from "../components/Card";
+import Button from "../components/Button";
 
 export default function Connect() {
   const { state, setState } = useSession();
@@ -12,44 +15,41 @@ export default function Connect() {
   };
 
   return (
-    <div className="min-h-screen bg-sp-bg text-slate-100 px-6 py-10">
-      <div className="max-w-xl mx-auto space-y-6">
-        <h2 className="text-2xl font-serif text-amber-100">Connect with Partner</h2>
-        <p className="text-sm text-slate-300">
-          Names stay on this device only. They simply help the guidance feel more
-          intimate.
+    <Layout>
+      <div className="mx-auto max-w-xl space-y-6">
+        <h2 className="font-display text-4xl text-amber-100">Connect with Partner</h2>
+        <p className="text-sm leading-7 text-slate-300">
+          Names stay on this device only. They simply help the guidance feel more intimate.
         </p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1">
-            <label className="text-xs uppercase tracking-wide text-slate-400">
-              Your name
-            </label>
-            <input
-              value={state.youName}
-              onChange={(e) => setState({ ...state, youName: e.target.value })}
-              className="w-full rounded-full bg-sp-card border border-slate-700 px-4 py-2 text-sm focus:outline-none focus:border-sp-gold"
-              placeholder="e.g. Alex"
-            />
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs uppercase tracking-wide text-slate-400">
-              Partner name
-            </label>
-            <input
-              value={state.partnerName}
-              onChange={(e) => setState({ ...state, partnerName: e.target.value })}
-              className="w-full rounded-full bg-sp-card border border-slate-700 px-4 py-2 text-sm focus:outline-none focus:border-sp-gold"
-              placeholder="e.g. Maya"
-            />
-          </div>
-          <button
-            type="submit"
-            className="mt-4 w-full py-3 rounded-full bg-sp-gold text-black font-medium"
-          >
-            Continue to intimacy weather
-          </button>
-        </form>
+
+        <Card>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-2">
+              <label className="sp-eyebrow block text-xs tracking-[0.2em] text-slate-400">
+                Your name
+              </label>
+              <input
+                value={state.youName}
+                onChange={(e) => setState({ ...state, youName: e.target.value })}
+                className="sp-input min-h-[58px] rounded-[20px] text-sm normal-case"
+                placeholder="e.g. Alex"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="sp-eyebrow block text-xs tracking-[0.2em] text-slate-400">
+                Partner name
+              </label>
+              <input
+                value={state.partnerName}
+                onChange={(e) => setState({ ...state, partnerName: e.target.value })}
+                className="sp-input min-h-[58px] rounded-[20px] text-sm normal-case"
+                placeholder="e.g. Maya"
+              />
+            </div>
+            <Button type="submit">Continue to intimacy weather</Button>
+          </form>
+        </Card>
       </div>
-    </div>
+    </Layout>
   );
 }
