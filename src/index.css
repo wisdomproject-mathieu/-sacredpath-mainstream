@@ -1312,13 +1312,13 @@ img { max-width: 100%; display: block; }
 }
 
 .ritual-v2-step-card {
-  border-radius: 26px;
-  border: 1px solid rgba(241, 212, 154, 0.24);
+  border-radius: 28px;
+  border: 1px solid rgba(241, 212, 154, 0.22);
   background:
-    radial-gradient(circle at 12% 0%, rgba(241, 212, 154, 0.12), transparent 42%),
-    linear-gradient(180deg, rgba(34, 24, 46, 0.82), rgba(16, 12, 24, 0.92));
-  padding: 18px 18px 16px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.26);
+    radial-gradient(circle at 12% 0%, rgba(241, 212, 154, 0.14), transparent 42%),
+    linear-gradient(180deg, rgba(34, 24, 46, 0.88), rgba(16, 12, 24, 0.95));
+  padding: 20px 20px 18px;
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.28);
 }
 
 .ritual-v2-step-card-head {
@@ -1330,13 +1330,14 @@ img { max-width: 100%; display: block; }
   margin: 6px 0 0;
   color: #fff4dd;
   font-family: "Cormorant Garamond", Georgia, serif;
-  font-size: clamp(1.45rem, 2.4vw, 2rem);
-  line-height: 1.05;
+  font-size: clamp(1.62rem, 2.55vw, 2.2rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
 }
 
 .ritual-v2-step-list {
   display: grid;
-  gap: 10px;
+  gap: 11px;
   margin-bottom: 16px;
 }
 
@@ -1345,10 +1346,12 @@ img { max-width: 100%; display: block; }
   grid-template-columns: 52px 1fr;
   gap: 14px;
   align-items: start;
-  padding: 14px 16px;
+  padding: 15px 16px;
   border-radius: 20px;
-  border: 1px solid rgba(241, 212, 154, 0.16);
-  background: rgba(8, 8, 14, 0.35);
+  border: 1px solid rgba(241, 212, 154, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(8, 8, 14, 0.42)),
+    rgba(8, 8, 14, 0.28);
 }
 
 .ritual-v2-step-index {
@@ -1364,15 +1367,15 @@ img { max-width: 100%; display: block; }
     rgba(27, 20, 34, 0.9);
   color: #f6e3b9;
   font-family: "Cormorant Garamond", Georgia, serif;
-  font-size: 1.2rem;
+  font-size: 1.24rem;
   letter-spacing: 0.1em;
 }
 
 .ritual-v2-step-item p {
   margin: 0;
   color: rgba(246, 240, 255, 0.92);
-  font-size: 0.98rem;
-  line-height: 1.5;
+  font-size: 1.03rem;
+  line-height: 1.58;
   font-weight: 600;
 }
 
@@ -1579,35 +1582,47 @@ img { max-width: 100%; display: block; }
 .ritual-v2-center {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   align-self: center;
   justify-self: center;
-  width: min(100%, 340px);
+  width: min(100%, 360px);
   margin-inline: auto;
 }
 
-.ritual-v2-swap-pill {
-  align-self: center;
-  min-height: 38px;
+.ritual-v2-center-action {
+  width: 100%;
+  max-width: 320px;
+  min-height: 48px;
   padding: 0 18px;
   border-radius: 999px;
-  border: 1px solid rgba(241, 212, 154, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.94rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.ritual-v2-center-action-dark {
+  border: 1px solid rgba(241, 212, 154, 0.18);
   background: rgba(255, 255, 255, 0.05);
   color: #e8ddc8;
-  font-size: 0.92rem;
-  font-weight: 700;
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.18);
 }
 
-.ritual-v2-sacred-cta {
-  width: 100%;
-  min-height: 52px;
-  padding-inline: 20px;
-  border: 1px solid rgba(241, 212, 154, 0.18);
-  border-radius: 999px;
-  box-shadow: 0 18px 40px rgba(216, 172, 104, 0.28);
-  text-align: center;
-  letter-spacing: 0.02em;
+.ritual-v2-center-action-gold {
+  border: 1px solid rgba(236, 200, 136, 0.32);
+  background: linear-gradient(180deg, rgba(243, 215, 154, 0.98), rgba(223, 194, 122, 0.96));
+  color: #1f160f;
+  box-shadow: 0 18px 36px rgba(236, 200, 136, 0.16);
+}
+
+.ritual-v2-center-action-swap {
+  border: 1px solid rgba(18, 16, 22, 0.82);
+  background: linear-gradient(180deg, rgba(27, 23, 32, 0.98), rgba(14, 11, 20, 0.96));
+  color: #f1e7d2;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
 }
 
 .ritual-v2-guidance-card {

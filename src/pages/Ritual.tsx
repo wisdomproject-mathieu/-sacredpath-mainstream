@@ -71,18 +71,21 @@ export default function Ritual() {
           </aside>
 
           <section className="ritual-v2-center">
-            <button type="button" onClick={() => navigate("/weather")} className="ritual-v2-swap-pill">
+            <Link to="/deeper" className="ritual-v2-center-action ritual-v2-center-action-dark">
+              Go deeper,
+            </Link>
+
+            <Link to="/paywall" className="ritual-v2-center-action ritual-v2-center-action-gold">
+              See premium for both of you
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => navigate("/weather")}
+              className="ritual-v2-center-action ritual-v2-center-action-swap"
+            >
               Swap Shiva ↔ Shakti
             </button>
-
-            <div className="ritual-v2-actions ritual-v2-actions-middle">
-              <Link to="/deeper" className="ritual-v2-action-primary ritual-v2-action-primary-sm">
-                Go deeper,
-              </Link>
-              <Link to="/paywall" className="ritual-v2-action-secondary">
-                See premium for both of you
-              </Link>
-            </div>
 
             <div className="ritual-v2-step-card">
               <div className="ritual-v2-step-card-head">
