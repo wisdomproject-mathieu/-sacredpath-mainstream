@@ -1,31 +1,16 @@
-import { useNavigate } from "react-router-dom";
-import { useSession } from "../contexts/SessionContext";
-import CoupleTopbar from "../components/CoupleTopbar";
-import { resolveWeatherRitual } from "../lib/ritualRegistry";
+import { Link } from "react-router-dom";
+import Layout from "../components/Layout";
 
-export default function AppHome() {
-  const navigate = useNavigate();
-  const { state, setState } = useSession();
-  const heroArtSrc = `${import.meta.env.BASE_URL}assets/home/home-premium-union.png`;
-  const yourName = state.youName;
-  const partnerName = state.partnerName;
-  const weatherResolution =
-    state.youWeather && state.partnerWeather
-      ? resolveWeatherRitual(state.youWeather, state.partnerWeather)
-      : null;
-  const sendCodeToWhatsApp = () => {
-    const message = encodeURIComponent(
-      `Sacred Path for Couples: ${yourName || "I"} and ${partnerName || "my partner"} are ready for our shared intimacy weather.`
-    );
-    window.open(`https://wa.me/?text=${message}`, "_blank", "noopener,noreferrer");
-  };
-
+export default function Home() {
   return (
-    <main className="min-h-screen bg-sp-bg text-slate-100">
-      <div className="home-shell">
-        <section className="home-hero">
-          <div className="home-left">
-            <h1 className="home-title">
+    <Layout>
+      <div className="max-w-6xl mx-auto">
+        {/* Hero Section - Split layout */}
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+          
+          {/* Left Side - Text & Inputs */}
+          <div className="space-y-8">
+            <h1 className="font-serif text-5xl md:text-6xl leading-tight">
               Deep connection &amp;
               <br />
               renewed intimacy
@@ -33,168 +18,80 @@ export default function AppHome() {
               for every couple.
             </h1>
 
-            <p className="home-subtitle">
-              Understand your unique needs and desires. Bring deep presence, safe
-              touch, and renewed closeness into your relationship. Start your journey
-              together.
+            <p className="text-lg text-muted leading-relaxed max-w-lg">
+              Understand your unique needs and desires. Bring deep presence, safe touch, 
+              and renewed closeness into your relationship. Start your journey together.
             </p>
 
-            <div className="home-name-row">
-              <label className="home-field-minimal">
-                <span>Your name</span>
-                <input
-                  value={yourName}
-                  onChange={(e) => setState({ ...state, youName: e.target.value })}
-                />
-              </label>
-              <label className="home-field-minimal">
-                <span>Partner name</span>
-                <input
-                  value={partnerName}
-                  onChange={(e) => setState({ ...state, partnerName: e.target.value })}
-                />
-              </label>
+            {/* Name Inputs */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link 
+                to="/connect" 
+                className="flex-1 bg-white/5 border border-white/10 rounded-full px-6 py-4 hover:bg-white/10 transition-colors text-center"
+              >
+                <span className="block text-sm font-medium">Enter Your Names</span>
+                <span className="block text-xs text-muted mt-1">To personalize rituals</span>
+              </Link>
+              
+              <Link 
+                to="/weather" 
+                className="flex-1 bg-gradient-to-br from-[#e6b980] to-[#eacda3] text-[#130f08] rounded-full px-6 py-4 font-medium hover:opacity-90 transition-opacity text-center"
+              >
+                Skip Names, Go Direct
+              </Link>
             </div>
 
-            <div className="home-value-grid">
-              <article className="value-card value-men">
-                <span className="value-card-art value-card-art-men" aria-hidden="true" />
-                <p className="value-kicker">Card for men</p>
-                <h2>
-                  Focus:
-                  <br />
-                  Presence.
-                </h2>
-                <p className="value-body">Learn to hold a stable and present space for your partner.</p>
+            {/* Value Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-8">
+              <article className="bg-card rounded-[18px] border border-white/5 p-6 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-32 h-32 bg-accent/10 blur-3xl -translate-x-1/2 -translate-y-1/2" />
+                <p className="text-[10px] uppercase tracking-widest text-accent mb-2">For Men</p>
+                <h3 className="font-serif text-xl mb-3">Focus: Presence.</h3>
+                <p className="text-sm text-muted">Learn to hold stable and present space for your partner.</p>
               </article>
 
-              <article className="value-card value-women">
-                <span className="value-card-art value-card-art-women" aria-hidden="true" />
-                <p className="value-kicker">Card for women</p>
-                <h2>
-                  Focus:
-                  <br />
-                  Softness.
-                </h2>
-                <p className="value-body">Experience deeply respected and gentle touch.</p>
+              <article className="bg-card rounded-[18px] border border-white/5 p-6 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-32 h-32 bg-accent/10 blur-3xl -translate-x-1/2 -translate-y-1/2" />
+                <p className="text-[10px] uppercase tracking-widest text-accent mb-2">For Women</p>
+                <h3 className="font-serif text-xl mb-3">Focus: Softness.</h3>
+                <p className="text-sm text-muted">Experience deeply respected and gentle touch.</p>
               </article>
 
-              <article className="value-card value-couple">
-                <span className="value-card-art value-card-art-couple" aria-hidden="true" />
-                <p className="value-kicker">Card for couple</p>
-                <h2>
-                  Focus:
-                  <br />
-                  Rituals.
-                </h2>
-                <p className="value-body">Build deep affection with shared, mindful practices.</p>
+              <article className="bg-card rounded-[18px] border border-white/5 p-6 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-32 h-32 bg-accent/10 blur-3xl -translate-x-1/2 -translate-y-1/2" />
+                <p className="text-[10px] uppercase tracking-widest text-accent mb-2">For Couples</p>
+                <h3 className="font-serif text-xl mb-3">Focus: Rituals.</h3>
+                <p className="text-sm text-muted">Build deep affection with shared, mindful practices.</p>
               </article>
-            </div>
-
-            <section className="mt-8 overflow-hidden rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-[0_18px_45px_rgba(0,0,0,0.45)] backdrop-blur-xl">
-              <p className="text-[0.72rem] font-black uppercase tracking-[0.32em] text-sp-gold">
-                {weatherResolution?.homeCard.eyebrow ?? "Tonight's path"}
-              </p>
-              <div className="mt-4 grid gap-5 lg:grid-cols-[1.3fr_1fr]">
-                <div>
-                  <h2 className="font-display text-[clamp(2rem,3vw,3.5rem)] leading-[0.95] text-sp-text">
-                    {weatherResolution?.homeCard.title ?? "Choose both weather states"}
-                  </h2>
-                  <p className="mt-3 max-w-xl text-sm leading-7 text-slate-300">
-                    {weatherResolution?.homeCard.body ??
-                      "Pick your weather and your partner's weather to reveal the shared ritual outcome for tonight."}
-                  </p>
-
-                  {weatherResolution?.freeRitual ? (
-                    <div className="mt-5 rounded-[24px] border border-white/10 bg-black/20 p-4">
-                      <p className="text-[0.68rem] font-black uppercase tracking-[0.28em] text-sp-gold">
-                        {weatherResolution.freeRitual.title}
-                      </p>
-                      <p className="mt-2 text-sm leading-6 text-slate-200">
-                        {weatherResolution.freeRitual.subtitle}
-                      </p>
-                      <ol className="mt-4 space-y-2 text-sm leading-6 text-slate-300">
-                        {weatherResolution.freeRitual.ritualSteps.slice(0, 4).map((step, index) => (
-                          <li key={step} className="flex gap-3">
-                            <span className="inline-flex h-6 w-6 flex-none items-center justify-center rounded-full border border-white/10 bg-white/5 text-[0.68rem] font-black text-sp-gold">
-                              {String(index + 1).padStart(2, "0")}
-                            </span>
-                            <span>{step}</span>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  ) : null}
-                </div>
-
-                <div className="flex flex-col justify-between gap-4 rounded-[24px] border border-white/10 bg-black/20 p-4">
-                  <div>
-                    <p className="text-[0.68rem] font-black uppercase tracking-[0.28em] text-sp-gold">
-                      Weather pair
-                    </p>
-                    <p className="mt-2 text-lg font-bold text-sp-text">
-                      {state.youWeather && state.partnerWeather
-                        ? `${state.youWeather} + ${state.partnerWeather}`
-                        : "Not connected yet"}
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">
-                      {state.youWeather && state.partnerWeather
-                        ? "The new 6-weather engine turns this pair into tonight's ritual."
-                        : "Connect both weather states to reveal the full ritual path and shared outcome."}
-                    </p>
-                  </div>
-                  <button
-                    className="inline-flex min-h-[56px] items-center justify-center rounded-full bg-gradient-to-r from-sp-gold to-sp-gold2 px-6 text-sm font-black text-sp-darkGold shadow-sp-gold transition hover:-translate-y-0.5"
-                    onClick={() => navigate("/ritual")}
-                    disabled={!state.youWeather || !state.partnerWeather}
-                    type="button"
-                  >
-                    Enter Tonight&apos;s Path
-                  </button>
-                </div>
-              </div>
-            </section>
-
-            <div className="home-cta-row">
-              <button
-                className="home-btn home-btn-gold"
-                onClick={() => navigate("/weather")}
-              >
-                Sense both weather
-              </button>
-              <button
-                className="home-btn home-btn-ghost"
-                onClick={sendCodeToWhatsApp}
-              >
-                Send code on WhatsApp
-              </button>
             </div>
           </div>
 
-          <aside className="home-visual-wrap">
-            <div className="home-visual-card">
-              <div className="home-visual-brand">
-                <CoupleTopbar />
-              </div>
-              <div className="home-visual-glow" />
-              <div className="home-visual-beam" />
-              <div className="home-visual-icon-area">
-                <img
-                  src={heroArtSrc}
-                  alt="Sacred Path for Couples"
-                  className="home-shiny-icon"
-                />
-              </div>
-              <div className="home-couple-panel">
-                <p className="panel-kicker">Tonight starts here</p>
-                <p className="panel-text">
-                  One simple ritual. More closeness, more softness, one stronger night together.
-                </p>
+          {/* Right Side - Preview Card */}
+          <aside className="relative">
+            <div className="sticky top-8">
+              <div className="bg-card rounded-[24px] border border-white/5 shadow-soft p-8 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-48 h-48 bg-accent/10 blur-[80px] pointer-events-none" />
+                
+                <div className="mb-6">
+                  <img 
+                    src="/assets/home/home-premium-union.png" 
+                    alt="Sacred Union" 
+                    className="w-full rounded-xl border border-white/5 aspect-square object-cover"
+                  />
+                </div>
+                
+                <div className="text-center space-y-3">
+                  <p className="text-[11px] uppercase tracking-widest text-accent">Tonight starts here</p>
+                  <p className="text-lg font-medium leading-snug">
+                    One simple ritual. More closeness, more softness, one stronger night together.
+                  </p>
+                </div>
               </div>
             </div>
           </aside>
+
         </section>
       </div>
-    </main>
+    </Layout>
   );
 }

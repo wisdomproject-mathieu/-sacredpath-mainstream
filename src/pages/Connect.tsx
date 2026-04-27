@@ -2,7 +2,6 @@ import { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSession } from "../contexts/SessionContext";
 import Layout from "../components/Layout";
-import Card from "../components/Card";
 import Button from "../components/Button";
 
 export default function Connect() {
@@ -15,40 +14,51 @@ export default function Connect() {
   };
 
   return (
-    <Layout>
-      <div className="mx-auto max-w-xl space-y-6">
-        <h2 className="font-display text-4xl text-amber-100">Connect with Partner</h2>
-        <p className="text-sm leading-7 text-slate-300">
-          Names stay on this device only. They simply help the guidance feel more intimate.
-        </p>
+    <Layout showHeader={true}>
+      <div className="max-w-md mx-auto">
+        <div className="text-center mb-10">
+          <p className="text-[11px] uppercase tracking-widest text-accent mb-3">Sacred Path</p>
+          <h1 className="font-serif text-3xl mb-3">Connect with Partner</h1>
+          <p className="text-sm text-muted">
+            Names stay on this device only. They simply help the guidance feel more intimate.
+          </p>
+        </div>
 
-        <Card>
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2">
-              <label className="sp-eyebrow block text-xs tracking-[0.2em] text-slate-400">
-                Your name
-              </label>
-              <input
-                value={state.youName}
-                onChange={(e) => setState({ ...state, youName: e.target.value })}
-                className="sp-input min-h-[58px] rounded-[20px] text-sm normal-case"
-                placeholder="e.g. Alex"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="sp-eyebrow block text-xs tracking-[0.2em] text-slate-400">
-                Partner name
-              </label>
-              <input
-                value={state.partnerName}
-                onChange={(e) => setState({ ...state, partnerName: e.target.value })}
-                className="sp-input min-h-[58px] rounded-[20px] text-sm normal-case"
-                placeholder="e.g. Maya"
-              />
-            </div>
-            <Button type="submit">Continue to intimacy weather</Button>
-          </form>
-        </Card>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <label className="block text-xs uppercase tracking-wide text-muted">Your name</label>
+            <input
+              value={state.youName || ""}
+              onChange={(e) => setState({ ...state, youName: e.target.value })}
+              className="w-full rounded-full bg-card border border-white/10 px-5 py-3 text-text focus:outline-none focus:border-accent transition-colors"
+              placeholder="e.g. Alex"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <label className="block text-xs uppercase tracking-wide text-muted">Partner name</label>
+            <input
+              value={state.partnerName || ""}
+              onChange={(e) => setState({ ...state, partnerName: e.target.value })}
+              className="w-full rounded-full bg-card border border-white/10 px-5 py-3 text-text focus:outline-none focus:border-accent transition-colors"
+              placeholder="e.g. Maya"
+            />
+          </div>
+          
+          <Button variant="glow" type="submit">
+            Continue to intimacy weather
+          </Button>
+          
+          <div className="text-center pt-4">
+            <button 
+              type="button"
+              onClick={() => navigate("/weather")}
+              className="text-sm text-muted hover:text-text transition-colors"
+            >
+              Skip names, continue as guest
+            </button>
+          </div>
+        </form>
       </div>
     </Layout>
   );

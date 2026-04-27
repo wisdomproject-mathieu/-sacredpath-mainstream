@@ -1,7 +1,8 @@
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Layout from "../components/Layout";
-import Card from "../components/Card";
 import Button from "../components/Button";
+import Card from "../components/Card";
+import { Link } from "react-router-dom";
 
 export default function Voice() {
   const location = useLocation();
@@ -9,22 +10,20 @@ export default function Voice() {
 
   return (
     <Layout>
-      <div className="mx-auto max-w-md">
-        <Card className="space-y-4 text-center">
-          <p className="sp-eyebrow">Sacred Voice Preview</p>
-          <h2 className="font-display text-4xl text-amber-100">{title}</h2>
-          <p className="text-sm leading-7 text-slate-300">
-            This is a stub for your guided audio experience. Connect this screen to your
-            existing Sacred Voice / TTS pipeline or uploaded audio tracks.
+      <div className="max-w-md mx-auto">
+        <Card>
+          <p className="text-[11px] uppercase tracking-widest text-accent text-center mb-4">Sacred Voice Preview</p>
+          <h2 className="font-serif text-2xl text-center mb-4">{title}</h2>
+          <p className="text-sm text-muted text-center mb-6">
+            This is a stub for your guided audio experience. Connect this screen to your existing Sacred Voice pipeline.
           </p>
-          <Button variant="glow">▶︎ Play sample (stub)</Button>
-          <p className="text-xs leading-6 text-slate-500">
-            In production, this button would stream a Sacred Voice session for the
-            selected ritual.
+          <Button variant="primary">▶︎ Play sample (stub)</Button>
+          <p className="text-xs text-muted text-center mt-3">
+            In production, this would stream a Sacred Voice session for the selected ritual.
           </p>
-          <Link to="/ritual" className="block text-xs text-slate-400 underline">
-            Back to tonight&apos;s ritual
-          </Link>
+          <div className="text-center mt-6">
+            <Link to="/ritual" className="text-sm text-muted underline">Back to tonight's ritual</Link>
+          </div>
         </Card>
       </div>
     </Layout>

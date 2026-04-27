@@ -1,167 +1,105 @@
 import { Link } from "react-router-dom";
-import CoupleTopbar from "../components/CoupleTopbar";
+import Layout from "../components/Layout";
+import Card from "../components/Card";
+import Button from "../components/Button";
 
 const practicePoints = [
   "Remove Distractions: These rituals require 100% focus. Put your phones in another room.",
-  "Create the Space: Dim the lights, use essential oils, or play ambient music to signal that this time is sacred.",
-  "Release Expectations: Tantra is about the process, not the climax. If you feel awkward, that’s okay—laugh together and start again.",
-  "Commit to Consistency: Pick one ritual per week to start. Intimacy is a muscle; it requires regular exercise to stay strong.",
-  'Remember: The goal isn’t perfection; it’s presence. When you stop "doing" and start "being" with your partner, the intimacy you seek will naturally unfold.',
+  "Create the Space: Dim the lights, use essential oils, or play ambient music.",
+  "Release Expectations: Tantra is about the process, not the climax. If you feel awkward, laugh together.",
+  "Commit to Consistency: Pick one ritual per week to start. Intimacy requires regular exercise.",
+  'Remember: The goal isn't perfection; it's presence.',
 ];
 
 export default function Deeper() {
   return (
-    <div className="min-h-screen bg-sp-bg text-slate-100 deeper-page">
-      <div className="deeper-shell">
-        <div className="deeper-brand-row">
-          <CoupleTopbar />
-        </div>
-
-        <header className="deeper-header">
-          <div className="deeper-kicker">Go deeper</div>
-          <h1 className="deeper-title">Beyond the Physical</h1>
-          <p className="deeper-subtitle">
+    <Layout>
+      <div className="max-w-4xl mx-auto">
+        
+        {/* Header */}
+        <header className="text-center mb-12">
+          <p className="text-[11px] uppercase tracking-widest text-accent mb-3">Beyond the Physical</p>
+          <h1 className="font-serif text-4xl md:text-5xl mb-4">Go deeper than one ritual</h1>
+          <p className="text-lg text-muted">
             How Tantra Can Help Couples Reconnect with slowed-down presence, mindful touch, and a calmer way of meeting each other.
           </p>
         </header>
 
-        <main className="deeper-grid">
-          <article className="deeper-card deeper-card-feature">
-            <h2>How Tantra Can Help Couples Reconnect</h2>
-            <div className="deeper-copy">
-              <p>
-                In the hustle and bustle of modern life, the spark that once defined a relationship can often dim.
-                Between work deadlines, household chores, and the endless digital noise, intimacy often gets relegated
-                to the bottom of the to-do list.
-              </p>
-              <p>
-                If you and your partner feel like you’re drifting apart or simply want to deepen the bond you already
-                share, you might be looking for a way to break the routine. Enter Tantra.
-              </p>
-              <p>
-                When most people hear the word "Tantra," they immediately think of sex. While physical intimacy is a
-                component, the true essence of Tantra is far more profound. At its core, Tantra is a spiritual
-                practice of presence, intentionality, and connection. It is a tool for seeing your partner not just
-                as someone you share a life with, but as a sacred vessel of energy.
-              </p>
-              <p>
-                Here is how incorporating Tantric principles can help you and your partner bridge the gap and
-                reconnect on a soul level.
-              </p>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          
+          <Card>
+            <h2 className="font-serif text-2xl mb-4">How Tantra Helps Couples Reconnect</h2>
+            <div className="space-y-3 text-sm text-muted leading-relaxed">
+              <p>In the hustle of modern life, the spark that once defined a relationship can often dim. Between work deadlines, household chores, and digital noise, intimacy gets relegated to the bottom of the to-do list.</p>
+              <p>If you feel like you're drifting apart or want to deepen the bond you already share, you might be looking for a way to break the routine. Enter Tantra.</p>
+              <p>While physical intimacy is a component, the true essence of Tantra is far more profound. At its core, Tantra is a spiritual practice of presence, intentionality, and connection.</p>
             </div>
-          </article>
+          </Card>
 
-          <section className="deeper-card deeper-card-steps">
-            <h3>The Art of Slowed-Down Presence</h3>
-            <p>
-              In our day-to-day lives, we are constantly rushing. We eat while scrolling, talk while multitasking,
-              and "connect" while distracted by notifications. Tantra invites you to do the opposite: stop and breathe.
+          <Card>
+            <h3 className="font-serif text-xl mb-3">The Art of Slowed-Down Presence</h3>
+            <p className="text-sm text-muted leading-relaxed mb-4">
+              In our day-to-day lives, we are constantly rushing. Tantra invites you to do the opposite: stop and breathe.
             </p>
-            <p>
-              Practicing presence means setting aside time-even just ten minutes-where the focus is entirely on your
-              partner. No phones, no talk of bills, no planning for tomorrow. When you look into each other’s eyes
-              without needing to "do" anything, the nervous system begins to settle.
+            <h3 className="font-serif text-xl mb-3">Cultivating Mindful Touch</h3>
+            <p className="text-sm text-muted leading-relaxed mb-4">
+              Tantric touch is non-goal-oriented. Try conscious touch exercises where the goal is simply to feel and be felt.
             </p>
+            <h3 className="font-serif text-xl mb-3">Energy Exchange: The Breath Connection</h3>
+            <p className="text-sm text-muted leading-relaxed">
+              Practice synchronized breathing. Sit facing each other and begin to breathe together to align your nervous systems.
+            </p>
+          </Card>
 
-            <h3>Cultivating Mindful Touch</h3>
-            <p>
-              Most of our touch in a long-term relationship becomes functional: a pat on the back, a quick hug
-              goodbye, or sexual intimacy that follows a set script.
-            </p>
-            <p>
-              Tantric touch is different. It is non-goal-oriented. Try conscious touch exercises: one partner sits
-              while the other gently caresses their arms, hands, or face with total awareness. The goal isn’t to
-              reach a climax or achieve a specific result; the goal is simply to feel and be felt.
-            </p>
+        </div>
 
-            <h3>Energy Exchange: The Breath Connection</h3>
-            <p>
-              In Tantra, the breath is considered the bridge between the physical and the spirit. Couples can
-              reconnect by practicing synchronized breathing. Sit facing each other, place your hands on each other’s
-              hearts or knees, and begin to breathe together.
-            </p>
-            <p>
-              As you breathe in rhythm, you literally align your nervous systems. This practice can help resolve
-              feelings of resentment or distance, allowing you to move out of the head space of analysis and into the
-              heart space of empathy.
-            </p>
-          </section>
-
-          <aside className="deeper-card deeper-card-tips">
-            <h3>How to Start Today</h3>
-            <ul>
-              <li>
-                <strong>The 5-Minute Eyegazing Practice:</strong> Sit comfortably facing each other and just look
-                into each other’s eyes in silence for five minutes. Notice what comes up.
-              </li>
-              <li>
-                <strong>Intentional Greeting:</strong> When you see each other at the end of the day, take a full 30
-                seconds to hug. Not a quick one-handed squeeze, but a full-body embrace where you both breathe deeply.
-              </li>
+        {/* Tips Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          
+          <Card>
+            <h3 className="font-serif text-xl mb-4">How to Start Today</h3>
+            <ul className="text-sm space-y-4 text-text/90">
+              <li><strong>The 5-Minute Eyegazing:</strong> Sit facing each other and just look into each other's eyes in silence.</li>
+              <li><strong>Intentional Greeting:</strong> When you see each other at the end of the day, take 30 seconds for a full-body hug.</li>
             </ul>
+          </Card>
 
-            <h3>Shifting from Performance to Play</h3>
-            <p>
-              One of the biggest killers of intimacy is the pressure to "perform." Tantra strips away these masks and
-              encourages a sense of playfulness and curiosity.
+          <Card>
+            <h3 className="font-serif text-xl mb-4">Why It Matters</h3>
+            <p className="text-sm text-muted leading-relaxed">
+              The goal is not perfection; it is presence. When you stop "doing" and start "being" with your partner, the intimacy you seek can unfold naturally.
             </p>
-            <p>
-              Instead of asking, "What do I need to do to satisfy my partner?" ask, "What is my partner feeling right
-              now, and how can I honor that?" When you move from performance to exploration, what remains is genuine
-              curiosity.
-            </p>
+          </Card>
 
-            <h3>Honoring the Sacredness of the Everyday</h3>
-            <p>
-              Ultimately, Tantra teaches us that connection isn’t something you find; it’s something you curate. It’s
-              in the way you pour your partner’s coffee, hold their hand while walking, or listen without preparing
-              your rebuttal.
-            </p>
-          </aside>
-        </main>
+        </div>
 
-        <section className="deeper-notes">
-          <div className="deeper-card deeper-card-note">
-            <h3>A Note on Tantric Practice</h3>
-            <p>
-              The goal of these rituals is not to "achieve" a specific outcome. It is to show up. If you feel awkward,
-              that’s okay. If you laugh, that’s okay. Tantra is about embracing whatever arises in the present moment
-              with your partner.
-            </p>
-            <p>
-              Choose one ritual to try this week. Approach it as an experiment, leave your expectations at the door,
-              and watch how even a few minutes of intentional presence can transform the landscape of your
-              relationship.
-            </p>
-          </div>
-
-          <div className="deeper-card deeper-card-note">
-            <h3>Why It Matters</h3>
-            <p>
-              The goal is not perfection; it is presence. When you stop "doing" and start "being" with your partner,
-              the intimacy you seek can unfold naturally. Use these practices as a gentle way to return to each other
-              with more breath, more patience, and more tenderness.
-            </p>
+        {/* Practice Points */}
+        <section className="mb-12">
+          <h3 className="font-serif text-2xl mb-6 text-center">Practice Guidelines</h3>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {practicePoints.map((point, i) => (
+              <span 
+                key={i} 
+                className="inline-flex items-center px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-muted hover:bg-white/10 transition-colors"
+              >
+                {point}
+              </span>
+            ))}
           </div>
         </section>
 
-        <section className="deeper-practice-grid">
-          {practicePoints.map((point) => (
-            <div key={point} className="deeper-practice-pill">
-              {point}
-            </div>
-          ))}
-        </section>
+        {/* Footer Actions */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link to="/ritual">
+            <Button variant="glow">Back to tonight's ritual</Button>
+          </Link>
+          <Link to="/paywall">
+            <Button variant="secondary">Open subscription page</Button>
+          </Link>
+        </div>
 
-        <footer className="deeper-footer">
-          <Link to="/ritual" className="deeper-primary-btn">
-            Back to tonight&apos;s ritual
-          </Link>
-          <Link to="/paywall" className="deeper-secondary-btn">
-            Open subscription page
-          </Link>
-        </footer>
       </div>
-    </div>
+    </Layout>
   );
 }
