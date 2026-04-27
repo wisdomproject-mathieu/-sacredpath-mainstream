@@ -1,0 +1,32 @@
+import React from "react";
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "primary" | "secondary" | "glow";
+  children: React.ReactNode;
+  className?: string;
+}
+
+export default function Button({ 
+  variant = "primary", 
+  children, 
+  className = "", 
+  ...props 
+}: ButtonProps) {
+  
+  const baseStyles = "w-full rounded-full py-3 px-6 text-[15px] font-medium transition-all duration-200 flex items-center justify-center gap-2 outline-none";
+  
+  const variants = {
+    primary: "bg-gradient-to-br from-[#e6b980] to-[#eacda3] text-[#130f08] hover:opacity-90",
+    secondary: "bg-black/40 text-muted border border-white/10 hover:bg-black/60 hover:text-text",
+    glow: "bg-gradient-to-br from-[#e6b980] to-[#eacda3] text-[#130f08] shadow-[0_0_20px_rgba(230,185,128,0.4)] hover:shadow-[0_0_30px_rgba(230,185,128,0.6)]"
+  };
+
+  return (
+    <button 
+      className={`${baseStyles} ${variants[variant]} ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
