@@ -1815,9 +1815,10 @@ img { max-width: 100%; display: block; }
 .ritual-v2-action-secondary {
   width: 100%;
   max-width: 320px;
-  border: 1px solid rgba(241, 212, 154, 0.24);
-  background: rgba(255, 255, 255, 0.04);
-  color: #f8ecda;
+  border: 1px solid rgba(236, 200, 136, 0.32);
+  background: linear-gradient(180deg, rgba(243, 215, 154, 0.98), rgba(223, 194, 122, 0.96));
+  color: #1f160f;
+  box-shadow: 0 18px 36px rgba(236, 200, 136, 0.16);
 }
 
 /* ===== RESPONSIVE ===== */
@@ -2827,7 +2828,7 @@ img { max-width: 100%; display: block; }
 }
 
 .weather-ref-guidance-card {
-  padding: 16px 16px 18px;
+  padding: 18px 18px 20px;
   border-radius: 24px;
   border: 1px solid rgba(241, 212, 154, 0.16);
   background:
@@ -2866,9 +2867,9 @@ img { max-width: 100%; display: block; }
 .weather-ref-ritual-note p {
   margin: 0;
   color: rgba(246, 240, 233, 0.9);
-  font-size: 1.02rem;
-  line-height: 1.68;
-  letter-spacing: -0.01em;
+  font-size: 1.08rem;
+  line-height: 1.78;
+  letter-spacing: -0.015em;
 }
 
 .weather-ref-sacred-block {
@@ -2916,13 +2917,13 @@ img { max-width: 100%; display: block; }
   min-height: 44px;
   width: 100%;
   border-radius: 999px;
-  border: 1px solid rgba(241, 212, 154, 0.22);
-  background: rgba(255, 255, 255, 0.04);
-  color: #f8ecda;
+  border: 1px solid rgba(236, 200, 136, 0.32);
+  background: linear-gradient(180deg, rgba(243, 215, 154, 0.96), rgba(223, 194, 122, 0.94));
+  color: #1f160f;
   font-size: 0.94rem;
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: 0.02em;
-  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 18px 36px rgba(236, 200, 136, 0.14);
 }
 
 .weather-ref-premium-button span {
@@ -3092,7 +3093,7 @@ img { max-width: 100%; display: block; }
 .deeper-title {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(2.4rem, 4vw, 4.3rem);
+  font-size: clamp(2.7rem, 4.6vw, 4.9rem);
   line-height: 0.98;
   color: #f7efe2;
   text-wrap: balance;
@@ -3101,8 +3102,8 @@ img { max-width: 100%; display: block; }
 .deeper-subtitle {
   margin: 0;
   max-width: 860px;
-  font-size: clamp(0.98rem, 1.3vw, 1.12rem);
-  line-height: 1.55;
+  font-size: clamp(1.05rem, 1.38vw, 1.2rem);
+  line-height: 1.62;
   color: rgba(236, 227, 247, 0.9);
   text-wrap: balance;
 }
@@ -3146,7 +3147,7 @@ img { max-width: 100%; display: block; }
 }
 
 .deeper-card-feature h2 {
-  font-size: clamp(1.45rem, 2vw, 2.1rem);
+  font-size: clamp(1.7rem, 2.25vw, 2.45rem);
 }
 
 .deeper-copy,
@@ -3167,8 +3168,8 @@ img { max-width: 100%; display: block; }
 .deeper-card-note p {
   margin: 0;
   color: rgba(236, 227, 247, 0.9);
-  line-height: 1.65;
-  font-size: 0.98rem;
+  line-height: 1.75;
+  font-size: 1.06rem;
 }
 
 .deeper-card-steps,
@@ -3180,7 +3181,7 @@ img { max-width: 100%; display: block; }
 .deeper-card-steps h3,
 .deeper-card-tips h3,
 .deeper-card-note h3 {
-  font-size: 1.1rem;
+  font-size: 1.22rem;
   color: #f1d49a;
 }
 
@@ -3207,8 +3208,8 @@ img { max-width: 100%; display: block; }
   background: rgba(255, 255, 255, 0.04);
   color: rgba(245, 236, 220, 0.94);
   padding: 16px 14px;
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: 0.98rem;
+  line-height: 1.6;
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.16);
 }
 
@@ -3261,7 +3262,7 @@ img { max-width: 100%; display: block; }
   }
 
   .deeper-title {
-    font-size: clamp(2rem, 10vw, 3rem);
+    font-size: clamp(2.2rem, 10vw, 3.4rem);
   }
 
   .deeper-practice-grid {

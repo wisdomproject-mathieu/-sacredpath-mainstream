@@ -202,6 +202,14 @@ export default function Weather() {
               Swap Shiva ↔ Shakti
             </button>
 
+            <div className="weather-ref-guidance-card weather-ref-ritual-note">
+              <p>
+                The secret to these rituals isn&apos;t doing them perfectly. It&apos;s the intention you bring.
+                If you feel rushed, pause, breathe, and reset. Intimacy is a garden—water it daily, and watch it
+                bloom.
+              </p>
+            </div>
+
             <button
               type="button"
               disabled={!canContinue}
@@ -210,14 +218,6 @@ export default function Weather() {
             >
               <span>SACRED RITUALS FOR COUPLED PRESENCE</span>
             </button>
-
-            <div className="weather-ref-guidance-card weather-ref-ritual-note">
-              <p>
-                The secret to these rituals isn&apos;t &quot;doing them perfectly.&quot; It&apos;s the intention you bring.
-                If you find yourself rushing, stop, take a breath, and reset. Intimacy is a garden—water it daily,
-                and watch it bloom.
-              </p>
-            </div>
 
             <button type="button" onClick={() => navigate("/paywall")} className="weather-ref-premium-button">
               <span>See premium for both of you</span>
