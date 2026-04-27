@@ -214,7 +214,7 @@ export default function Weather() {
             <div className="weather-ref-guidance-card weather-ref-ritual-note">
               <p>
                 The secret to these rituals isn&apos;t &quot;doing them perfectly.&quot; It&apos;s the intention you bring.
-                If you find yourself rushing, stop, take a breath, and reset. Intimacy is a garden-water it daily,
+                If you find yourself rushing, stop, take a breath, and reset. Intimacy is a garden—water it daily,
                 and watch it bloom.
               </p>
             </div>

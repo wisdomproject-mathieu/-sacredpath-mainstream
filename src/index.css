@@ -2786,7 +2786,9 @@ img { max-width: 100%; display: block; }
   gap: 10px;
   align-items: stretch;
   justify-content: center;
-  padding-top: 14px;
+  padding-top: 10px;
+  width: min(100%, 360px);
+  margin: 0 auto;
 }
 
 .weather-ref-swap-pill {
@@ -2800,6 +2802,28 @@ img { max-width: 100%; display: block; }
   font-weight: 800;
   letter-spacing: 0.02em;
   box-shadow: 0 12px 26px rgba(236, 200, 136, 0.14);
+}
+
+.weather-ref-sacred-button {
+  min-height: 54px;
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(236, 200, 136, 0.32);
+  background: linear-gradient(180deg, rgba(243, 215, 154, 0.98), rgba(223, 194, 122, 0.96));
+  color: #1f160f;
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 18px 36px rgba(236, 200, 136, 0.16);
+}
+
+.weather-ref-sacred-button span {
+  display: block;
+  max-width: 16ch;
+  margin: 0 auto;
+  line-height: 1.12;
+  text-align: center;
 }
 
 .weather-ref-guidance-card {
@@ -2842,8 +2866,9 @@ img { max-width: 100%; display: block; }
 .weather-ref-ritual-note p {
   margin: 0;
   color: rgba(246, 240, 233, 0.9);
-  font-size: 0.94rem;
-  line-height: 1.5;
+  font-size: 1.02rem;
+  line-height: 1.68;
+  letter-spacing: -0.01em;
 }
 
 .weather-ref-sacred-block {
@@ -2966,6 +2991,11 @@ img { max-width: 100%; display: block; }
 
   .weather-ref-guidance-card h2 {
     font-size: 1.4rem;
+  }
+
+  .weather-ref-sacred-button {
+    min-height: 50px;
+    font-size: 0.84rem;
   }
 
   .weather-ref-sacred-block {
