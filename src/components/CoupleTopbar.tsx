@@ -7,7 +7,8 @@ export default function CoupleTopbar() {
         <img src={logoSrc} alt="" />
       </span>
       <span className="sacred-brand-copy">
-        <span className="sacred-brand-title">Sacred Path for Couples</span>
+        <span className="sacred-brand-kicker">Sacred Path</span>
+        <span className="sacred-brand-title">For Couples</span>
         <span className="sacred-brand-note">Ancient wisdom for modern couples.</span>
       </span>
     </div>

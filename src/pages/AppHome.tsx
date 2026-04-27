@@ -5,7 +5,7 @@ import CoupleTopbar from "../components/CoupleTopbar";
 export default function AppHome() {
   const navigate = useNavigate();
   const { state, setState } = useSession();
-  const logoSrc = `${import.meta.env.BASE_URL}shiva-shakti-icon.png`;
+  const heroArtSrc = `${import.meta.env.BASE_URL}assets/home/home-premium-union.png`;
   const yourName = state.youName;
   const partnerName = state.partnerName;
   const sendCodeToWhatsApp = () => {
@@ -111,8 +111,8 @@ export default function AppHome() {
               <div className="home-visual-beam" />
               <div className="home-visual-icon-area">
                 <img
-                  src={logoSrc}
-                  alt="Sacred Path"
+                  src={heroArtSrc}
+                  alt="Sacred Path for Couples"
                   className="home-shiny-icon"
                 />
               </div>
