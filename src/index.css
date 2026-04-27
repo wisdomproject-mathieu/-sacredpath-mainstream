@@ -57,11 +57,42 @@ img { max-width: 100%; display: block; }
 
 /* ===== PREMIUM CARDS ===== */
 .value-card {
+  position: relative;
+  overflow: hidden;
   padding: 28px 26px 32px;
   border-radius: 28px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  isolation: isolate;
+}
+
+.value-card > *:not(.value-card-art) {
+  position: relative;
+  z-index: 2;
+}
+
+.value-card-art {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.34;
+  filter: saturate(1.04) contrast(1.04);
+  transform: scale(1.04);
+}
+
+.value-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(245, 217, 168, 0.16), transparent 42%),
+    linear-gradient(180deg, rgba(10, 8, 16, 0.05), rgba(10, 8, 16, 0.48) 72%, rgba(10, 8, 16, 0.7));
+  pointer-events: none;
 }
 
 .value-card .value-kicker {
@@ -109,12 +140,33 @@ img { max-width: 100%; display: block; }
   background: linear-gradient(180deg, rgba(180, 160, 90, 0.22), rgba(60, 50, 20, 0.35) 60%, rgba(18, 15, 23, 0.7));
 }
 
+.value-men .value-card-art {
+  background-image: url("/assets/home/home-men-women-art.png");
+  background-position: left center;
+}
+
 .value-women {
   background: linear-gradient(180deg, rgba(160, 80, 140, 0.22), rgba(70, 30, 60, 0.35) 60%, rgba(18, 15, 23, 0.7));
 }
 
+.value-women .value-card-art {
+  background-image: url("/assets/home/home-men-women-art.png");
+  background-position: right center;
+}
+
 .value-couple {
   background: linear-gradient(180deg, rgba(80, 70, 160, 0.22), rgba(30, 30, 70, 0.35) 60%, rgba(18, 15, 23, 0.7));
+}
+
+.value-couple .value-card-art {
+  background-image: url("/assets/home/home-premium-union.png");
+  background-position: center center;
+}
+
+.value-men .value-card-art,
+.value-women .value-card-art,
+.value-couple .value-card-art {
+  opacity: 0.28;
 }
 
 /* ===== HOMEPAGE ===== */

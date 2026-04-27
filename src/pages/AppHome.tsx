@@ -53,6 +53,7 @@ export default function AppHome() {
 
             <div className="home-value-grid">
               <article className="value-card value-men">
+                <span className="value-card-art value-card-art-men" aria-hidden="true" />
                 <p className="value-kicker">Card for men</p>
                 <h2>
                   Focus:
@@ -63,6 +64,7 @@ export default function AppHome() {
               </article>
 
               <article className="value-card value-women">
+                <span className="value-card-art value-card-art-women" aria-hidden="true" />
                 <p className="value-kicker">Card for women</p>
                 <h2>
                   Focus:
@@ -73,6 +75,7 @@ export default function AppHome() {
               </article>
 
               <article className="value-card value-couple">
+                <span className="value-card-art value-card-art-couple" aria-hidden="true" />
                 <p className="value-kicker">Card for couple</p>
                 <h2>
                   Focus:
