@@ -43,7 +43,6 @@ export default function Ritual() {
   const partnerName = state.partnerName?.trim() || "Partner";
   const youTitle = `${WEATHER_TONE_LABELS[youTone]} ${youName}`;
   const partnerTitle = `${WEATHER_TONE_LABELS[partnerTone]} ${partnerName}`;
-  const ritualSteps = freeRitual.ritualSteps.slice(0, 3);
 
   return (
     <main className="min-h-screen bg-sp-bg text-slate-100 ritual-v2-page">
@@ -75,34 +74,21 @@ export default function Ritual() {
               Swap Shiva ↔ Shakti
             </button>
 
-            <div className="ritual-v2-actions ritual-v2-actions-middle">
-              <Link to="/deeper" className="ritual-v2-action-primary ritual-v2-action-primary-sm">
-                Go deeper,
-              </Link>
-              <Link to="/paywall" className="ritual-v2-action-secondary">
-                See premium for both of you
-              </Link>
+            <Link to="/deeper" className="ritual-v2-action-primary ritual-v2-sacred-cta">
+              SACRED RITUALS FOR COUPLED PRESENCE
+            </Link>
+
+            <div className="ritual-v2-guidance-card">
+              <p className="ritual-v2-guidance-copy">
+                The secret to these rituals isn&apos;t &quot;doing them perfectly.&quot; It&apos;s the intention you
+                bring. If you find yourself rushing, stop, take a breath, and reset. Intimacy is a garden—water it
+                daily, and watch it bloom.
+              </p>
             </div>
 
-            <div className="ritual-v2-step-card">
-              <div className="ritual-v2-step-card-head">
-                <p className="ritual-v2-practice-kicker">Straight steps</p>
-                <h3>Yoga of Touch process</h3>
-              </div>
-              <div className="ritual-v2-step-list">
-                {ritualSteps.length > 0 ? ritualSteps.map((step, index) => (
-                  <div key={step} className="ritual-v2-step-item">
-                    <span className="ritual-v2-step-index">{String(index + 1).padStart(2, "0")}</span>
-                    <p>{step}</p>
-                  </div>
-                )) : (
-                  <div className="ritual-v2-step-item">
-                    <span className="ritual-v2-step-index">01</span>
-                    <p>Begin with presence and let the body slow down together.</p>
-                  </div>
-                )}
-              </div>
-            </div>
+            <Link to="/paywall" className="ritual-v2-action-secondary">
+              See premium for both of you
+            </Link>
           </section>
 
           <aside className="ritual-v2-side ritual-v2-side-right">

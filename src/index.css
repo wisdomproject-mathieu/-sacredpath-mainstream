@@ -386,11 +386,29 @@ img { max-width: 100%; display: block; }
 
 .home-visual-brand {
   position: absolute;
-  top: 18px;
+  top: 12px;
   left: 18px;
   right: 18px;
   z-index: 3;
   pointer-events: none;
+}
+
+.home-visual-brand .sacred-brand-card {
+  padding: 16px 20px;
+  border-radius: 26px;
+}
+
+.home-visual-brand .sacred-brand-mark {
+  width: 62px;
+  height: 62px;
+}
+
+.home-visual-brand .sacred-brand-title {
+  font-size: clamp(1.28rem, 2.1vw, 1.92rem);
+}
+
+.home-visual-brand .sacred-brand-note {
+  font-size: 0.92rem;
 }
 
 .home-visual-glow {
@@ -419,12 +437,12 @@ img { max-width: 100%; display: block; }
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 124px 0 124px;
+  padding: 106px 0 120px;
 }
 
 .home-shiny-icon {
-  width: min(82%, 500px);
-  max-width: 500px;
+  width: min(84%, 520px);
+  max-width: 520px;
   opacity: 0.95;
   object-fit: contain;
   filter: drop-shadow(0 0 36px rgba(241, 212, 154, 0.4)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.3));
@@ -1561,7 +1579,11 @@ img { max-width: 100%; display: block; }
 .ritual-v2-center {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+  align-self: center;
+  justify-self: center;
+  width: min(100%, 340px);
+  margin-inline: auto;
 }
 
 .ritual-v2-swap-pill {
@@ -1575,6 +1597,36 @@ img { max-width: 100%; display: block; }
   font-size: 0.92rem;
   font-weight: 700;
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.18);
+}
+
+.ritual-v2-sacred-cta {
+  width: 100%;
+  min-height: 52px;
+  padding-inline: 20px;
+  border: 1px solid rgba(241, 212, 154, 0.18);
+  border-radius: 999px;
+  box-shadow: 0 18px 40px rgba(216, 172, 104, 0.28);
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.ritual-v2-guidance-card {
+  border-radius: 26px;
+  border: 1px solid rgba(241, 212, 154, 0.16);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(241, 212, 154, 0.1), transparent 44%),
+    linear-gradient(180deg, rgba(35, 25, 44, 0.9), rgba(14, 11, 22, 0.97));
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
+  padding: 18px 18px 17px;
+}
+
+.ritual-v2-guidance-copy {
+  margin: 0;
+  color: rgba(244, 236, 244, 0.96);
+  font-size: 1.03rem;
+  line-height: 1.72;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .ritual-v2-practice-card,
@@ -1941,6 +1993,15 @@ img { max-width: 100%; display: block; }
   .ritual-v2-practice-btn,
   .ritual-v2-swap-pill {
     min-height: 46px;
+  }
+
+  .ritual-v2-center {
+    width: min(100%, 360px);
+  }
+
+  .ritual-v2-guidance-copy {
+    font-size: 0.98rem;
+    line-height: 1.65;
   }
 }
 
