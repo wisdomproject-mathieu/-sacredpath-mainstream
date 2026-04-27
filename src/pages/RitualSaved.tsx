@@ -6,15 +6,12 @@ import {
   WEATHER_TONE_COPY,
   WEATHER_TONE_LABELS,
   getWeatherImageUrlByTone,
+  getWeatherVisualKey,
   type WeatherVisualKey,
 } from "../lib/weatherAssets";
 
 function fallbackTone(weather: string | undefined): WeatherVisualKey {
-  if (weather === "stormy") return "stormy";
-  if (weather === "cloudy") return "foggy";
-  if (weather === "warm") return "warm";
-  if (weather === "electric") return "electric";
-  return "sunny";
+  return getWeatherVisualKey(weather as WeatherVisualKey | undefined);
 }
 
 function formatElapsed(totalSeconds: number) {

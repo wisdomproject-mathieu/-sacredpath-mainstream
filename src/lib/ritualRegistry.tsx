@@ -1,8 +1,19 @@
-import weatherMatrix from "../data/sacred_path_weather_matrix_25.json";
-import ritualLibrary from "../data/sacred_path_ritual_library_55.json";
-import ritualReserve from "../data/sacred_path_ritual_reserve_30.json";
+import {
+  getRitualById as getMainstreamRitualById,
+  getRitualsByIds as getMainstreamRitualsByIds,
+  getWeatherRitualOutcome,
+  type MainstreamRitual,
+  type IntimacyWeather as CanonicalWeather,
+} from "../utils/ritualEngine";
+import { WEATHER_TONE_LABELS } from "./weatherAssets";
 
-export type IntimacyWeather = "stormy" | "cloudy" | "warm" | "electric" | "radiant";
+export type IntimacyWeather =
+  | "stormy"
+  | "frozen"
+  | "foggy"
+  | "warm"
+  | "electric"
+  | "sunny";
 
 export interface Ritual {
   id: string;
@@ -14,107 +25,154 @@ export interface Ritual {
   primaryNeed?: string;
   theme?: string;
   ritualSteps: string[];
-  sourceCategory?: "library" | "reserve";
+  sourceCategory?: "library" | "reserve" | "matrix";
   sourceTraditions?: string[];
   sourceAuthors?: string[];
   sourceConcepts?: string[];
   weatherTags?: IntimacyWeather[];
   premium: boolean;
   hasVoice: boolean;
+  category?: MainstreamRitual["category"];
+  intensity?: MainstreamRitual["intensity"];
+  polarity?: MainstreamRitual["polarity"];
+  durationMinutes?: number;
+  consentLevel?: MainstreamRitual["consentLevel"];
+  premiumTier?: MainstreamRitual["premiumTier"];
+  steps?: string[];
+  closing?: string;
 }
 
 type WeatherKey = `${IntimacyWeather}|${IntimacyWeather}`;
 
-interface WeatherEntry {
+export interface RitualResolution {
+  key: string;
   archetype: string;
-  main: string;
-  alternates: string[];
   homeCard: {
     eyebrow: string;
     title: string;
     body: string;
     cta: string;
   };
+  freeRitual?: Ritual;
+  premiumRituals: Ritual[];
+  recommendedRituals: Ritual[];
+  relatedRituals: Ritual[];
+  outcome: ReturnType<typeof getWeatherRitualOutcome>;
 }
 
-const libraryById = new Map<string, Ritual>();
-const reserveById = new Map<string, Ritual>();
+function normalizeWeather(value: string | undefined): CanonicalWeather | undefined {
+  if (!value) return undefined;
+  const normalized = value.trim().toLowerCase();
 
-(ritualLibrary as any[]).forEach((r) => {
-  libraryById.set(r.id, {
-    id: r.id,
-    title: r.title,
-    subtitle: r.subtitle,
-    description: r.description,
-    duration: r.duration,
-    intimacyLevel: r.intimacyLevel,
-    primaryNeed: r.primaryNeed,
-    theme: r.theme,
-    ritualSteps: r.ritualSteps ?? [],
-    sourceCategory: "library",
-    sourceTraditions: r.sourceTraditions ?? [],
-    sourceAuthors: r.sourceAuthors ?? [],
-    sourceConcepts: r.sourceConcepts ?? [],
-    premium: false,
-    hasVoice: false,
-  });
-});
+  switch (normalized) {
+    case "stormy":
+      return "Stormy";
+    case "frozen":
+      return "Frozen";
+    case "foggy":
+    case "cloudy":
+      return "Foggy";
+    case "warm":
+      return "Warm";
+    case "electric":
+      return "Electric";
+    case "sunny":
+    case "radiant":
+      return "Sunny";
+    default:
+      return undefined;
+  }
+}
 
-(ritualReserve as any[]).forEach((r) => {
-  reserveById.set(r.id, {
-    id: r.id,
-    title: r.title,
-    subtitle: r.subtitle,
-    description: r.description,
-    duration: r.duration,
-    intimacyLevel: r.intimacyLevel,
-    primaryNeed: r.primaryNeed,
-    theme: r.theme,
-    ritualSteps: r.ritualSteps ?? [],
-    sourceCategory: "reserve",
+function toLegacyWeather(weather: CanonicalWeather): IntimacyWeather {
+  return weather.toLowerCase() as IntimacyWeather;
+}
+
+function mapRitual(ritual: MainstreamRitual): Ritual {
+  return {
+    id: ritual.id,
+    title: ritual.title,
+    subtitle: ritual.subtitle,
+    description: ritual.subtitle,
+    duration: `${ritual.durationMinutes} min`,
+    intimacyLevel: ritual.intensity,
+    primaryNeed: ritual.bestFor[0],
+    theme: ritual.category,
+    ritualSteps: ritual.steps,
+    sourceCategory: ritual.sourceSet === "tantric-kinky-100" ? "library" : "reserve",
     sourceTraditions: [],
     sourceAuthors: [],
     sourceConcepts: [],
-    premium: true,
+    weatherTags: ritual.weatherTags.map(toLegacyWeather),
+    premium: ritual.premiumTier === "premium",
     hasVoice: false,
-  });
-});
-
-Object.values(weatherMatrix as Record<WeatherKey, WeatherEntry>).forEach((entry) => {
-  entry.alternates.forEach((id) => {
-    const ritual = libraryById.get(id);
-    if (ritual) ritual.premium = true;
-  });
-});
-
-export function getRitualById(id: string): Ritual | undefined {
-  return libraryById.get(id) ?? reserveById.get(id);
+    category: ritual.category,
+    intensity: ritual.intensity,
+    polarity: ritual.polarity,
+    durationMinutes: ritual.durationMinutes,
+    consentLevel: ritual.consentLevel,
+    premiumTier: ritual.premiumTier,
+    steps: ritual.steps,
+    closing: ritual.closing,
+  };
 }
 
-export function normalizeWeatherKey(
-  you: IntimacyWeather,
-  partner: IntimacyWeather
-): WeatherKey {
-  const order: IntimacyWeather[] = ["stormy", "cloudy", "warm", "electric", "radiant"];
-  const [a, b] = [you, partner].sort((x, y) => order.indexOf(x) - order.indexOf(y));
-  return `${a}|${b}` as WeatherKey;
+function mapRituals(ids: string[]): Ritual[] {
+  return getMainstreamRitualsByIds(ids).map(mapRitual);
 }
 
-export function resolveWeatherRitual(you: IntimacyWeather, partner: IntimacyWeather) {
-  const key = normalizeWeatherKey(you, partner);
-  const entry = (weatherMatrix as Record<WeatherKey, WeatherEntry>)[key];
-  if (!entry) return null;
+export function getRitualById(id: string): Ritual {
+  return mapRitual(getMainstreamRitualById(id));
+}
 
-  const freeRitual = getRitualById(entry.main);
-  const premiumRituals = entry.alternates
-    .map((id) => getRitualById(id))
-    .filter((r): r is Ritual => Boolean(r));
+export function getRitualsByIds(ids: string[]): Ritual[] {
+  return mapRituals(ids);
+}
+
+export function resolveWeatherRitual(you: IntimacyWeather, partner: IntimacyWeather): RitualResolution {
+  const canonicalYou = normalizeWeather(you);
+  const canonicalPartner = normalizeWeather(partner);
+
+  if (!canonicalYou || !canonicalPartner) {
+    const fallbackOutcome = getWeatherRitualOutcome("Foggy", "Foggy");
+    const fallbackPrimary = getMainstreamRitualById(fallbackOutcome.primaryRitualId);
+    const recommendedRituals = getMainstreamRitualsByIds(fallbackOutcome.recommendedRitualIds).map(mapRitual);
+    const relatedRituals = getMainstreamRitualsByIds(fallbackOutcome.relatedRitualIds).map(mapRitual);
+    return {
+      key: "Foggy_Foggy",
+    archetype: "safe reconnection",
+      homeCard: {
+        eyebrow: "Foggy + Foggy",
+        title: fallbackOutcome.title,
+        body: fallbackOutcome.subtitle,
+        cta: "Enter Tonight's Path",
+      },
+      freeRitual: mapRitual(fallbackPrimary),
+      premiumRituals: recommendedRituals,
+      recommendedRituals,
+      relatedRituals,
+      outcome: fallbackOutcome,
+    };
+  }
+
+  const outcome = getWeatherRitualOutcome(canonicalYou, canonicalPartner);
+  const primary = getMainstreamRitualById(outcome.primaryRitualId);
+  const recommendedRituals = getMainstreamRitualsByIds(outcome.recommendedRitualIds).map(mapRitual);
+  const relatedRituals = getMainstreamRitualsByIds(outcome.relatedRitualIds).map(mapRitual);
 
   return {
-    key,
-    archetype: entry.archetype,
-    homeCard: entry.homeCard,
-    freeRitual,
-    premiumRituals,
+    key: `${canonicalYou}|${canonicalPartner}`,
+    archetype: outcome.tone,
+    homeCard: {
+      eyebrow: `${WEATHER_TONE_LABELS[toLegacyWeather(canonicalYou)]} + ${WEATHER_TONE_LABELS[toLegacyWeather(canonicalPartner)]}`,
+      title: outcome.title,
+      body: outcome.subtitle,
+      cta: "Enter Tonight's Path",
+    },
+    freeRitual: mapRitual(primary),
+    premiumRituals: recommendedRituals,
+    recommendedRituals,
+    relatedRituals,
+    outcome,
   };
 }

@@ -57,23 +57,21 @@ export function getWeatherForTitle(tone: WeatherVisualKey, displayName: string) 
   return `${WEATHER_TONE_LABELS[tone]} for ${displayName}`;
 }
 
-export function getWeatherVisualKey(
-  weather: IntimacyWeather | undefined,
-  cloudyVariant?: "foggy" | "frozen"
-): WeatherVisualKey {
+export function getWeatherVisualKey(weather: IntimacyWeather | "cloudy" | "radiant" | undefined): WeatherVisualKey {
   if (weather === "stormy") return "stormy";
+  if (weather === "frozen") return "frozen";
+  if (weather === "foggy" || weather === "cloudy") return "foggy";
   if (weather === "warm") return "warm";
   if (weather === "electric") return "electric";
-  if (weather === "cloudy") return cloudyVariant === "frozen" ? "frozen" : "foggy";
+  if (weather === "sunny" || weather === "radiant") return "sunny";
   return "sunny";
 }
 
 export function getWeatherImageUrl(
   role: WeatherRole,
-  weather: IntimacyWeather | undefined,
-  cloudyVariant?: "foggy" | "frozen"
+  weather: IntimacyWeather | "cloudy" | "radiant" | undefined
 ) {
-  return WEATHER_IMAGE_MAP[role][getWeatherVisualKey(weather, cloudyVariant)];
+  return WEATHER_IMAGE_MAP[role][getWeatherVisualKey(weather)];
 }
 
 export function getWeatherImageUrlByTone(role: WeatherRole, tone: WeatherVisualKey) {

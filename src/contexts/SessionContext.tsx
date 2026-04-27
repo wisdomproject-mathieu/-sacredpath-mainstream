@@ -18,6 +18,35 @@ interface SessionState {
   savedRitual?: SavedRitualSession;
 }
 
+function normalizeWeather(value: unknown): IntimacyWeather | undefined {
+  switch (value) {
+    case "stormy":
+    case "Stormy":
+      return "stormy";
+    case "frozen":
+    case "Frozen":
+      return "frozen";
+    case "foggy":
+    case "Foggy":
+    case "cloudy":
+    case "Cloudy":
+      return "foggy";
+    case "warm":
+    case "Warm":
+      return "warm";
+    case "electric":
+    case "Electric":
+      return "electric";
+    case "sunny":
+    case "Sunny":
+    case "radiant":
+    case "Radiant":
+      return "sunny";
+    default:
+      return undefined;
+  }
+}
+
 const SessionContext = createContext<{
   state: SessionState;
   setState: (s: SessionState) => void;
@@ -36,8 +65,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       return {
         youName: parsed.youName ?? "",
         partnerName: parsed.partnerName ?? "",
-        youWeather: parsed.youWeather,
-        partnerWeather: parsed.partnerWeather,
+        youWeather: normalizeWeather(parsed.youWeather),
+        partnerWeather: normalizeWeather(parsed.partnerWeather),
         youWeatherTone: parsed.youWeatherTone,
         partnerWeatherTone: parsed.partnerWeatherTone,
         weatherSidesSwapped: parsed.weatherSidesSwapped,

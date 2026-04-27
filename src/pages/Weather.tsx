@@ -8,7 +8,6 @@ import {
   getDisplayName,
   getWeatherForTitle,
   getWeatherVisualKey,
-  getWeatherTitle,
   type WeatherVisualKey,
 } from "../lib/weatherAssets";
 
@@ -21,16 +20,15 @@ type WeatherOption = {
   title: string;
   subtitle: string;
   toneClass: string;
-  cloudyVariant?: "foggy" | "frozen";
 };
 
 const WEATHER_OPTIONS: WeatherOption[] = [
   { key: "stormy", id: "stormy", title: "Stormy", subtitle: "Heavy, tumultuous...", toneClass: "weather-ref-stormy" },
-  { key: "foggy", id: "cloudy", title: "Foggy", subtitle: "Detached, confused...", toneClass: "weather-ref-foggy", cloudyVariant: "foggy" },
-  { key: "frozen", id: "cloudy", title: "Frozen", subtitle: "Numb, tired, shut down...", toneClass: "weather-ref-frozen", cloudyVariant: "frozen" },
+  { key: "frozen", id: "frozen", title: "Frozen", subtitle: "Numb, tired, shut down...", toneClass: "weather-ref-frozen" },
+  { key: "foggy", id: "foggy", title: "Foggy", subtitle: "Detached, confused...", toneClass: "weather-ref-foggy" },
   { key: "warm", id: "warm", title: "Warm", subtitle: "Soft, tender...", toneClass: "weather-ref-warm" },
   { key: "electric", id: "electric", title: "Electric", subtitle: "Crackling, awake...", toneClass: "weather-ref-electric" },
-  { key: "sunny", id: "radiant", title: "Sunny", subtitle: "Clear, light...", toneClass: "weather-ref-sunny" },
+  { key: "sunny", id: "sunny", title: "Sunny", subtitle: "Clear, light...", toneClass: "weather-ref-sunny" },
 ];
 
 const TOP_OPTIONS = WEATHER_OPTIONS.slice(0, 3);
@@ -146,9 +144,9 @@ export default function Weather() {
   const myName = getDisplayName(state.youName, "You");
   const partnerName = getDisplayName(state.partnerName, "Partner");
 
-  const setWeather = (field: WeatherField, value: IntimacyWeather, cloudyVariant?: "foggy" | "frozen") => {
+  const setWeather = (field: WeatherField, value: IntimacyWeather) => {
     const toneField = field === "youWeather" ? "youWeatherTone" : "partnerWeatherTone";
-    const tone = getWeatherVisualKey(value, cloudyVariant);
+    const tone = getWeatherVisualKey(value);
     setState({ ...state, [field]: value, [toneField]: tone });
   };
 
@@ -169,10 +167,6 @@ export default function Weather() {
   const rightDisplayName = leftIsShakti ? myName : partnerName;
   const leftSelectedTone = leftIsShakti ? rightTone : leftTone;
   const rightSelectedTone = leftIsShakti ? leftTone : rightTone;
-  const leftSelectedWeather = leftIsShakti ? state.partnerWeather : state.youWeather;
-  const rightSelectedWeather = leftIsShakti ? state.youWeather : state.partnerWeather;
-  const leftPanelTitle = getWeatherTitle(leftSelectedTone, leftDisplayName);
-  const rightPanelTitle = getWeatherTitle(rightSelectedTone, rightDisplayName);
 
   return (
     <div className="weather-ref-page">
@@ -194,7 +188,7 @@ export default function Weather() {
             label={leftDisplayName}
             selectedTone={leftSelectedTone}
             displayName={leftDisplayName}
-            onSelect={(option) => setWeather(leftIsShakti ? "partnerWeather" : "youWeather", option.id, option.cloudyVariant)}
+            onSelect={(option) => setWeather(leftIsShakti ? "partnerWeather" : "youWeather", option.id)}
           />
 
           <div className="weather-ref-center">
@@ -229,7 +223,7 @@ export default function Weather() {
             label={rightDisplayName}
             selectedTone={rightSelectedTone}
             displayName={rightDisplayName}
-            onSelect={(option) => setWeather(leftIsShakti ? "youWeather" : "partnerWeather", option.id, option.cloudyVariant)}
+            onSelect={(option) => setWeather(leftIsShakti ? "youWeather" : "partnerWeather", option.id)}
           />
         </section>
       </div>
