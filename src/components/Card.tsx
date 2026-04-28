@@ -7,9 +7,8 @@ interface CardProps {
 
 export default function Card({ children, className = "" }: CardProps) {
   return (
-    <article className={`sp-card ${className}`.trim()}>
+    <div className={`sp-glass sp-card-padding ${className}`.trim()}>
       {children}
-    </article>
+    </div>
   );
 }
-
