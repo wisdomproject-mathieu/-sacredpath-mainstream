@@ -136,7 +136,7 @@ export default function Weather() {
         ) : (
           <div className="max-w-3xl mx-auto space-y-4 md:space-y-6">
             <p className="text-center text-sm uppercase tracking-[0.2em] text-muted">
-              {stage === "you" ? `${myName} • Shiva` : `${partnerName} • Shakti`}
+              {stage === "you" ? `${myName} • Me` : `${partnerName} • Partner`}
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
               {WEATHER_OPTIONS.map((option) => (
@@ -154,11 +154,11 @@ export default function Weather() {
 
             {stage === "you" ? (
               <Button variant="primary" disabled={!canSenseBeloved} onClick={() => canSenseBeloved && setStage("transition")}>
-                Now sense your beloved Shakti&apos;s weather
+                Now sense your partner&apos;s weather
               </Button>
             ) : (
               <Button variant="primary" disabled={!canRevealPath} onClick={() => canRevealPath && navigate("/ritual")}>
-                Unreveal your ritual and tonight path
+                Reveal your ritual and tonight path
               </Button>
             )}
           </div>

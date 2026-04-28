@@ -115,6 +115,12 @@ export default function Ritual() {
           >
             Premium for 2
           </Link>
+          <Link
+            to="/rituals"
+            className="block w-full rounded-full bg-white/5 border border-white/10 text-center py-3 px-6 font-semibold hover:bg-white/10 transition-colors"
+          >
+            More rituals for two
+          </Link>
         </Card>
       </div>
     </Layout>
