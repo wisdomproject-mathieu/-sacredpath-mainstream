@@ -8,7 +8,7 @@ const practicePoints = [
   "Create the Space: Dim the lights, use essential oils, or play ambient music.",
   "Release Expectations: Tantra is about the process, not the climax. If you feel awkward, laugh together.",
   "Commit to Consistency: Pick one ritual per week to start. Intimacy requires regular exercise.",
-  'Remember: The goal isn't perfection; it's presence.',
+  "Remember: The goal isn't perfection; it's presence.",
 ];
 
 export default function Deeper() {

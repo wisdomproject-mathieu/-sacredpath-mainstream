@@ -25,11 +25,11 @@ type WeatherOption = {
 
 const WEATHER_OPTIONS: WeatherOption[] = [
   { key: "stormy", id: "stormy", title: "Stormy", subtitle: "Heavy, tumultuous..." },
-  { key: "foggy", id: "cloudy", title: "Foggy", subtitle: "Detached, confused..." },
-  { key: "frozen", id: "cloudy", title: "Frozen", subtitle: "Numb, tired, shut down..." },
+  { key: "foggy", id: "foggy", title: "Foggy", subtitle: "Detached, confused..." },
+  { key: "frozen", id: "frozen", title: "Frozen", subtitle: "Numb, tired, shut down..." },
   { key: "warm", id: "warm", title: "Warm", subtitle: "Soft, tender..." },
   { key: "electric", id: "electric", title: "Electric", subtitle: "Crackling, awake..." },
-  { key: "sunny", id: "radiant", title: "Sunny", subtitle: "Clear, light..." },
+  { key: "sunny", id: "sunny", title: "Sunny", subtitle: "Clear, light..." },
 ];
 
 function WeatherPill({ 
@@ -119,7 +119,13 @@ export default function Weather() {
                   role="shiva"
                   option={option}
                   selected={state.youWeatherTone === option.key}
-                  onClick={() => setWeather("youWeather", option.id)}
+                  onClick={() =>
+                    setWeather(
+                      "youWeather",
+                      option.id,
+                      option.key === "foggy" || option.key === "frozen" ? option.key : undefined,
+                    )
+                  }
                 />
               ))}
             </div>
@@ -180,7 +186,13 @@ export default function Weather() {
                   role="shakti"
                   option={option}
                   selected={state.partnerWeatherTone === option.key}
-                  onClick={() => setWeather("partnerWeather", option.id)}
+                  onClick={() =>
+                    setWeather(
+                      "partnerWeather",
+                      option.id,
+                      option.key === "foggy" || option.key === "frozen" ? option.key : undefined,
+                    )
+                  }
                 />
               ))}
             </div>
