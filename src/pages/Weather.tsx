@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import Button from "../components/Button";
@@ -15,6 +15,7 @@ import {
 
 type WeatherRole = "shiva" | "shakti";
 type WeatherField = "youWeather" | "partnerWeather";
+type SelectionStage = "you" | "transition" | "partner";
 
 type WeatherOption = {
   key: WeatherVisualKey;
@@ -85,6 +86,13 @@ export default function Weather() {
   const navigate = useNavigate();
   const myName = getDisplayName(state.youName, "You");
   const partnerName = getDisplayName(state.partnerName, "Partner");
+  const [stage, setStage] = useState<SelectionStage>("you");
+
+  useEffect(() => {
+    if (stage !== "transition") return;
+    const timer = window.setTimeout(() => setStage("partner"), 2000);
+    return () => window.clearTimeout(timer);
+  }, [stage]);
 
   const setWeather = (field: WeatherField, value: IntimacyWeather, cloudyVariant?: "foggy" | "frozen") => {
     const toneField = field === "youWeather" ? "youWeatherTone" : "partnerWeatherTone";
@@ -92,13 +100,24 @@ export default function Weather() {
     setState({ ...state, [field]: value, [toneField]: tone });
   };
 
-  const canContinue = Boolean(state.youWeather && state.partnerWeather);
-  
+  const canSenseBeloved = Boolean(state.youWeather);
+  const canRevealPath = Boolean(state.partnerWeather);
+  const activeRole: WeatherRole = stage === "partner" ? "shakti" : "shiva";
+  const activeName = stage === "partner" ? partnerName : myName;
+  const activeTone = stage === "partner" ? (state.partnerWeatherTone ?? "sunny") : (state.youWeatherTone ?? "stormy");
+  const activeField: WeatherField = stage === "partner" ? "partnerWeather" : "youWeather";
+
+  const handleSelect = (option: WeatherOption) => {
+    setWeather(
+      activeField,
+      option.id,
+      option.key === "foggy" || option.key === "frozen" ? option.key : undefined,
+    );
+  };
+
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto">
-        
-        {/* Page Header */}
+      <div className="max-w-4xl mx-auto">
         <div className="text-center mb-6 md:mb-10">
           <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-3">Your shared intimacy weather</h1>
           <p className="text-base md:text-lg text-muted max-w-2xl mx-auto">
@@ -106,111 +125,44 @@ export default function Weather() {
           </p>
         </div>
 
-        {/* Three Column Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px_1fr] gap-6 md:gap-8 items-start">
-          
-          {/* Left Panel */}
-          <aside>
-            <p className="text-[11px] uppercase tracking-widest text-muted mb-4">Shiva Energy</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-4">
-              {WEATHER_OPTIONS.slice(0, 3).map((option) => (
+        {stage === "transition" ? (
+          <Card className="max-w-2xl mx-auto">
+            <p className="text-base md:text-lg leading-relaxed text-center text-muted">
+              The secret to these rituals isn't "doing them perfectly." It’s the intention you bring.
+              If you find yourself rushing, stop, take a breath, and reset.
+              Intimacy is a garden. Water it daily, and watch it bloom.
+            </p>
+          </Card>
+        ) : (
+          <div className="max-w-3xl mx-auto space-y-4 md:space-y-6">
+            <p className="text-center text-sm uppercase tracking-[0.2em] text-muted">
+              {stage === "you" ? `${myName} • Shiva` : `${partnerName} • Shakti`}
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+              {WEATHER_OPTIONS.map((option) => (
                 <WeatherPill
-                  key={`top-left-${option.key}`}
-                  role="shiva"
+                  key={`${activeRole}-${option.key}`}
+                  role={activeRole}
                   option={option}
-                  selected={state.youWeatherTone === option.key}
-                  onClick={() =>
-                    setWeather(
-                      "youWeather",
-                      option.id,
-                      option.key === "foggy" || option.key === "frozen" ? option.key : undefined,
-                    )
-                  }
+                  selected={activeTone === option.key}
+                  onClick={() => handleSelect(option)}
                 />
               ))}
             </div>
-            <WeatherPreview role="shiva" tone={state.youWeatherTone ?? "stormy"} displayName={myName} />
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-4">
-              {WEATHER_OPTIONS.slice(3).map((option) => (
-                <WeatherPill
-                  key={`bottom-left-${option.key}`}
-                  role="shiva"
-                  option={option}
-                  selected={state.youWeatherTone === option.key}
-                  onClick={() => setWeather("youWeather", option.id)}
-                />
-              ))}
-            </div>
-          </aside>
 
-          {/* Center Panel */}
-          <section className="flex flex-col gap-3 md:gap-4 lg:sticky lg:top-8">
-            <button 
-              type="button" 
-              onClick={() => setState({ ...state, weatherSidesSwapped: !state.weatherSidesSwapped })}
-              className="py-2.5 px-4 rounded-full bg-card border border-white/10 text-sm text-muted hover:bg-white/5 transition-colors"
-            >
-              Swap Shiva ↔ Shakti
-            </button>
+            <WeatherPreview role={activeRole} tone={activeTone} displayName={activeName} />
 
-            <Card>
-              <p className="text-sm text-muted leading-relaxed">
-                The secret to these rituals isn't doing them perfectly. It's the intention you bring.
-                If you feel rushed, pause, breathe, and reset. Intimacy is a garden—water it daily, and watch it bloom.
-              </p>
-            </Card>
-
-            <Button 
-              variant="glow" 
-              disabled={!canContinue}
-              onClick={() => canContinue && navigate("/ritual")}
-            >
-              SACRED RITUALS FOR COUPLED PRESENCE
-            </Button>
-
-            <Button 
-              variant="secondary"
-              onClick={() => navigate("/paywall")}
-            >
-              See premium for both of you
-            </Button>
-          </section>
-
-          {/* Right Panel */}
-          <aside>
-            <p className="text-[11px] uppercase tracking-widest text-muted mb-4">Shakti Energy</p>
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              {WEATHER_OPTIONS.slice(0, 3).map((option) => (
-                <WeatherPill
-                  key={`top-right-${option.key}`}
-                  role="shakti"
-                  option={option}
-                  selected={state.partnerWeatherTone === option.key}
-                  onClick={() =>
-                    setWeather(
-                      "partnerWeather",
-                      option.id,
-                      option.key === "foggy" || option.key === "frozen" ? option.key : undefined,
-                    )
-                  }
-                />
-              ))}
-            </div>
-            <WeatherPreview role="shakti" tone={state.partnerWeatherTone ?? "sunny"} displayName={partnerName} />
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-4">
-              {WEATHER_OPTIONS.slice(3).map((option) => (
-                <WeatherPill
-                  key={`bottom-right-${option.key}`}
-                  role="shakti"
-                  option={option}
-                  selected={state.partnerWeatherTone === option.key}
-                  onClick={() => setWeather("partnerWeather", option.id)}
-                />
-              ))}
-            </div>
-          </aside>
-
-        </div>
+            {stage === "you" ? (
+              <Button variant="primary" disabled={!canSenseBeloved} onClick={() => canSenseBeloved && setStage("transition")}>
+                Now sense your beloved Shakti&apos;s weather
+              </Button>
+            ) : (
+              <Button variant="primary" disabled={!canRevealPath} onClick={() => canRevealPath && navigate("/ritual")}>
+                Unreveal your ritual and tonight path
+              </Button>
+            )}
+          </div>
+        )}
       </div>
     </Layout>
   );

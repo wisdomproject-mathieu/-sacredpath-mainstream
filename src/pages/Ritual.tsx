@@ -7,13 +7,15 @@ import { useSession } from "../contexts/SessionContext";
 import { resolveWeatherRitual } from "../lib/ritualRegistry";
 import {
   WEATHER_TONE_LABELS,
+  WEATHER_TONE_COPY,
   getWeatherImageUrlByTone,
   type WeatherVisualKey,
 } from "../lib/weatherAssets";
 
 function fallbackTone(weather: string | undefined): WeatherVisualKey {
   if (weather === "stormy") return "stormy";
-  if (weather === "cloudy") return "foggy";
+  if (weather === "foggy" || weather === "cloudy") return "foggy";
+  if (weather === "frozen") return "frozen";
   if (weather === "warm") return "warm";
   if (weather === "electric") return "electric";
   return "sunny";
@@ -54,84 +56,66 @@ export default function Ritual() {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto">
-        
-        {/* Page Header */}
-        <div className="text-center mb-6 md:mb-10">
-          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-3">Sacred Rituals for Coupled Presence</h1>
-          <p className="text-base md:text-lg text-muted max-w-2xl mx-auto">
-            Explore practices to cultivate deeper connection, flow, and energetic awareness.
+      <div className="max-w-5xl mx-auto space-y-5 md:space-y-7">
+        <div className="text-center">
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-2">Sacred Rituals for Coupled Presence</h1>
+          <p className="text-sm sm:text-base text-muted">
+            Tonight&apos;s shared path based on your two weather choices.
           </p>
         </div>
 
-        {/* Three Column Grid - Same structure as Weather for alignment */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px_1fr] gap-6 md:gap-8 items-start">
-          
-          {/* Left Panel */}
-          <aside>
-            <Card className="aspect-[3/4] p-0 overflow-hidden">
-              <img 
-                src={getWeatherImageUrlByTone("shiva", youTone)} 
-                alt={youTitle} 
-                className="w-full h-full object-cover"
-              />
-            </Card>
-            <div className="mt-3 md:mt-4 text-center">
-              <h2 className="font-serif text-lg md:text-xl">{youTitle}</h2>
-            </div>
-          </aside>
+        <div className="grid grid-cols-2 gap-3 md:gap-5">
+          <Card className="p-3 md:p-4">
+            <img
+              src={getWeatherImageUrlByTone("shiva", youTone)}
+              alt={youTitle}
+              className="w-full aspect-[3/4] object-cover rounded-xl border border-white/10"
+            />
+            <h2 className="font-serif text-base sm:text-lg mt-3 text-center">{youTitle}</h2>
+            <p className="text-xs sm:text-sm text-muted text-center mt-1">{WEATHER_TONE_COPY[youTone]}</p>
+          </Card>
 
-          {/* Center Panel */}
-          <section className="flex flex-col gap-3 md:gap-4 lg:sticky lg:top-8">
-            <Link to="/deeper" className="w-full py-3 px-6 rounded-full bg-card border border-white/10 text-center hover:bg-white/5 transition-colors">
-              Go deeper
-            </Link>
-
-            <Link to="/paywall" className="w-full py-3 px-6 rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] text-[#130f08] text-center font-medium hover:opacity-90 transition-opacity">
-              See premium for both of you
-            </Link>
-
-            <Button variant="secondary" onClick={() => navigate("/weather")}>
-              Swap Shiva ↔ Shakti
-            </Button>
-
-            <Card>
-              <p className="text-[11px] uppercase tracking-widest text-accent mb-3">Straight steps</p>
-              <h3 className="font-serif text-xl md:text-2xl mb-4">{freeRitual.title}</h3>
-              
-              <div className="space-y-3">
-                {ritualSteps.length > 0 ? ritualSteps.map((step, index) => (
-                  <div key={index} className="flex gap-3 items-start">
-                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-accent/20 text-accent text-sm flex items-center justify-center font-medium">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <p className="text-sm leading-relaxed">{step}</p>
-                  </div>
-                )) : (
-                  <div className="flex gap-3 items-start">
-                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-accent/20 text-accent text-sm flex items-center justify-center font-medium">01</span>
-                    <p className="text-sm leading-relaxed">Begin with presence and let the body slow down together.</p>
-                  </div>
-                )}
-              </div>
-            </Card>
-          </section>
-
-          {/* Right Panel */}
-          <aside>
-            <Card className="aspect-[3/4] p-0 overflow-hidden">
-              <img 
-                src={getWeatherImageUrlByTone("shakti", partnerTone)} 
-                alt={partnerTitle} 
-                className="w-full h-full object-cover"
-              />
-            </Card>
-            <div className="mt-3 md:mt-4 text-center">
-              <h2 className="font-serif text-lg md:text-xl">{partnerTitle}</h2>
-            </div>
-          </aside>
-
+          <Card className="p-3 md:p-4">
+            <img
+              src={getWeatherImageUrlByTone("shakti", partnerTone)}
+              alt={partnerTitle}
+              className="w-full aspect-[3/4] object-cover rounded-xl border border-white/10"
+            />
+            <h2 className="font-serif text-base sm:text-lg mt-3 text-center">{partnerTitle}</h2>
+            <p className="text-xs sm:text-sm text-muted text-center mt-1">{WEATHER_TONE_COPY[partnerTone]}</p>
+          </Card>
         </div>
+
+        <Card>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-accent mb-2">Ritual in 3 steps</p>
+          <h3 className="font-serif text-2xl mb-4">{freeRitual.title}</h3>
+          <div className="space-y-3">
+            {ritualSteps.map((step, index) => (
+              <div key={index} className="flex gap-3 items-start">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-accent/20 text-accent text-sm flex items-center justify-center font-medium">
+                  {index + 1}
+                </span>
+                <p className="text-sm sm:text-base leading-relaxed">{step}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="space-y-4">
+          <Button variant="secondary" onClick={() => navigate("/deeper")}>
+            Go deeper
+          </Button>
+          <p className="text-sm sm:text-base text-muted leading-relaxed">
+            Beyond the physical, tantra invites you to slow down, breathe together, and reconnect with intention.
+            Presence over performance creates deeper trust, safety, and closeness in your shared path.
+          </p>
+          <Link
+            to="/paywall"
+            className="block w-full rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] text-[#130f08] text-center py-3 px-6 font-semibold hover:opacity-90 transition-opacity"
+          >
+            Premium for 2
+          </Link>
+        </Card>
       </div>
     </Layout>
   );

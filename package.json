@@ -9,6 +9,7 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "picomatch": "^4.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3"
@@ -21,7 +22,7 @@
     "browserslist": "^4.28.2",
     "caniuse-lite": "^1.0.30001791",
     "fast-glob": "^3.3.2",
-    "node-releases": "^2.0.38",
+    "node-releases": "^2.0.21",
     "postcss": "^8.4.0",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.0.0",
