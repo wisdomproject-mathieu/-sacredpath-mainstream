@@ -52,9 +52,9 @@ function WeatherPill({
       className={`group relative rounded-2xl overflow-hidden border transition-all ${selected ? "border-accent ring-2 ring-accent/30" : "border-white/10"}`}
     >
       <img src={image} alt={option.title} className="w-full aspect-[4/3] object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute inset-0 bg-black/60 p-3 flex flex-col justify-end">
-        <p className="text-sm font-semibold text-text">{option.title}.</p>
-        <p className="text-xs text-muted truncate">{option.subtitle}</p>
+      <div className="absolute inset-0 bg-black/60 p-2 sm:p-3 flex flex-col justify-end">
+        <p className="text-xs sm:text-sm font-semibold text-text">{option.title}.</p>
+        <p className="text-[11px] sm:text-xs text-muted truncate">{option.subtitle}</p>
       </div>
     </button>
   );
@@ -75,7 +75,7 @@ function WeatherPreview({
   return (
     <Card>
       <img src={image} alt={`${tone} weather`} className="w-full aspect-[3/4] object-cover rounded-xl border border-white/5 mb-4" />
-      <p className="font-serif text-xl text-center">{title}</p>
+      <p className="font-serif text-lg sm:text-xl text-center">{title}</p>
     </Card>
   );
 }
@@ -99,20 +99,20 @@ export default function Weather() {
       <div className="max-w-7xl mx-auto">
         
         {/* Page Header */}
-        <div className="text-center mb-10">
-          <h1 className="font-serif text-4xl md:text-5xl mb-3">Your shared intimacy weather</h1>
-          <p className="text-lg text-muted max-w-2xl mx-auto">
+        <div className="text-center mb-6 md:mb-10">
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-3">Your shared intimacy weather</h1>
+          <p className="text-base md:text-lg text-muted max-w-2xl mx-auto">
             Take a moment. Breathe. Share your current state, then welcome your partner's weather with love, respect, and curiosity.
           </p>
         </div>
 
         {/* Three Column Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px_1fr] gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px_1fr] gap-6 md:gap-8 items-start">
           
           {/* Left Panel */}
           <aside>
             <p className="text-[11px] uppercase tracking-widest text-muted mb-4">Shiva Energy</p>
-            <div className="grid grid-cols-3 gap-3 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-4">
               {WEATHER_OPTIONS.slice(0, 3).map((option) => (
                 <WeatherPill
                   key={`top-left-${option.key}`}
@@ -130,7 +130,7 @@ export default function Weather() {
               ))}
             </div>
             <WeatherPreview role="shiva" tone={state.youWeatherTone ?? "stormy"} displayName={myName} />
-            <div className="grid grid-cols-3 gap-3 mt-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-4">
               {WEATHER_OPTIONS.slice(3).map((option) => (
                 <WeatherPill
                   key={`bottom-left-${option.key}`}
@@ -144,11 +144,11 @@ export default function Weather() {
           </aside>
 
           {/* Center Panel */}
-          <section className="flex flex-col gap-4 sticky top-8">
+          <section className="flex flex-col gap-3 md:gap-4 lg:sticky lg:top-8">
             <button 
               type="button" 
               onClick={() => setState({ ...state, weatherSidesSwapped: !state.weatherSidesSwapped })}
-              className="py-2 px-4 rounded-full bg-card border border-white/10 text-sm text-muted hover:bg-white/5 transition-colors"
+              className="py-2.5 px-4 rounded-full bg-card border border-white/10 text-sm text-muted hover:bg-white/5 transition-colors"
             >
               Swap Shiva ↔ Shakti
             </button>
@@ -197,7 +197,7 @@ export default function Weather() {
               ))}
             </div>
             <WeatherPreview role="shakti" tone={state.partnerWeatherTone ?? "sunny"} displayName={partnerName} />
-            <div className="grid grid-cols-3 gap-3 mt-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-4">
               {WEATHER_OPTIONS.slice(3).map((option) => (
                 <WeatherPill
                   key={`bottom-right-${option.key}`}

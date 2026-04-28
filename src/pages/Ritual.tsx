@@ -57,15 +57,15 @@ export default function Ritual() {
       <div className="max-w-7xl mx-auto">
         
         {/* Page Header */}
-        <div className="text-center mb-10">
-          <h1 className="font-serif text-4xl md:text-5xl mb-3">Sacred Rituals for Coupled Presence</h1>
-          <p className="text-lg text-muted max-w-2xl mx-auto">
+        <div className="text-center mb-6 md:mb-10">
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-3">Sacred Rituals for Coupled Presence</h1>
+          <p className="text-base md:text-lg text-muted max-w-2xl mx-auto">
             Explore practices to cultivate deeper connection, flow, and energetic awareness.
           </p>
         </div>
 
         {/* Three Column Grid - Same structure as Weather for alignment */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px_1fr] gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px_1fr] gap-6 md:gap-8 items-start">
           
           {/* Left Panel */}
           <aside>
@@ -76,13 +76,13 @@ export default function Ritual() {
                 className="w-full h-full object-cover"
               />
             </Card>
-            <div className="mt-4 text-center">
-              <h2 className="font-serif text-xl">{youTitle}</h2>
+            <div className="mt-3 md:mt-4 text-center">
+              <h2 className="font-serif text-lg md:text-xl">{youTitle}</h2>
             </div>
           </aside>
 
           {/* Center Panel */}
-          <section className="flex flex-col gap-4 sticky top-8">
+          <section className="flex flex-col gap-3 md:gap-4 lg:sticky lg:top-8">
             <Link to="/deeper" className="w-full py-3 px-6 rounded-full bg-card border border-white/10 text-center hover:bg-white/5 transition-colors">
               Go deeper
             </Link>
@@ -97,7 +97,7 @@ export default function Ritual() {
 
             <Card>
               <p className="text-[11px] uppercase tracking-widest text-accent mb-3">Straight steps</p>
-              <h3 className="font-serif text-2xl mb-4">{freeRitual.title}</h3>
+              <h3 className="font-serif text-xl md:text-2xl mb-4">{freeRitual.title}</h3>
               
               <div className="space-y-3">
                 {ritualSteps.length > 0 ? ritualSteps.map((step, index) => (
@@ -126,8 +126,8 @@ export default function Ritual() {
                 className="w-full h-full object-cover"
               />
             </Card>
-            <div className="mt-4 text-center">
-              <h2 className="font-serif text-xl">{partnerTitle}</h2>
+            <div className="mt-3 md:mt-4 text-center">
+              <h2 className="font-serif text-lg md:text-xl">{partnerTitle}</h2>
             </div>
           </aside>
 

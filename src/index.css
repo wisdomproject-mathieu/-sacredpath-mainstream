@@ -101,7 +101,7 @@ main {
   max-width: var(--sp-page-max);
   margin-right: auto;
   margin-left: auto;
-  padding: 48px 24px;
+  padding: 24px 16px;
 }
 
 @media (min-width: 640px) {
@@ -314,19 +314,28 @@ main {
 
 @media (max-width: 640px) {
   .sp-brand {
-    gap: 14px;
-    padding: 18px;
+    gap: 12px;
+    padding: 14px;
   }
 
   .sp-brand-logo-wrap {
-    width: 64px;
-    height: 64px;
-    border-radius: 20px;
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
   }
 
   .sp-brand-kicker {
-    font-size: 0.72rem;
-    letter-spacing: 0.24em;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+  }
+
+  .sp-brand-title {
+    font-size: 2rem;
+    line-height: 0.95;
+  }
+
+  .sp-brand-subtitle {
+    font-size: 0.95rem;
   }
 }
 
