@@ -67,7 +67,7 @@ export default function Ritual() {
         <div className="grid grid-cols-2 gap-3 md:gap-5">
           <Card className="p-3 md:p-4">
             <img
-              src={getWeatherImageUrlByTone("shiva", youTone)}
+              src={getWeatherImageUrlByTone("me", youTone)}
               alt={youTitle}
               className="w-full aspect-[3/4] object-cover rounded-xl border border-white/10"
             />
@@ -77,7 +77,7 @@ export default function Ritual() {
 
           <Card className="p-3 md:p-4">
             <img
-              src={getWeatherImageUrlByTone("shakti", partnerTone)}
+              src={getWeatherImageUrlByTone("partner", partnerTone)}
               alt={partnerTitle}
               className="w-full aspect-[3/4] object-cover rounded-xl border border-white/10"
             />
@@ -106,7 +106,7 @@ export default function Ritual() {
             Go deeper
           </Button>
           <p className="text-sm sm:text-base text-muted leading-relaxed">
-            Beyond the physical, tantra invites you to slow down, breathe together, and reconnect with intention.
+            Slow down, breathe together, and reconnect with intention.
             Presence over performance creates deeper trust, safety, and closeness in your shared path.
           </p>
           <Link

@@ -13,7 +13,7 @@ import {
   type WeatherVisualKey,
 } from "../lib/weatherAssets";
 
-type WeatherRole = "shiva" | "shakti";
+type WeatherRole = "me" | "partner";
 type WeatherField = "youWeather" | "partnerWeather";
 type SelectionStage = "you" | "transition" | "partner";
 
@@ -102,7 +102,7 @@ export default function Weather() {
 
   const canSenseBeloved = Boolean(state.youWeather);
   const canRevealPath = Boolean(state.partnerWeather);
-  const activeRole: WeatherRole = stage === "partner" ? "shakti" : "shiva";
+  const activeRole: WeatherRole = stage === "partner" ? "partner" : "me";
   const activeName = stage === "partner" ? partnerName : myName;
   const activeTone = stage === "partner" ? (state.partnerWeatherTone ?? "sunny") : (state.youWeatherTone ?? "stormy");
   const activeField: WeatherField = stage === "partner" ? "partnerWeather" : "youWeather";

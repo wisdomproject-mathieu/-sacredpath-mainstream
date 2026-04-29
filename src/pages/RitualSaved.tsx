@@ -99,7 +99,7 @@ export default function RitualSaved() {
           <div className="ritual-saved-mini-ritual">
             <div className="ritual-saved-mini-media">
               <div className="ritual-saved-mini-side">
-                <img src={getWeatherImageUrlByTone("shiva", youTone)} alt={`${WEATHER_TONE_LABELS[youTone]} Shiva`} />
+                <img src={getWeatherImageUrlByTone("me", youTone)} alt={`${WEATHER_TONE_LABELS[youTone]} Me`} />
               </div>
               <div className="ritual-saved-mini-core">
                 <span className="ritual-saved-mini-pill">Original ritual</span>
@@ -117,7 +117,7 @@ export default function RitualSaved() {
                 ) : null}
               </div>
               <div className="ritual-saved-mini-side">
-                <img src={getWeatherImageUrlByTone("shakti", partnerTone)} alt={`${WEATHER_TONE_LABELS[partnerTone]} Shakti`} />
+                <img src={getWeatherImageUrlByTone("partner", partnerTone)} alt={`${WEATHER_TONE_LABELS[partnerTone]} Partner`} />
               </div>
             </div>
           </div>
