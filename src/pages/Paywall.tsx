@@ -1,16 +1,26 @@
-import { Link } from "react-router-dom";
+import { useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import Layout from "../components/Layout";
 import Card from "../components/Card";
 import Button from "../components/Button";
 
 export default function Paywall() {
+  const [searchParams] = useSearchParams();
+  const source = searchParams.get("source");
+  const heading = useMemo(() => {
+    if (source === "voice") return "Unlock full Sacred Voice for both of you.";
+    if (source === "oracle") return "Unlock unlimited Intimacy Oracle.";
+    if (source === "journey" || source === "journey-benefits") return "Unlock your full shared Journey.";
+    return "Go deeper than one card.";
+  }, [source]);
+
   return (
     <Layout>
       <div className="max-w-5xl mx-auto">
         
         {/* Header Section */}
         <div className="text-center mb-12">
-          <h1 className="font-serif text-4xl md:text-5xl mb-4">Go deeper than one card.</h1>
+          <h1 className="font-serif text-4xl md:text-5xl mb-4">{heading}</h1>
           <p className="text-lg text-muted max-w-3xl mx-auto">
             Unlock the full intimacy library for both of you - $29/year. One subscription. Two partners.
             Daily rituals, guided voice, oracle prompts, and your shared journey.
@@ -67,7 +77,7 @@ export default function Paywall() {
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-          <Button variant="glow">Start subscription</Button>
+          <Button variant="glow">Subscribe with Apple Pay</Button>
           <Button variant="secondary" onClick={() => window.history.back()}>Back to ritual</Button>
         </div>
 

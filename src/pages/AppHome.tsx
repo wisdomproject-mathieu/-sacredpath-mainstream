@@ -132,7 +132,6 @@ export default function AppHome() {
               <input
                 value={state.youName ?? ""}
                 onChange={(e) => setState({ ...state, youName: e.target.value })}
-                placeholder="Me"
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-text outline-none transition focus:border-accent/60"
               />
             </label>
@@ -141,7 +140,6 @@ export default function AppHome() {
               <input
                 value={state.partnerName ?? ""}
                 onChange={(e) => setState({ ...state, partnerName: e.target.value })}
-                placeholder="Partner"
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-text outline-none transition focus:border-accent/60"
               />
             </label>
