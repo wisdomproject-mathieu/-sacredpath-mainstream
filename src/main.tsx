@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import "./index.css";
 
 import AppHome from "./pages/AppHome";
@@ -16,10 +17,19 @@ import Journey from "./pages/Journey";
 import Connect from "./pages/Connect";
 import { SessionProvider } from "./contexts/SessionContext";
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname]);
+  return null;
+}
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <SessionProvider>
       <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<AppHome />} />
           <Route path="/weather" element={<Weather />} />

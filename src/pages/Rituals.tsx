@@ -80,6 +80,26 @@ export default function Rituals() {
   const list = useMemo(() => [freeToday, ...filtered.filter((item) => item.id !== freeToday.id)], [freeToday, filtered]);
   const selected = list.find((item) => item.id === selectedId) ?? list[0] ?? rituals[0];
   const selectedLocked = !hasPremium && selected.id !== freeToday.id && selected.tier === "premium";
+  const premiumFilterClass = "appearance-none rounded-xl border border-white/10 bg-gradient-to-b from-white/10 to-white/5 px-3 py-2 text-sm text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] focus:border-accent/60 focus:outline-none";
+
+  const renderInlineDetails = (ritual: Ritual) => {
+    const locked = !hasPremium && ritual.id !== freeToday.id && ritual.tier === "premium";
+    if (locked) return null;
+    return (
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-3">
+        <p className="text-sm">{ritual.intro}</p>
+        <div className="space-y-2">
+          {ritual.steps.slice(0, 7).map((step, index) => (
+            <p key={index} className="text-sm">
+              <span className="text-accent font-semibold mr-2">{index + 1}.</span>
+              {step}
+            </p>
+          ))}
+        </div>
+        <p className="text-sm text-muted">{ritual.closing}</p>
+      </div>
+    );
+  };
 
   return (
     <Layout>
@@ -91,46 +111,50 @@ export default function Rituals() {
           </p>
         </header>
 
-        <section className="rounded-2xl border border-accent/30 bg-accent/10 p-5">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-accent">
-            {tonightPath?.freeRitual ? "Tonight's Path (free)" : "Daily discovery"}
-          </p>
-          <h2 className="font-serif text-2xl mt-2">{freeToday.title}</h2>
-          <p className="text-sm text-muted mt-1">{freeToday.subtitle}</p>
-          <p className="text-xs text-muted mt-2">{freeToday.durationMinutes} min · {freeToday.intensity}</p>
-        </section>
-
         <section className="rounded-2xl border border-white/10 bg-card p-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          <select className="rounded-xl border border-white/10 bg-white/5 px-3 py-2" value={weather} onChange={(e) => setWeather(e.target.value as WeatherState | "all")}>
+          <select className={premiumFilterClass} value={weather} onChange={(e) => setWeather(e.target.value as WeatherState | "all")}>
             {WEATHER_FILTERS.map((item) => <option key={item} value={item}>{item === "all" ? "Weather: All" : `Weather: ${item}`}</option>)}
           </select>
-          <select className="rounded-xl border border-white/10 bg-white/5 px-3 py-2" value={duration} onChange={(e) => setDuration((e.target.value === "all" ? "all" : Number(e.target.value)) as DurationFilter)}>
+          <select className={premiumFilterClass} value={duration} onChange={(e) => setDuration((e.target.value === "all" ? "all" : Number(e.target.value)) as DurationFilter)}>
             {DURATION_FILTERS.map((item) => <option key={String(item)} value={item}>{item === "all" ? "Duration: All" : `Duration: ${item} min`}</option>)}
           </select>
-          <select className="rounded-xl border border-white/10 bg-white/5 px-3 py-2" value={goal} onChange={(e) => setGoal(e.target.value as GoalFilter)}>
+          <select className={premiumFilterClass} value={goal} onChange={(e) => setGoal(e.target.value as GoalFilter)}>
             {GOAL_FILTERS.map((item) => <option key={item} value={item}>{item === "all" ? "Goal: All" : `Goal: ${item}`}</option>)}
           </select>
-          <select className="rounded-xl border border-white/10 bg-white/5 px-3 py-2" value={intensity} onChange={(e) => setIntensity(e.target.value as IntensityFilter)}>
+          <select className={premiumFilterClass} value={intensity} onChange={(e) => setIntensity(e.target.value as IntensityFilter)}>
             {INTENSITY_FILTERS.map((item) => <option key={item} value={item}>{item === "all" ? "Intensity: All" : `Intensity: ${item}`}</option>)}
           </select>
-          <select className="rounded-xl border border-white/10 bg-white/5 px-3 py-2" value={category} onChange={(e) => setCategory(e.target.value as CategoryFilter)}>
+          <select className={premiumFilterClass} value={category} onChange={(e) => setCategory(e.target.value as CategoryFilter)}>
             {CATEGORY_FILTERS.map((item) => <option key={item} value={item}>{item === "all" ? "Category: All" : `Category: ${item}`}</option>)}
           </select>
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="rounded-xl border border-white/10 bg-white/5 px-3 py-2"
+            className="rounded-xl border border-white/10 bg-gradient-to-b from-white/10 to-white/5 px-3 py-2 text-sm text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] focus:border-accent/60 focus:outline-none"
             placeholder="Search rituals..."
           />
+        </section>
+
+        <section className="space-y-3">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-accent">
+            {tonightPath?.freeRitual ? "Tonight's Path (free)" : "Daily discovery"}
+          </p>
+          <RitualCard
+            ritual={freeToday}
+            selected={selected.id === freeToday.id}
+            locked={false}
+            isFreeToday={true}
+            onClick={() => setSelectedId(freeToday.id)}
+          />
+          {(selected.id === freeToday.id || !selectedId) ? renderInlineDetails(freeToday) : null}
         </section>
 
         <p className="text-sm text-muted">
           Showing <strong>{list.length}</strong> rituals from a library of <strong>{rituals.length}</strong>.
         </p>
 
-        <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-          <div className="grid gap-3 sm:grid-cols-2">
-            {list.slice(0, 160).map((ritual, index) => {
+        <section className="grid gap-3 sm:grid-cols-2">
+            {list.slice(0, 160).filter((r) => r.id !== freeToday.id).map((ritual, index) => {
               const locked = !hasPremium && ritual.id !== freeToday.id && ritual.tier === "premium";
               return (
                 <div key={ritual.id} className="space-y-3">
@@ -141,6 +165,7 @@ export default function Rituals() {
                     isFreeToday={ritual.id === freeToday.id}
                     onClick={() => setSelectedId(ritual.id)}
                   />
+                  {selected.id === ritual.id ? renderInlineDetails(ritual) : null}
                   {!hasPremium && index === 4 ? (
                     <div className="rounded-2xl border border-accent/40 bg-accent/10 p-4">
                       <p className="text-sm">
@@ -154,44 +179,6 @@ export default function Rituals() {
                 </div>
               );
             })}
-          </div>
-
-          <aside className="rounded-2xl border border-white/10 bg-card p-5 h-max lg:sticky lg:top-6">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-accent mb-2">Ritual details</p>
-            <h2 className="text-2xl font-serif">{selected.title}</h2>
-            <p className="text-muted mt-1">{selected.subtitle}</p>
-            <p className="text-xs text-muted mt-2">{selected.durationMinutes} min · {selected.intensity} · {selected.category}</p>
-
-            {selectedLocked ? (
-              <div className="mt-4 rounded-xl border border-accent/30 bg-accent/10 p-4">
-                <p className="text-sm">
-                  Unlock the full library for both of you - $29/year. One subscription gives both connected partners access to 300+ rituals, guided voice, oracle prompts, and shared journey tools.
-                </p>
-                <button className="mt-3 rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-4 py-2 text-[#130f08] font-semibold">
-                  Unlock for both of us
-                </button>
-              </div>
-            ) : (
-              <>
-                <p className="text-sm mt-4">{selected.intro}</p>
-                <div className="mt-4 space-y-2">
-                  {selected.steps.slice(0, 7).map((step, index) => (
-                    <p key={index} className="text-sm">
-                      <span className="text-accent font-semibold mr-2">{index + 1}.</span>
-                      {step}
-                    </p>
-                  ))}
-                </div>
-                <p className="text-sm text-muted mt-4">{selected.closing}</p>
-                <div className="mt-4 grid gap-2">
-                  <button className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10">Play Sacred Voice</button>
-                  <button className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10">Save to Journey</button>
-                  <button className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10">Send to Partner</button>
-                  <button className="rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-4 py-2 text-[#130f08] font-semibold">Complete ritual</button>
-                </div>
-              </>
-            )}
-          </aside>
         </section>
 
         {!hasPremium ? (
