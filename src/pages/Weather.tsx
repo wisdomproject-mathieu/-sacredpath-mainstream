@@ -113,6 +113,9 @@ export default function Weather() {
       option.id,
       option.key === "foggy" || option.key === "frozen" ? option.key : undefined,
     );
+    if (stage === "partner") {
+      navigate("/ritual");
+    }
   };
 
   return (
