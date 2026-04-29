@@ -20,6 +20,7 @@ export default function Rituals() {
 
   const selected = list.find((r) => r.id === selectedId) ?? list[0] ?? rituals[0];
   const selectedIsLocked = !hasPremium && selected.id !== freeToday.id && selected.tier === "premium";
+  const premiumAnchorId = "premium-subscribe-section";
 
   const imageFor = (mood: WeatherState) => `${import.meta.env.BASE_URL}assets/weather-mainstream/${mood}.png`;
 
@@ -79,6 +80,19 @@ export default function Rituals() {
                     <span className="rounded-full border border-accent/60 bg-black/60 px-3 py-1 text-xs tracking-wide">Locked</span>
                   </div>
                 ) : null}
+                {selected?.id === ritual.id && (!selectedIsLocked || ritual.id === freeToday.id) ? (
+                  <div className="border-t border-white/10 bg-white/5 p-4">
+                    <p className="text-[11px] uppercase tracking-[0.2em] text-accent mb-2">Steps</p>
+                    <div className="space-y-2">
+                      {ritual.steps.slice(0, 6).map((step, index) => (
+                        <p key={index} className="text-sm">
+                          <span className="text-accent font-semibold mr-2">{index + 1}.</span>
+                          {step}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
               </button>
             ))}
           </div>
@@ -105,6 +119,33 @@ export default function Rituals() {
               )}
             </aside>
           )}
+        </section>
+
+        <div className="flex justify-center">
+          <a
+            href={`#${premiumAnchorId}`}
+            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10 transition-colors"
+          >
+            <span>↓</span>
+            <span>Go to premium</span>
+          </a>
+        </div>
+
+        <section id={premiumAnchorId} className="rounded-2xl border border-accent/40 bg-gradient-to-br from-[#e6b980]/25 to-[#eacda3]/20 p-6 text-center">
+          <p className="font-serif text-2xl md:text-3xl leading-snug">
+            Subscribe for two,
+            <br />
+            great Intomacy,
+            <br />
+            Deep connection.
+            <br />
+            only 29$ per year,
+            <br />
+            for both of you
+          </p>
+          <button className="mt-5 rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-6 py-3 font-semibold text-[#130f08]">
+            Unlock for both of us
+          </button>
         </section>
       </div>
     </Layout>
