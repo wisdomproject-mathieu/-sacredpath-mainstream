@@ -27,7 +27,7 @@ type WeatherOption = {
 const WEATHER_OPTIONS: WeatherOption[] = [
   { key: "warm", id: "warm", title: "Warm", subtitle: "Soft, tender..." },
   { key: "electric", id: "electric", title: "Electric", subtitle: "Crackling, awake..." },
-  { key: "sunny", id: "sunny", title: "Sunny", subtitle: "Clear, light..." },
+  { key: "sunny", id: "sunny", title: "Hot", subtitle: "Desire, heat..." },
   { key: "stormy", id: "stormy", title: "Stormy", subtitle: "Heavy, tumultuous..." },
   { key: "foggy", id: "foggy", title: "Foggy", subtitle: "Detached, confused..." },
   { key: "frozen", id: "frozen", title: "Frozen", subtitle: "Numb, tired, shut down..." },

@@ -17,7 +17,7 @@ import {
 type HomeCheckinStage = "me" | "meSelected" | "partner" | "complete";
 
 const WEATHER_OPTIONS: Array<{ id: IntimacyWeather; subtitle: string }> = [
-  { id: "sunny", subtitle: "Clear, light, easy connection" },
+  { id: "sunny", subtitle: "Desire, heat, hunger" },
   { id: "warm", subtitle: "Soft, tender, wanting closeness" },
   { id: "electric", subtitle: "Spark, chemistry, attraction" },
   { id: "foggy", subtitle: "Unclear, distant, uncertain" },

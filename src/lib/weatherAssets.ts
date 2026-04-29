@@ -32,7 +32,7 @@ export const WEATHER_TONE_LABELS: Record<WeatherVisualKey, string> = {
   frozen: "Frozen",
   warm: "Warm",
   electric: "Electric",
-  sunny: "Sunny",
+  sunny: "Hot",
 };
 
 export const WEATHER_TONE_COPY: Record<WeatherVisualKey, string> = {
@@ -41,7 +41,7 @@ export const WEATHER_TONE_COPY: Record<WeatherVisualKey, string> = {
   frozen: "Numb, tired, and shut down in the body.",
   warm: "Soft, tender, and wanting closeness.",
   electric: "Crackling, awake, and drawn to one another.",
-  sunny: "Clear, light, and easy with each other today.",
+  sunny: "Desire, heat, hunger.",
 };
 
 export function getDisplayName(name: string | undefined, fallback: string) {
