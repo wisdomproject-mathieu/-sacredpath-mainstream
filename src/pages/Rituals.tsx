@@ -46,6 +46,9 @@ export default function Rituals() {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const hasPremium = typeof window !== "undefined" && window.localStorage.getItem("sacredpath-premium") === "true";
+  const toggleSelected = (id: string) => {
+    setSelectedId((prev) => (prev === id ? null : id));
+  };
 
   const tonightPath = useMemo(() => getTonightPath(state.youWeather, state.partnerWeather), [state.youWeather, state.partnerWeather]);
   const dailyDiscovery = useMemo(
@@ -144,7 +147,7 @@ export default function Rituals() {
             selected={selected.id === freeToday.id}
             locked={false}
             isFreeToday={true}
-            onClick={() => setSelectedId(freeToday.id)}
+            onClick={() => toggleSelected(freeToday.id)}
           />
           {(selected.id === freeToday.id || !selectedId) ? renderInlineDetails(freeToday) : null}
         </section>
@@ -163,7 +166,7 @@ export default function Rituals() {
                     selected={selected.id === ritual.id}
                     locked={locked}
                     isFreeToday={ritual.id === freeToday.id}
-                    onClick={() => setSelectedId(ritual.id)}
+                    onClick={() => toggleSelected(ritual.id)}
                   />
                   {selected.id === ritual.id ? renderInlineDetails(ritual) : null}
                   {!hasPremium && index === 4 ? (
