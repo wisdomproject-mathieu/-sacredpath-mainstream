@@ -19,7 +19,7 @@ type HomeCheckinStage = "me" | "meSelected" | "partner" | "complete";
 const WEATHER_OPTIONS: Array<{ id: IntimacyWeather; subtitle: string }> = [
   { id: "sunny", subtitle: "Desire, heat, hunger" },
   { id: "warm", subtitle: "Soft, tender, wanting closeness" },
-  { id: "electric", subtitle: "Spark, chemistry, attraction" },
+  { id: "electric", subtitle: "Curious, playful, adventurous" },
   { id: "foggy", subtitle: "Unclear, distant, uncertain" },
   { id: "frozen", subtitle: "Numb, shut down, tired" },
   { id: "stormy", subtitle: "Charged, tense, friction" },

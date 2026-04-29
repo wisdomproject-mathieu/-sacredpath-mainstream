@@ -40,7 +40,7 @@ export const WEATHER_TONE_COPY: Record<WeatherVisualKey, string> = {
   foggy: "Unclear, drifting, and still finding shape.",
   frozen: "Numb, tired, and shut down in the body.",
   warm: "Soft, tender, and wanting closeness.",
-  electric: "Crackling, awake, and drawn to one another.",
+  electric: "Curious, playful, adventurous.",
   sunny: "Desire, heat, hunger.",
 };
 
