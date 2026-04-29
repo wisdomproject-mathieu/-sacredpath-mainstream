@@ -3,22 +3,22 @@
 @tailwind utilities;
 
 :root {
-  --color-bg: #050409;
-  --color-card: #111018;
-  --color-card-2: #17131f;
-  --color-accent: #e6b980;
-  --color-accent-2: #eacda3;
+  --color-bg: #0b0f17;
+  --color-card: #111827;
+  --color-card-2: #172433;
+  --color-accent: #f2c46d;
+  --color-accent-2: #e98265;
   --color-accent-soft: rgba(230, 185, 128, 0.14);
-  --color-text: #f6f1e9;
-  --color-muted: #b8a892;
+  --color-text: #faf8f5;
+  --color-muted: #647080;
   --color-dark-gold: #130f08;
 
-  --radius-card: 32px;
-  --radius-card-sm: 18px;
+  --radius-card: 28px;
+  --radius-card-sm: 24px;
   --radius-pill: 999px;
 
-  --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.65);
-  --shadow-gold: 0 20px 60px rgba(230, 185, 128, 0.22);
+  --shadow-soft: 0 12px 40px rgba(23, 36, 51, 0.1);
+  --shadow-gold: 0 24px 70px rgba(23, 36, 51, 0.18);
 
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
     sans-serif;
