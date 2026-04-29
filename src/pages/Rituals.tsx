@@ -81,8 +81,7 @@ export default function Rituals() {
   );
 
   const list = useMemo(() => [freeToday, ...filtered.filter((item) => item.id !== freeToday.id)], [freeToday, filtered]);
-  const selected = list.find((item) => item.id === selectedId) ?? list[0] ?? rituals[0];
-  const selectedLocked = !hasPremium && selected.id !== freeToday.id && selected.tier === "premium";
+  const selected = selectedId ? list.find((item) => item.id === selectedId) ?? null : null;
   const premiumFilterClass = "appearance-none rounded-xl border border-white/10 bg-gradient-to-b from-white/10 to-white/5 px-3 py-2 text-sm text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] focus:border-accent/60 focus:outline-none";
 
   const renderInlineDetails = (ritual: Ritual) => {
@@ -116,19 +115,19 @@ export default function Rituals() {
 
         <section className="rounded-2xl border border-white/10 bg-card p-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           <select className={premiumFilterClass} value={weather} onChange={(e) => setWeather(e.target.value as WeatherState | "all")}>
-            {WEATHER_FILTERS.map((item) => <option key={item} value={item}>{item === "all" ? "Weather: All" : `Weather: ${item}`}</option>)}
+            {WEATHER_FILTERS.map((item) => <option key={item} className="bg-[#171327] text-white" value={item}>{item === "all" ? "Weather: All" : `Weather: ${item}`}</option>)}
           </select>
           <select className={premiumFilterClass} value={duration} onChange={(e) => setDuration((e.target.value === "all" ? "all" : Number(e.target.value)) as DurationFilter)}>
-            {DURATION_FILTERS.map((item) => <option key={String(item)} value={item}>{item === "all" ? "Duration: All" : `Duration: ${item} min`}</option>)}
+            {DURATION_FILTERS.map((item) => <option key={String(item)} className="bg-[#171327] text-white" value={item}>{item === "all" ? "Duration: All" : `Duration: ${item} min`}</option>)}
           </select>
           <select className={premiumFilterClass} value={goal} onChange={(e) => setGoal(e.target.value as GoalFilter)}>
-            {GOAL_FILTERS.map((item) => <option key={item} value={item}>{item === "all" ? "Goal: All" : `Goal: ${item}`}</option>)}
+            {GOAL_FILTERS.map((item) => <option key={item} className="bg-[#171327] text-white" value={item}>{item === "all" ? "Goal: All" : `Goal: ${item}`}</option>)}
           </select>
           <select className={premiumFilterClass} value={intensity} onChange={(e) => setIntensity(e.target.value as IntensityFilter)}>
-            {INTENSITY_FILTERS.map((item) => <option key={item} value={item}>{item === "all" ? "Intensity: All" : `Intensity: ${item}`}</option>)}
+            {INTENSITY_FILTERS.map((item) => <option key={item} className="bg-[#171327] text-white" value={item}>{item === "all" ? "Intensity: All" : `Intensity: ${item}`}</option>)}
           </select>
           <select className={premiumFilterClass} value={category} onChange={(e) => setCategory(e.target.value as CategoryFilter)}>
-            {CATEGORY_FILTERS.map((item) => <option key={item} value={item}>{item === "all" ? "Category: All" : `Category: ${item}`}</option>)}
+            {CATEGORY_FILTERS.map((item) => <option key={item} className="bg-[#171327] text-white" value={item}>{item === "all" ? "Category: All" : `Category: ${item}`}</option>)}
           </select>
           <input
             value={query}
@@ -144,12 +143,12 @@ export default function Rituals() {
           </p>
           <RitualCard
             ritual={freeToday}
-            selected={selected.id === freeToday.id}
+            selected={selected?.id === freeToday.id}
             locked={false}
             isFreeToday={true}
             onClick={() => toggleSelected(freeToday.id)}
           />
-          {(selected.id === freeToday.id || !selectedId) ? renderInlineDetails(freeToday) : null}
+          {selected?.id === freeToday.id ? renderInlineDetails(freeToday) : null}
         </section>
 
         <p className="text-sm text-muted">
@@ -163,12 +162,12 @@ export default function Rituals() {
                 <div key={ritual.id} className="space-y-3">
                   <RitualCard
                     ritual={ritual}
-                    selected={selected.id === ritual.id}
+                    selected={selected?.id === ritual.id}
                     locked={locked}
                     isFreeToday={ritual.id === freeToday.id}
                     onClick={() => toggleSelected(ritual.id)}
                   />
-                  {selected.id === ritual.id ? renderInlineDetails(ritual) : null}
+                  {selected?.id === ritual.id ? renderInlineDetails(ritual) : null}
                   {!hasPremium && index === 4 ? (
                     <div className="rounded-2xl border border-accent/40 bg-accent/10 p-4">
                       <p className="text-sm">

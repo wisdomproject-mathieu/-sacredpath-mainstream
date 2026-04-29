@@ -176,12 +176,8 @@ export default function AppHome() {
               <img
                 src={getWeatherImageUrlByTone("me", meTone)}
                 alt={`Me ${WEATHER_TONE_LABELS[meTone]}`}
-                className="h-[340px] w-full object-cover md:h-[420px]"
+                className="h-[340px] w-full bg-[#151126] object-contain p-2 md:h-[420px]"
               />
-              <div className="space-y-2 p-5 text-center">
-                <h3 className="font-serif text-3xl">{WEATHER_TONE_LABELS[meTone]}</h3>
-                <p className="text-sm text-muted">{WEATHER_TONE_COPY[meTone]}</p>
-              </div>
             </div>
             <div className="mx-auto flex max-w-2xl flex-col gap-3">
               <button
@@ -231,21 +227,15 @@ export default function AppHome() {
                 <img
                   src={getWeatherImageUrlByTone("me", meTone)}
                   alt={`${WEATHER_TONE_LABELS[meTone]} Me`}
-                  className="h-56 w-full object-cover"
+                  className="h-64 w-full bg-[#151126] object-contain p-2"
                 />
-                <div className="space-y-1 p-4">
-                  <p className="font-serif text-2xl">{WEATHER_TONE_LABELS[meTone]}</p>
-                </div>
               </div>
               <div className="overflow-hidden rounded-2xl border border-white/10">
                 <img
                   src={getWeatherImageUrlByTone("partner", partnerTone)}
                   alt={`${WEATHER_TONE_LABELS[partnerTone]} Partner`}
-                  className="h-56 w-full object-cover"
+                  className="h-64 w-full bg-[#151126] object-contain p-2"
                 />
-                <div className="space-y-1 p-4">
-                  <p className="font-serif text-2xl">{WEATHER_TONE_LABELS[partnerTone]}</p>
-                </div>
               </div>
             </div>
 
