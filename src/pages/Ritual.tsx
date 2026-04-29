@@ -4,7 +4,7 @@ import Layout from "../components/Layout";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import { useSession } from "../contexts/SessionContext";
-import { resolveWeatherRitual } from "../lib/ritualRegistry";
+import { getTonightPath } from "../lib/tonightPath";
 import {
   WEATHER_TONE_LABELS,
   WEATHER_TONE_COPY,
@@ -31,7 +31,7 @@ export default function Ritual() {
 
   if (!state.youWeather || !state.partnerWeather) return null;
 
-  const result = resolveWeatherRitual(state.youWeather, state.partnerWeather);
+  const result = getTonightPath(state.youWeather, state.partnerWeather);
   if (!result || !result.freeRitual) {
     return (
       <Layout>
@@ -53,6 +53,7 @@ export default function Ritual() {
   const youTitle = `${WEATHER_TONE_LABELS[youTone]} ${youName}`;
   const partnerTitle = `${WEATHER_TONE_LABELS[partnerTone]} ${partnerName}`;
   const ritualSteps = freeRitual.ritualSteps.slice(0, 3);
+  const weatherPairLabel = `${WEATHER_TONE_LABELS[youTone]} + ${WEATHER_TONE_LABELS[partnerTone]}`;
 
   return (
     <Layout>
@@ -62,6 +63,7 @@ export default function Ritual() {
           <p className="text-sm sm:text-base text-muted">
             Tonight&apos;s shared path based on your two weather choices.
           </p>
+          <p className="text-xs uppercase tracking-[0.18em] text-accent mt-3">{weatherPairLabel}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-3 md:gap-5">

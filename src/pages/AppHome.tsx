@@ -2,39 +2,26 @@ import { Link } from "react-router-dom";
 import { useMemo } from "react";
 import Layout from "../components/Layout";
 import { useSession } from "../contexts/SessionContext";
-import { resolveWeatherRitual } from "../lib/ritualRegistry";
-import type { IntimacyWeather } from "../lib/ritualRegistry";
-import { getDailyFreeRitual, type WeatherState } from "../data/ritualLibrary";
 import { getWeatherImageUrlByTone, type WeatherVisualKey } from "../lib/weatherAssets";
 import BrandHeader from "../components/BrandHeader";
-
-const WEATHER_OPTIONS: Array<{ id: IntimacyWeather; title: string; subtitle: string }> = [
-  { id: "sunny", title: "Sunny", subtitle: "Clear, light, easy connection" },
-  { id: "warm", title: "Warm", subtitle: "Soft, tender, wanting closeness" },
-  { id: "electric", title: "Electric", subtitle: "Spark, chemistry, attraction" },
-  { id: "foggy", title: "Foggy", subtitle: "Unclear, distant, uncertain" },
-  { id: "frozen", title: "Frozen", subtitle: "Numb, shut down, tired" },
-  { id: "stormy", title: "Stormy", subtitle: "Charged, tense, friction" },
-];
+import { getTonightPath } from "../lib/tonightPath";
 
 export default function Home() {
-  const { state, setState } = useSession();
+  const { state } = useSession();
   const myName = state.youName?.trim() || "Me";
   const partnerName = state.partnerName?.trim() || "Partner";
-  const myWeather = state.youWeather ?? "warm";
-  const partnerWeather = state.partnerWeather ?? "sunny";
+  const myWeather = state.youWeather;
+  const partnerWeather = state.partnerWeather;
+  const hasWeatherPair = Boolean(myWeather && partnerWeather);
   const isConnected = Boolean(state.partnerName?.trim());
   const hasPremium = typeof window !== "undefined" && window.localStorage.getItem("sacredpath-premium") === "true";
 
-  const ritual = useMemo(() => resolveWeatherRitual(myWeather, partnerWeather), [myWeather, partnerWeather]);
-  const dailyFree = useMemo(
-    () => getDailyFreeRitual(new Date(), myWeather as WeatherState, partnerWeather as WeatherState),
-    [myWeather, partnerWeather],
-  );
-  const steps = dailyFree.steps.slice(0, 4);
+  const ritual = useMemo(() => getTonightPath(myWeather, partnerWeather), [myWeather, partnerWeather]);
+  const activeRitual = ritual?.freeRitual;
+  const steps = (activeRitual?.ritualSteps ?? []).slice(0, 4);
   const dominantWeather = useMemo<WeatherVisualKey>(() => {
     const tones: WeatherVisualKey[] = ["stormy", "frozen", "foggy", "warm", "electric", "sunny"];
-    const pair = [myWeather, partnerWeather] as WeatherVisualKey[];
+    const pair = [myWeather, partnerWeather].filter(Boolean) as WeatherVisualKey[];
     return tones.find((tone) => pair.includes(tone)) ?? "warm";
   }, [myWeather, partnerWeather]);
 
@@ -80,46 +67,41 @@ export default function Home() {
           </p>
         </header>
 
-        <section className="grid gap-4 md:grid-cols-2">
-          <div className="bg-card rounded-[22px] border border-white/10 p-5">
-            <p className="text-sm font-semibold mb-3">My weather ({myName})</p>
-            <div className="grid grid-cols-2 gap-2">
-              {WEATHER_OPTIONS.map((option) => (
-                <button
-                  key={`me-${option.id}`}
-                  type="button"
-                  onClick={() => setState({ ...state, youWeather: option.id, youWeatherTone: option.id })}
-                  className={`rounded-xl border p-3 text-left transition ${
-                    myWeather === option.id ? "border-accent bg-white/10" : "border-white/10 bg-white/5 hover:bg-white/10"
-                  }`}
-                >
-                  <p className="font-semibold">{option.title}</p>
-                  <p className="text-xs text-muted mt-1">{option.subtitle}</p>
-                </button>
-              ))}
+        {!hasWeatherPair ? (
+          <section className="bg-card rounded-[24px] border border-accent/40 p-6 space-y-4 text-center">
+            <p className="text-[11px] uppercase tracking-[0.22em] text-accent">Start your check-in</p>
+            <h2 className="font-serif text-3xl md:text-4xl">How are you and your partner feeling right now?</h2>
+            <p className="text-muted max-w-2xl mx-auto">
+              Complete the two-step weather check-in to generate your Tonight&apos;s Path ritual.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
+              <Link
+                to="/weather"
+                className="flex-1 bg-gradient-to-br from-[#e6b980] to-[#eacda3] text-[#130f08] rounded-full px-6 py-3.5 font-semibold text-center hover:opacity-90 transition-opacity"
+              >
+                Start weather check-in
+              </Link>
+              <Link to="/connect" className="flex-1 bg-white/5 border border-white/10 rounded-full px-6 py-3.5 text-center hover:bg-white/10 transition-colors">
+                Connect partner
+              </Link>
             </div>
-          </div>
-
-          <div className="bg-card rounded-[22px] border border-white/10 p-5">
-            <p className="text-sm font-semibold mb-3">Partner weather ({partnerName})</p>
-            <div className="grid grid-cols-2 gap-2">
-              {WEATHER_OPTIONS.map((option) => (
-                <button
-                  key={`partner-${option.id}`}
-                  type="button"
-                  onClick={() => setState({ ...state, partnerWeather: option.id, partnerWeatherTone: option.id })}
-                  className={`rounded-xl border p-3 text-left transition ${
-                    partnerWeather === option.id ? "border-accent bg-white/10" : "border-white/10 bg-white/5 hover:bg-white/10"
-                  }`}
-                >
-                  <p className="font-semibold">{option.title}</p>
-                  <p className="text-xs text-muted mt-1">{option.subtitle}</p>
-                </button>
-              ))}
+          </section>
+        ) : (
+          <section className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p className="text-xs uppercase tracking-[0.16em] text-accent">Me</p>
+              <p className="font-semibold mt-1">{myName}</p>
+              <p className="text-sm text-muted mt-1">{myWeather}</p>
             </div>
-          </div>
-        </section>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p className="text-xs uppercase tracking-[0.16em] text-accent">Partner</p>
+              <p className="font-semibold mt-1">{partnerName}</p>
+              <p className="text-sm text-muted mt-1">{partnerWeather}</p>
+            </div>
+          </section>
+        )}
 
+        {hasWeatherPair && ritual ? (
         <section className="bg-card rounded-[24px] border border-accent/40 p-5 md:p-6 space-y-4">
           <p className="text-[11px] uppercase tracking-[0.22em] text-accent">{ritual.homeCard.eyebrow}</p>
           <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
@@ -137,9 +119,11 @@ export default function Home() {
               <p className="text-muted max-w-3xl mt-2">{ritual.homeCard.body}</p>
               <div className="rounded-xl border border-white/10 bg-white/5 p-4 mt-4">
                 <p className="text-xs uppercase tracking-[0.16em] text-accent">Today&apos;s Path</p>
-                <p className="text-sm font-semibold mt-1">{dailyFree.title}</p>
-                <p className="text-sm text-muted mt-1">{dailyFree.subtitle}</p>
-                <p className="text-xs text-muted mt-2">{dailyFree.durationMinutes} min · {dailyFree.intensity}</p>
+                <p className="text-sm font-semibold mt-1">{activeRitual?.title ?? "Tonight's Path"}</p>
+                <p className="text-sm text-muted mt-1">{activeRitual?.subtitle ?? ritual.homeCard.body}</p>
+                {activeRitual?.duration ? (
+                  <p className="text-xs text-muted mt-2">{activeRitual.duration}</p>
+                ) : null}
                 <ol className="mt-3 space-y-2">
                   {steps.map((step, idx) => (
                     <li key={idx} className="text-sm">
@@ -153,16 +137,17 @@ export default function Home() {
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
-              to="/weather"
+              to="/ritual"
               className="flex-1 bg-gradient-to-br from-[#e6b980] to-[#eacda3] text-[#130f08] rounded-full px-6 py-3.5 font-semibold text-center hover:opacity-90 transition-opacity"
             >
-              Start today&apos;s path
+              Open Tonight&apos;s Path
             </Link>
-            <Link to="/connect" className="flex-1 bg-white/5 border border-white/10 rounded-full px-6 py-3.5 text-center hover:bg-white/10 transition-colors">
-              Invite my partner
+            <Link to="/weather" className="flex-1 bg-white/5 border border-white/10 rounded-full px-6 py-3.5 text-center hover:bg-white/10 transition-colors">
+              Update our weather
             </Link>
           </div>
         </section>
+        ) : null}
 
         {!hasPremium ? (
           <section className="rounded-2xl border border-accent/30 bg-accent/10 p-5">

@@ -25,12 +25,12 @@ type WeatherOption = {
 };
 
 const WEATHER_OPTIONS: WeatherOption[] = [
-  { key: "stormy", id: "stormy", title: "Stormy", subtitle: "Heavy, tumultuous..." },
-  { key: "foggy", id: "foggy", title: "Foggy", subtitle: "Detached, confused..." },
-  { key: "frozen", id: "frozen", title: "Frozen", subtitle: "Numb, tired, shut down..." },
   { key: "warm", id: "warm", title: "Warm", subtitle: "Soft, tender..." },
   { key: "electric", id: "electric", title: "Electric", subtitle: "Crackling, awake..." },
   { key: "sunny", id: "sunny", title: "Sunny", subtitle: "Clear, light..." },
+  { key: "stormy", id: "stormy", title: "Stormy", subtitle: "Heavy, tumultuous..." },
+  { key: "foggy", id: "foggy", title: "Foggy", subtitle: "Detached, confused..." },
+  { key: "frozen", id: "frozen", title: "Frozen", subtitle: "Numb, tired, shut down..." },
 ];
 
 function WeatherPill({ 
@@ -135,9 +135,6 @@ export default function Weather() {
           </Card>
         ) : (
           <div className="max-w-3xl mx-auto space-y-4 md:space-y-6">
-            <p className="text-center text-sm uppercase tracking-[0.2em] text-muted">
-              {stage === "you" ? `${myName} • Me` : `${partnerName} • Partner`}
-            </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
               {WEATHER_OPTIONS.map((option) => (
                 <WeatherPill

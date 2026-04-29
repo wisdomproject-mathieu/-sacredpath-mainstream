@@ -13,6 +13,7 @@ import Paywall from "./pages/Paywall";
 import Voice from "./pages/Voice";
 import Oracle from "./pages/Oracle";
 import Journey from "./pages/Journey";
+import Connect from "./pages/Connect";
 import { SessionProvider } from "./contexts/SessionContext";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
@@ -30,6 +31,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/voice" element={<Voice />} />
           <Route path="/oracle" element={<Oracle />} />
           <Route path="/journey" element={<Journey />} />
+          <Route path="/connect" element={<Connect />} />
         </Routes>
       </BrowserRouter>
     </SessionProvider>

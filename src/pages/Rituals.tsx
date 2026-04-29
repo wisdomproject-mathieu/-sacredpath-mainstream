@@ -10,6 +10,7 @@ import {
   type RitualCategory,
   type WeatherState,
 } from "../data/ritualLibrary";
+import { getTonightPath } from "../lib/tonightPath";
 
 type DurationFilter = 3 | 5 | 8 | 12 | 20 | "all";
 type IntensityFilter = "gentle" | "medium" | "deep" | "all";
@@ -46,9 +47,18 @@ export default function Rituals() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const hasPremium = typeof window !== "undefined" && window.localStorage.getItem("sacredpath-premium") === "true";
 
-  const myWeather = (state.youWeather ?? "warm") as WeatherState;
-  const partnerWeather = (state.partnerWeather ?? "sunny") as WeatherState;
-  const freeToday = useMemo(() => getDailyFreeRitual(new Date(), myWeather, partnerWeather), [myWeather, partnerWeather]);
+  const tonightPath = useMemo(() => getTonightPath(state.youWeather, state.partnerWeather), [state.youWeather, state.partnerWeather]);
+  const dailyDiscovery = useMemo(
+    () => getDailyFreeRitual(new Date(), "warm", "sunny"),
+    [],
+  );
+  const freeToday = useMemo(() => {
+    if (tonightPath?.freeRitual) {
+      const mapped = rituals.find((item) => item.id === tonightPath.freeRitual?.id);
+      if (mapped) return mapped;
+    }
+    return dailyDiscovery;
+  }, [dailyDiscovery, tonightPath]);
 
   const base = useMemo(
     () =>
@@ -82,7 +92,9 @@ export default function Rituals() {
         </header>
 
         <section className="rounded-2xl border border-accent/30 bg-accent/10 p-5">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-accent">Free today</p>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-accent">
+            {tonightPath?.freeRitual ? "Tonight's Path (free)" : "Daily discovery"}
+          </p>
           <h2 className="font-serif text-2xl mt-2">{freeToday.title}</h2>
           <p className="text-sm text-muted mt-1">{freeToday.subtitle}</p>
           <p className="text-xs text-muted mt-2">{freeToday.durationMinutes} min · {freeToday.intensity}</p>
@@ -111,6 +123,10 @@ export default function Rituals() {
             placeholder="Search rituals..."
           />
         </section>
+
+        <p className="text-sm text-muted">
+          Showing <strong>{list.length}</strong> rituals from a library of <strong>{rituals.length}</strong>.
+        </p>
 
         <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
           <div className="grid gap-3 sm:grid-cols-2">
@@ -183,7 +199,7 @@ export default function Rituals() {
             <p className="font-serif text-2xl md:text-3xl leading-snug">
               Subscribe for two,
               <br />
-              great Intomacy,
+              great Intimacy,
               <br />
               Deep connection.
               <br />
