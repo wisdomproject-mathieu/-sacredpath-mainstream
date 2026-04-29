@@ -3,8 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import Card from "../components/Card";
 import Button from "../components/Button";
+import BackButton from "../components/BackButton";
+import SubscribeButton from "../components/SubscribeButton";
 import { useSession } from "../contexts/SessionContext";
 import { getTonightPath } from "../lib/tonightPath";
+import { isPremium } from "../lib/premium";
 import {
   WEATHER_TONE_LABELS,
   WEATHER_TONE_COPY,
@@ -24,6 +27,7 @@ function fallbackTone(weather: string | undefined): WeatherVisualKey {
 export default function Ritual() {
   const { state } = useSession();
   const navigate = useNavigate();
+  const hasPremium = isPremium();
 
   useEffect(() => {
     if (!state.youWeather || !state.partnerWeather) navigate("/weather");
@@ -58,6 +62,7 @@ export default function Ritual() {
   return (
     <Layout>
       <div className="max-w-5xl mx-auto space-y-5 md:space-y-7">
+        <BackButton fallbackPath="/" />
         <div className="text-center">
           <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-2">Sacred Rituals for Coupled Presence</h1>
           <p className="text-sm sm:text-base text-muted">
@@ -111,12 +116,7 @@ export default function Ritual() {
             Slow down, breathe together, and reconnect with intention.
             Presence over performance creates deeper trust, safety, and closeness in your shared path.
           </p>
-          <Link
-            to="/paywall"
-            className="block w-full rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] text-[#130f08] text-center py-3 px-6 font-semibold hover:opacity-90 transition-opacity"
-          >
-            Premium for 2
-          </Link>
+          {!hasPremium ? <SubscribeButton source="ritual" mode="navigate" /> : <p className="text-sm text-muted">Premium active for both of you.</p>}
           <Link
             to="/rituals"
             className="block w-full rounded-full bg-white/5 border border-white/10 text-center py-3 px-6 font-semibold hover:bg-white/10 transition-colors"

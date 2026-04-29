@@ -1,9 +1,10 @@
 import { useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import Card from "../components/Card";
 import Button from "../components/Button";
-import { goToPaywall, isPremium } from "../lib/premium";
+import BackButton from "../components/BackButton";
+import SubscribeButton from "../components/SubscribeButton";
+import { isPremium } from "../lib/premium";
 
 const PREMIUM_MODES = [
   { label: "3 min", detail: "Quick reset", value: 3 },
@@ -26,7 +27,6 @@ const buildPremiumScript = (minutes: 3 | 5, style: keyof typeof VOICE_STYLE_TEXT
     : "Then share one truth and one appreciation. End with a long embrace and gratitude.");
 
 export default function Voice() {
-  const navigate = useNavigate();
   const hasPremium = isPremium();
   const [mode, setMode] = useState<3 | 5>(3);
   const [style, setStyle] = useState<keyof typeof VOICE_STYLE_TEXT>("calm");
@@ -98,6 +98,7 @@ export default function Voice() {
   return (
     <Layout>
       <div className="max-w-5xl mx-auto space-y-6">
+        <BackButton fallbackPath="/" />
         <header className="text-center">
           <h1 className="font-serif text-4xl md:text-5xl">Sacred Voice</h1>
           <p className="text-muted mt-2">Guided audio that reads rituals in a calm, intimate, app-native way.</p>
@@ -126,7 +127,7 @@ export default function Voice() {
           <p className="text-sm text-muted">
             {hasPremium
               ? "Choose voice style, session duration, and play full narration."
-              : "Play a 10-second preview from the 3-minute guidance. Unlock full Sacred Voice for both of you."}
+              : "Play a 10-second preview from the 3-minute guidance, then subscribe to unlock full Sacred Voice."}
           </p>
           {hasPremium && (
             <div className="mt-4 mb-4">
@@ -156,9 +157,7 @@ export default function Voice() {
             {!hasPremium ? (
               <>
                 <Button onClick={onPlayPreview} aria-label="Play 10-second preview">Play 10s preview</Button>
-                <Button variant="secondary" onClick={() => goToPaywall(navigate, "voice")} aria-label="Unlock full Sacred Voice">
-                  Unlock full Sacred Voice
-                </Button>
+                <SubscribeButton source="voice" mode="navigate" />
               </>
             ) : (
               <>
@@ -178,9 +177,7 @@ export default function Voice() {
             <div className="mt-5 rounded-2xl border border-[#e7b881]/40 bg-gradient-to-r from-[#1b1410] via-[#261b14] to-[#1a130f] p-4">
               <p className="text-base font-semibold text-[#f6d3a6]">Want to hear more?</p>
               <p className="text-sm text-[#efd8bc] mt-1">Subscribe for two, only $29 per year.</p>
-              <Button className="mt-3" onClick={() => goToPaywall(navigate, "voice")}>
-                Subscribe with Apple Pay
-              </Button>
+              <SubscribeButton source="voice" mode="navigate" className="mt-3" />
             </div>
           )}
         </Card>

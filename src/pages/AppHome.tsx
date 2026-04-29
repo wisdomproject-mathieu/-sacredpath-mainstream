@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import BrandHeader from "../components/BrandHeader";
+import SubscribeButton from "../components/SubscribeButton";
 import { useSession } from "../contexts/SessionContext";
 import { getTonightPath } from "../lib/tonightPath";
+import { isPremium } from "../lib/premium";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
 import {
   getDisplayName,
@@ -60,7 +62,7 @@ function SmallWeatherCard({
 export default function AppHome() {
   const { state, setState } = useSession();
   const navigate = useNavigate();
-  const hasPremium = typeof window !== "undefined" && window.localStorage.getItem("sacredpath-premium") === "true";
+  const hasPremium = isPremium();
   const didResetRef = useRef(false);
 
   const [stage, setStage] = useState<HomeCheckinStage>("me");
@@ -271,9 +273,7 @@ export default function AppHome() {
               Sacred Voice, oracle prompts, and your shared journey.
             </p>
             <div className="mt-4 flex gap-3">
-              <Link to="/paywall" className="rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-5 py-2.5 font-semibold text-[#130f08]">
-                Unlock for both of us
-              </Link>
+              <SubscribeButton source="home" mode="navigate" />
             </div>
           </section>
         ) : null}

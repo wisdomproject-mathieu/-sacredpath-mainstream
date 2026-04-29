@@ -1,22 +1,31 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Layout from "../components/Layout";
 import Card from "../components/Card";
 import Button from "../components/Button";
+import BackButton from "../components/BackButton";
+import SubscribeButton from "../components/SubscribeButton";
 
 export default function Paywall() {
   const [searchParams] = useSearchParams();
+  const [restoreMessage, setRestoreMessage] = useState("");
   const source = searchParams.get("source");
   const heading = useMemo(() => {
-    if (source === "voice") return "Unlock full Sacred Voice for both of you.";
+    if (source === "home") return "Unlock the full Sacred Path for both of you.";
+    if (source === "ritual") return "Unlock deeper rituals for both of you.";
+    if (source === "rituals") return "Unlock the complete intimacy library.";
+    if (source === "voice") return "Unlock Sacred Voice for both of you.";
     if (source === "oracle") return "Unlock unlimited Intimacy Oracle.";
     if (source === "journey" || source === "journey-benefits") return "Unlock your full shared Journey.";
-    return "Go deeper than one card.";
+    if (source === "deeper") return "Go deeper together with the full premium path.";
+    if (source === "saved") return "Keep building your shared memory.";
+    return "Unlock the full Sacred Path for both of you.";
   }, [source]);
 
   return (
     <Layout>
       <div className="max-w-5xl mx-auto">
+        <BackButton fallbackPath="/" />
         
         {/* Header Section */}
         <div className="text-center mb-12">
@@ -24,6 +33,9 @@ export default function Paywall() {
           <p className="text-lg text-muted max-w-3xl mx-auto">
             Unlock the full intimacy library for both of you - $29/year. One subscription. Two partners.
             Daily rituals, guided voice, oracle prompts, and your shared journey.
+          </p>
+          <p className="text-sm text-muted max-w-3xl mx-auto mt-3">
+            One subscription unlocks the full path for both connected partners: 300+ rituals, Sacred Voice, Intimacy Oracle, shared Journey, saved reflections, repair milestones, and deeper weather-based recommendations.
           </p>
         </div>
 
@@ -76,9 +88,50 @@ export default function Paywall() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-          <Button variant="glow">Subscribe with Apple Pay</Button>
+        <div className="max-w-xl mx-auto space-y-4">
+          <SubscribeButton source="paywall" mode="purchase" />
+          <p className="text-center text-xs text-muted">
+            Payment and subscription management are handled by the App Store.
+          </p>
+          <Card>
+            <p className="text-sm">
+              <strong>Product:</strong> Sacred Path Premium
+            </p>
+            <p className="text-sm">
+              <strong>Price:</strong> $29/year
+            </p>
+            <p className="text-sm">
+              <strong>Access:</strong> One subscription unlocks the premium path for both connected partners.
+            </p>
+            <ul className="text-sm mt-3 space-y-1 text-muted">
+              <li>300+ rituals</li>
+              <li>Sacred Voice guided audio</li>
+              <li>Intimacy Oracle</li>
+              <li>Shared Journey dashboard</li>
+              <li>Saved reflections</li>
+              <li>Repair milestones</li>
+              <li>Weather-based recommendations</li>
+            </ul>
+          </Card>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Button
+              variant="secondary"
+              onClick={() =>
+                setRestoreMessage("Restore check complete for testing. Connect StoreKit / RevenueCat restore before production.")
+              }
+            >
+              Restore purchases
+            </Button>
+            <Button variant="secondary" onClick={() => window.open("/terms", "_blank")}>Terms of Use</Button>
+            <Button variant="secondary" onClick={() => window.open("/privacy", "_blank")}>Privacy Policy</Button>
+          </div>
+          {restoreMessage ? <p className="text-xs text-muted text-center">{restoreMessage}</p> : null}
+          <p className="text-center text-xs text-muted">
+            Premium unlocked for testing. Replace with StoreKit / RevenueCat before production.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
           <Button variant="secondary" onClick={() => window.history.back()}>Back to ritual</Button>
+          </div>
         </div>
 
       </div>

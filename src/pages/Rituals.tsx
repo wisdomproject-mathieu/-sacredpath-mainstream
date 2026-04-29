@@ -1,15 +1,11 @@
 import { useMemo, useState } from "react";
 import Layout from "../components/Layout";
 import RitualCard from "../components/RitualCard";
+import BackButton from "../components/BackButton";
+import SubscribeButton from "../components/SubscribeButton";
 import { useSession } from "../contexts/SessionContext";
-import {
-  getDailyFreeRitual,
-  getPremiumRituals,
-  rituals,
-  type Ritual,
-  type RitualCategory,
-  type WeatherState,
-} from "../data/ritualLibrary";
+import { getDailyFreeRitual, getPremiumRituals, rituals, type Ritual, type RitualCategory, type WeatherState } from "../data/ritualLibrary";
+import { isPremium } from "../lib/premium";
 import { getTonightPath } from "../lib/tonightPath";
 
 type DurationFilter = 3 | 5 | 8 | 12 | 20 | "all";
@@ -45,7 +41,7 @@ export default function Rituals() {
   const [category, setCategory] = useState<CategoryFilter>("all");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const hasPremium = typeof window !== "undefined" && window.localStorage.getItem("sacredpath-premium") === "true";
+  const hasPremium = isPremium();
   const toggleSelected = (id: string) => {
     setSelectedId((prev) => (prev === id ? null : id));
   };
@@ -82,7 +78,7 @@ export default function Rituals() {
 
   const list = useMemo(() => [freeToday, ...filtered.filter((item) => item.id !== freeToday.id)], [freeToday, filtered]);
   const selected = selectedId ? list.find((item) => item.id === selectedId) ?? null : null;
-  const premiumFilterClass = "appearance-none rounded-xl border border-white/10 bg-gradient-to-b from-white/10 to-white/5 px-3 py-2 text-sm text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] focus:border-accent/60 focus:outline-none";
+  const selectedLocked = !!selected && !hasPremium && selected.id !== freeToday.id && selected.tier === "premium";
 
   const renderInlineDetails = (ritual: Ritual) => {
     const locked = !hasPremium && ritual.id !== freeToday.id && ritual.tier === "premium";
@@ -106,36 +102,13 @@ export default function Rituals() {
   return (
     <Layout>
       <div className="max-w-6xl mx-auto space-y-6">
+        <BackButton fallbackPath="/" />
         <header className="text-center space-y-3">
           <h1 className="font-serif text-4xl md:text-5xl">A complete intimacy library for the two of you.</h1>
           <p className="text-muted max-w-3xl mx-auto">
             One daily practice is free. Unlock 300+ rituals, guided voice, oracle prompts, and shared journey tools for both partners.
           </p>
         </header>
-
-        <section className="rounded-2xl border border-white/10 bg-card p-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          <select className={premiumFilterClass} value={weather} onChange={(e) => setWeather(e.target.value as WeatherState | "all")}>
-            {WEATHER_FILTERS.map((item) => <option key={item} className="bg-[#171327] text-white" value={item}>{item === "all" ? "Weather: All" : `Weather: ${item}`}</option>)}
-          </select>
-          <select className={premiumFilterClass} value={duration} onChange={(e) => setDuration((e.target.value === "all" ? "all" : Number(e.target.value)) as DurationFilter)}>
-            {DURATION_FILTERS.map((item) => <option key={String(item)} className="bg-[#171327] text-white" value={item}>{item === "all" ? "Duration: All" : `Duration: ${item} min`}</option>)}
-          </select>
-          <select className={premiumFilterClass} value={goal} onChange={(e) => setGoal(e.target.value as GoalFilter)}>
-            {GOAL_FILTERS.map((item) => <option key={item} className="bg-[#171327] text-white" value={item}>{item === "all" ? "Goal: All" : `Goal: ${item}`}</option>)}
-          </select>
-          <select className={premiumFilterClass} value={intensity} onChange={(e) => setIntensity(e.target.value as IntensityFilter)}>
-            {INTENSITY_FILTERS.map((item) => <option key={item} className="bg-[#171327] text-white" value={item}>{item === "all" ? "Intensity: All" : `Intensity: ${item}`}</option>)}
-          </select>
-          <select className={premiumFilterClass} value={category} onChange={(e) => setCategory(e.target.value as CategoryFilter)}>
-            {CATEGORY_FILTERS.map((item) => <option key={item} className="bg-[#171327] text-white" value={item}>{item === "all" ? "Category: All" : `Category: ${item}`}</option>)}
-          </select>
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="rounded-xl border border-white/10 bg-gradient-to-b from-white/10 to-white/5 px-3 py-2 text-sm text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] focus:border-accent/60 focus:outline-none"
-            placeholder="Search rituals..."
-          />
-        </section>
 
         <section className="space-y-3">
           <p className="text-[11px] uppercase tracking-[0.2em] text-accent">
@@ -150,6 +123,16 @@ export default function Rituals() {
           />
           {selected?.id === freeToday.id ? renderInlineDetails(freeToday) : null}
         </section>
+
+        {selectedLocked ? (
+          <section className="rounded-2xl border border-accent/30 bg-accent/10 p-4 md:p-5 space-y-3">
+            <h3 className="font-serif text-2xl">Unlock this ritual</h3>
+            <p className="text-sm text-muted">
+              This practice is part of the full Sacred Path library for both of you.
+            </p>
+            <SubscribeButton source="rituals" mode="navigate" />
+          </section>
+        ) : null}
 
         <p className="text-sm text-muted">
           Showing <strong>{list.length}</strong> rituals from a library of <strong>{rituals.length}</strong>.
@@ -173,9 +156,7 @@ export default function Rituals() {
                       <p className="text-sm">
                         Unlock the full library for both of you - $29/year. One subscription gives both connected partners access to 300+ rituals.
                       </p>
-                      <button className="mt-3 rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-4 py-2 text-[#130f08] font-semibold">
-                        Unlock for both of us
-                      </button>
+                      <SubscribeButton source="rituals" mode="navigate" className="mt-3" />
                     </div>
                   ) : null}
                 </div>
@@ -196,9 +177,7 @@ export default function Rituals() {
               <br />
               for both of you
             </p>
-            <button className="mt-5 rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-6 py-3 font-semibold text-[#130f08]">
-              Unlock for both of us
-            </button>
+            <SubscribeButton source="rituals" mode="navigate" className="mt-5" />
           </section>
         ) : null}
       </div>

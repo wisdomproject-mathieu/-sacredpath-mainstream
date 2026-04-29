@@ -21,6 +21,7 @@
     "autoprefixer": "^10.4.0",
     "browserslist": "^4.28.2",
     "caniuse-lite": "^1.0.30001791",
+    "eslint": "^10.2.1",
     "fast-glob": "^3.3.2",
     "node-releases": "^2.0.21",
     "postcss": "^8.4.0",

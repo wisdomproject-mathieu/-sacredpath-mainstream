@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
 import Card from "../components/Card";
 import Button from "../components/Button";
+import BackButton from "../components/BackButton";
+import SubscribeButton from "../components/SubscribeButton";
 
 const practicePoints = [
   "Remove Distractions: These rituals require 100% focus. Put your phones in another room.",
@@ -15,6 +17,7 @@ export default function Deeper() {
   return (
     <Layout>
       <div className="max-w-4xl mx-auto">
+        <BackButton fallbackPath="/ritual" />
         
         {/* Header */}
         <header className="text-center mb-12">
@@ -94,9 +97,7 @@ export default function Deeper() {
           <Link to="/ritual">
             <Button variant="glow">Back to tonight's ritual</Button>
           </Link>
-          <Link to="/paywall">
-            <Button variant="secondary">Open subscription page</Button>
-          </Link>
+          <SubscribeButton source="deeper" mode="navigate" />
         </div>
 
       </div>

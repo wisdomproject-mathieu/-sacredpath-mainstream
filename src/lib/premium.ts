@@ -1,4 +1,5 @@
 export const PREMIUM_STORAGE_KEY = "sacredpath-premium";
+// TEMPORARY DEV PREMIUM STATE — replace with StoreKit / RevenueCat entitlement validation before production.
 
 export function isPremium(): boolean {
   if (typeof window === "undefined") return false;
@@ -10,10 +11,13 @@ export function setPremiumForTesting(value: boolean): void {
   window.localStorage.setItem(PREMIUM_STORAGE_KEY, value ? "true" : "false");
 }
 
-export function goToPaywall(
-  navigate: (to: string) => void,
-  source: "voice" | "oracle" | "journey" | "rituals" | "premium-benefits" | "journey-benefits" | string,
-): void {
-  navigate(`/paywall?source=${encodeURIComponent(source)}`);
+export function getPaywallUrl(source: string): string {
+  return `/paywall?source=${encodeURIComponent(source)}`;
 }
 
+export function goToPaywall(
+  navigate: (to: string) => void,
+  source: string,
+): void {
+  navigate(getPaywallUrl(source));
+}

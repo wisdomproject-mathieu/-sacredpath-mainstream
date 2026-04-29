@@ -15,6 +15,7 @@ export default function RitualCard({ ritual, selected, locked, isFreeToday, onCl
     <button
       type="button"
       onClick={onClick}
+      aria-label={`${ritual.title} ${locked ? "Premium ritual. Tap to unlock." : "Unlocked ritual."}`}
       className={`relative text-left rounded-3xl border overflow-hidden transition ${
         selected ? "border-accent bg-white/10" : "border-white/10 bg-card hover:bg-white/10"
       }`}
@@ -30,8 +31,11 @@ export default function RitualCard({ ritual, selected, locked, isFreeToday, onCl
         <p className="text-xs text-muted mt-2">{ritual.durationMinutes} min · {ritual.intensity} · {ritual.category}</p>
       </div>
       {locked ? (
-        <div className="absolute inset-0 bg-black/45 grid place-items-center">
-          <span className="rounded-full border border-accent/60 bg-black/60 px-3 py-1 text-xs tracking-wide">Locked</span>
+        <div className="absolute inset-0 bg-black/45 grid place-items-center text-center">
+          <div className="rounded-2xl border border-accent/60 bg-black/60 px-4 py-2">
+            <p className="text-xs tracking-wide font-semibold">Premium ritual</p>
+            <p className="text-[11px] text-white/80 mt-1">Tap to unlock</p>
+          </div>
         </div>
       ) : null}
     </button>

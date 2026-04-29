@@ -1,7 +1,10 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import CoupleTopbar from "../components/CoupleTopbar";
+import BackButton from "../components/BackButton";
+import SubscribeButton from "../components/SubscribeButton";
 import { useSession } from "../contexts/SessionContext";
 import { resolveWeatherRitual } from "../lib/ritualRegistry";
+import { isPremium } from "../lib/premium";
 import {
   WEATHER_TONE_COPY,
   WEATHER_TONE_LABELS,
@@ -62,6 +65,7 @@ const featureCards = [
 export default function RitualSaved() {
   const { state } = useSession();
   const navigate = useNavigate();
+  const hasPremium = isPremium();
 
   if (!state.youWeather || !state.partnerWeather) {
     return (
@@ -85,6 +89,7 @@ export default function RitualSaved() {
   return (
     <main className="ritual-saved-page">
       <div className="ritual-saved-shell">
+        <BackButton fallbackPath="/ritual" />
         <CoupleTopbar />
 
         <header className="ritual-saved-header">
@@ -149,9 +154,7 @@ export default function RitualSaved() {
           <button type="button" className="ritual-saved-close" onClick={() => navigate("/ritual")}>
             Close
           </button>
-          <Link to="/paywall" className="ritual-saved-premium">
-            Explore premium
-          </Link>
+          {!hasPremium ? <SubscribeButton source="saved" mode="navigate" /> : <p className="text-sm text-muted">Saved to your Journey.</p>}
         </footer>
       </div>
     </main>
