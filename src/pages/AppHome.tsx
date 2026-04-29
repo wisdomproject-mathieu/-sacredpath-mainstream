@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import BrandHeader from "../components/BrandHeader";
@@ -24,12 +24,6 @@ const WEATHER_OPTIONS: Array<{ id: IntimacyWeather; subtitle: string }> = [
   { id: "frozen", subtitle: "Numb, shut down, tired" },
   { id: "stormy", subtitle: "Charged, tense, friction" },
 ];
-
-function deriveStage(youWeather?: IntimacyWeather, partnerWeather?: IntimacyWeather): HomeCheckinStage {
-  if (youWeather && partnerWeather) return "complete";
-  if (youWeather) return "meSelected";
-  return "me";
-}
 
 function SmallWeatherCard({
   role,
@@ -67,12 +61,22 @@ export default function AppHome() {
   const { state, setState } = useSession();
   const navigate = useNavigate();
   const hasPremium = typeof window !== "undefined" && window.localStorage.getItem("sacredpath-premium") === "true";
+  const didResetRef = useRef(false);
 
-  const [stage, setStage] = useState<HomeCheckinStage>(() => deriveStage(state.youWeather, state.partnerWeather));
+  const [stage, setStage] = useState<HomeCheckinStage>("me");
 
   useEffect(() => {
-    setStage(deriveStage(state.youWeather, state.partnerWeather));
-  }, [state.youWeather, state.partnerWeather]);
+    if (didResetRef.current) return;
+    didResetRef.current = true;
+    setState({
+      ...state,
+      youWeather: undefined,
+      partnerWeather: undefined,
+      youWeatherTone: undefined,
+      partnerWeatherTone: undefined,
+    });
+    setStage("me");
+  }, [setState, state]);
 
   const myName = getDisplayName(state.youName, "Me");
   const partnerName = getDisplayName(state.partnerName, "Partner");
@@ -175,7 +179,6 @@ export default function AppHome() {
                 className="h-[340px] w-full object-cover md:h-[420px]"
               />
               <div className="space-y-2 p-5 text-center">
-                <p className="text-xs uppercase tracking-[0.2em] text-accent">Me: {myName}</p>
                 <h3 className="font-serif text-3xl">{WEATHER_TONE_LABELS[meTone]}</h3>
                 <p className="text-sm text-muted">{WEATHER_TONE_COPY[meTone]}</p>
               </div>
@@ -231,7 +234,6 @@ export default function AppHome() {
                   className="h-56 w-full object-cover"
                 />
                 <div className="space-y-1 p-4">
-                  <p className="text-xs uppercase tracking-[0.18em] text-accent">Me: {myName}</p>
                   <p className="font-serif text-2xl">{WEATHER_TONE_LABELS[meTone]}</p>
                 </div>
               </div>
@@ -242,7 +244,6 @@ export default function AppHome() {
                   className="h-56 w-full object-cover"
                 />
                 <div className="space-y-1 p-4">
-                  <p className="text-xs uppercase tracking-[0.18em] text-accent">Partner: {partnerName}</p>
                   <p className="font-serif text-2xl">{WEATHER_TONE_LABELS[partnerTone]}</p>
                 </div>
               </div>
@@ -294,4 +295,3 @@ export default function AppHome() {
     </Layout>
   );
 }
-
