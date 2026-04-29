@@ -1,152 +1,280 @@
-import { Link } from "react-router-dom";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
-import { useSession } from "../contexts/SessionContext";
-import { getWeatherImageUrlByTone, type WeatherVisualKey } from "../lib/weatherAssets";
 import BrandHeader from "../components/BrandHeader";
+import { useSession } from "../contexts/SessionContext";
 import { getTonightPath } from "../lib/tonightPath";
+import type { IntimacyWeather } from "../lib/ritualRegistry";
+import {
+  getDisplayName,
+  getWeatherImageUrlByTone,
+  getWeatherVisualKey,
+  WEATHER_TONE_COPY,
+  WEATHER_TONE_LABELS,
+  type WeatherVisualKey,
+} from "../lib/weatherAssets";
 
-export default function Home() {
-  const { state } = useSession();
-  const myName = state.youName?.trim() || "Me";
-  const partnerName = state.partnerName?.trim() || "Partner";
-  const myWeather = state.youWeather;
-  const partnerWeather = state.partnerWeather;
-  const hasWeatherPair = Boolean(myWeather && partnerWeather);
-  const isConnected = Boolean(state.partnerName?.trim());
+type HomeCheckinStage = "me" | "meSelected" | "partner" | "complete";
+
+const WEATHER_OPTIONS: Array<{ id: IntimacyWeather; subtitle: string }> = [
+  { id: "sunny", subtitle: "Clear, light, easy connection" },
+  { id: "warm", subtitle: "Soft, tender, wanting closeness" },
+  { id: "electric", subtitle: "Spark, chemistry, attraction" },
+  { id: "foggy", subtitle: "Unclear, distant, uncertain" },
+  { id: "frozen", subtitle: "Numb, shut down, tired" },
+  { id: "stormy", subtitle: "Charged, tense, friction" },
+];
+
+function deriveStage(youWeather?: IntimacyWeather, partnerWeather?: IntimacyWeather): HomeCheckinStage {
+  if (youWeather && partnerWeather) return "complete";
+  if (youWeather) return "meSelected";
+  return "me";
+}
+
+function SmallWeatherCard({
+  role,
+  tone,
+  subtitle,
+  selected,
+  onClick,
+}: {
+  role: "me" | "partner";
+  tone: WeatherVisualKey;
+  subtitle: string;
+  selected?: boolean;
+  onClick: () => void;
+}) {
+  const image = getWeatherImageUrlByTone(role, tone);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group relative overflow-hidden rounded-2xl border transition ${
+        selected ? "border-accent ring-2 ring-accent/40" : "border-white/10 hover:border-white/25"
+      }`}
+    >
+      <img src={image} alt={WEATHER_TONE_LABELS[tone]} className="h-28 w-full object-cover md:h-32" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 p-2 text-left">
+        <p className="text-sm font-semibold text-white">{WEATHER_TONE_LABELS[tone]}</p>
+        <p className="text-[11px] leading-tight text-white/80">{subtitle}</p>
+      </div>
+    </button>
+  );
+}
+
+export default function AppHome() {
+  const { state, setState } = useSession();
+  const navigate = useNavigate();
   const hasPremium = typeof window !== "undefined" && window.localStorage.getItem("sacredpath-premium") === "true";
 
-  const ritual = useMemo(() => getTonightPath(myWeather, partnerWeather), [myWeather, partnerWeather]);
-  const activeRitual = ritual?.freeRitual;
-  const steps = (activeRitual?.ritualSteps ?? []).slice(0, 4);
-  const dominantWeather = useMemo<WeatherVisualKey>(() => {
-    const tones: WeatherVisualKey[] = ["stormy", "frozen", "foggy", "warm", "electric", "sunny"];
-    const pair = [myWeather, partnerWeather].filter(Boolean) as WeatherVisualKey[];
-    return tones.find((tone) => pair.includes(tone)) ?? "warm";
-  }, [myWeather, partnerWeather]);
+  const [stage, setStage] = useState<HomeCheckinStage>(() => deriveStage(state.youWeather, state.partnerWeather));
 
-  const weatherIcon = dominantWeather === "sunny"
-    ? "☀"
-    : dominantWeather === "warm"
-      ? "♡"
-      : dominantWeather === "electric"
-        ? "⚡"
-        : dominantWeather === "foggy"
-          ? "〰"
-          : dominantWeather === "frozen"
-            ? "❄"
-            : "⛈";
-  const outcomeImage = getWeatherImageUrlByTone("me", dominantWeather);
+  useEffect(() => {
+    setStage(deriveStage(state.youWeather, state.partnerWeather));
+  }, [state.youWeather, state.partnerWeather]);
+
+  const myName = getDisplayName(state.youName, "Me");
+  const partnerName = getDisplayName(state.partnerName, "Partner");
+
+  const meTone = state.youWeatherTone ?? getWeatherVisualKey(state.youWeather);
+  const partnerTone = state.partnerWeatherTone ?? getWeatherVisualKey(state.partnerWeather);
+
+  const tonightPath = useMemo(
+    () => getTonightPath(state.youWeather, state.partnerWeather),
+    [state.youWeather, state.partnerWeather],
+  );
+
+  const selectMeWeather = (weather: IntimacyWeather) => {
+    setState({
+      ...state,
+      youWeather: weather,
+      youWeatherTone: weather,
+    });
+    setStage("meSelected");
+  };
+
+  const selectPartnerWeather = (weather: IntimacyWeather) => {
+    setState({
+      ...state,
+      partnerWeather: weather,
+      partnerWeatherTone: weather,
+    });
+    setStage("complete");
+  };
 
   return (
     <Layout showHeader={false}>
-      <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
-        <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+      <div className="mx-auto max-w-6xl space-y-6 md:space-y-8">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
           <BrandHeader className="md:mb-0" />
-          <div className="md:ml-auto">
-            {isConnected ? (
-              <span className="inline-flex items-center rounded-full border border-emerald-300/30 bg-emerald-400/10 px-4 py-2 text-sm text-emerald-100">
-                Connected · {myName} + {partnerName}
-              </span>
-            ) : (
-              <Link to="/connect" className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-muted hover:bg-white/10">
-                Invite partner
-              </Link>
-            )}
-          </div>
         </div>
 
-        <header className="text-center space-y-3">
-          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl leading-[1.02]">
+        <header className="space-y-3 text-center">
+          <h1 className="font-serif text-4xl leading-[1.02] sm:text-5xl md:text-6xl">
             Understand the mood
             <br />
             between you in seconds.
           </h1>
-          <p className="text-base md:text-lg text-muted leading-relaxed max-w-3xl mx-auto">
-            Choose your intimacy weather, receive one practice for today, and reconnect without pressure.
+          <p className="mx-auto max-w-3xl text-base leading-relaxed text-muted md:text-lg">
+            Choose your intimacy weather, receive one practice for tonight, and reconnect without pressure.
           </p>
         </header>
 
-        {!hasWeatherPair ? (
-          <section className="bg-card rounded-[24px] border border-accent/40 p-6 space-y-4 text-center">
-            <p className="text-[11px] uppercase tracking-[0.22em] text-accent">Start your check-in</p>
-            <h2 className="font-serif text-3xl md:text-4xl">How are you and your partner feeling right now?</h2>
-            <p className="text-muted max-w-2xl mx-auto">
-              Complete the two-step weather check-in to generate your Tonight&apos;s Path ritual.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
-              <Link
-                to="/weather"
-                className="flex-1 bg-gradient-to-br from-[#e6b980] to-[#eacda3] text-[#130f08] rounded-full px-6 py-3.5 font-semibold text-center hover:opacity-90 transition-opacity"
-              >
-                Start weather check-in
-              </Link>
-              <Link to="/connect" className="flex-1 bg-white/5 border border-white/10 rounded-full px-6 py-3.5 text-center hover:bg-white/10 transition-colors">
-                Connect partner
-              </Link>
-            </div>
-          </section>
-        ) : (
-          <section className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <p className="text-xs uppercase tracking-[0.16em] text-accent">Me</p>
-              <p className="font-semibold mt-1">{myName}</p>
-              <p className="text-sm text-muted mt-1">{myWeather}</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <p className="text-xs uppercase tracking-[0.16em] text-accent">Partner</p>
-              <p className="font-semibold mt-1">{partnerName}</p>
-              <p className="text-sm text-muted mt-1">{partnerWeather}</p>
-            </div>
-          </section>
-        )}
-
-        {hasWeatherPair && ritual ? (
-        <section className="bg-card rounded-[24px] border border-accent/40 p-5 md:p-6 space-y-4">
-          <p className="text-[11px] uppercase tracking-[0.22em] text-accent">{ritual.homeCard.eyebrow}</p>
-          <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
-            <div className="relative rounded-[28px] overflow-hidden border border-white/10">
-              <img src={outcomeImage} alt={`${dominantWeather} intimacy weather`} className="w-full h-full min-h-[260px] object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent" />
-              <div className="absolute left-5 right-5 bottom-5 text-white">
-                <p className="text-2xl mb-2">{weatherIcon}</p>
-                <p className="text-sm uppercase tracking-[0.2em]">{dominantWeather}</p>
-                <h2 className="font-serif text-2xl mt-1">{ritual.homeCard.title}</h2>
-              </div>
-            </div>
-            <div>
-              <h2 className="font-serif text-3xl md:text-4xl">{ritual.homeCard.title}</h2>
-              <p className="text-muted max-w-3xl mt-2">{ritual.homeCard.body}</p>
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4 mt-4">
-                <p className="text-xs uppercase tracking-[0.16em] text-accent">Today&apos;s Path</p>
-                <p className="text-sm font-semibold mt-1">{activeRitual?.title ?? "Tonight's Path"}</p>
-                <p className="text-sm text-muted mt-1">{activeRitual?.subtitle ?? ritual.homeCard.body}</p>
-                {activeRitual?.duration ? (
-                  <p className="text-xs text-muted mt-2">{activeRitual.duration}</p>
-                ) : null}
-                <ol className="mt-3 space-y-2">
-                  {steps.map((step, idx) => (
-                    <li key={idx} className="text-sm">
-                      <span className="text-accent font-semibold mr-2">{idx + 1}.</span>
-                      {step}
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Link
-              to="/ritual"
-              className="flex-1 bg-gradient-to-br from-[#e6b980] to-[#eacda3] text-[#130f08] rounded-full px-6 py-3.5 font-semibold text-center hover:opacity-90 transition-opacity"
-            >
-              Open Tonight&apos;s Path
-            </Link>
-            <Link to="/weather" className="flex-1 bg-white/5 border border-white/10 rounded-full px-6 py-3.5 text-center hover:bg-white/10 transition-colors">
-              Update our weather
-            </Link>
+        <section className="rounded-[22px] border border-white/10 bg-card p-4 md:p-5">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="space-y-2">
+              <span className="text-xs uppercase tracking-[0.16em] text-muted">Me</span>
+              <input
+                value={state.youName ?? ""}
+                onChange={(e) => setState({ ...state, youName: e.target.value })}
+                placeholder="Me"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-text outline-none transition focus:border-accent/60"
+              />
+            </label>
+            <label className="space-y-2">
+              <span className="text-xs uppercase tracking-[0.16em] text-muted">Partner</span>
+              <input
+                value={state.partnerName ?? ""}
+                onChange={(e) => setState({ ...state, partnerName: e.target.value })}
+                placeholder="Partner"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-text outline-none transition focus:border-accent/60"
+              />
+            </label>
           </div>
         </section>
+
+        {stage === "me" ? (
+          <section className="space-y-4">
+            <div className="space-y-2 text-center">
+              <h2 className="font-serif text-3xl md:text-4xl">How are you arriving today?</h2>
+              <p className="mx-auto max-w-2xl text-muted">
+                Choose the weather that best describes your body and mood right now.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+              {WEATHER_OPTIONS.map((option) => (
+                <SmallWeatherCard
+                  key={`me-${option.id}`}
+                  role="me"
+                  tone={option.id}
+                  subtitle={option.subtitle}
+                  onClick={() => selectMeWeather(option.id)}
+                />
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {stage === "meSelected" ? (
+          <section className="space-y-4">
+            <div className="mx-auto max-w-2xl overflow-hidden rounded-[28px] border border-accent/40 bg-card">
+              <img
+                src={getWeatherImageUrlByTone("me", meTone)}
+                alt={`Me ${WEATHER_TONE_LABELS[meTone]}`}
+                className="h-[340px] w-full object-cover md:h-[420px]"
+              />
+              <div className="space-y-2 p-5 text-center">
+                <p className="text-xs uppercase tracking-[0.2em] text-accent">Me: {myName}</p>
+                <h3 className="font-serif text-3xl">{WEATHER_TONE_LABELS[meTone]}</h3>
+                <p className="text-sm text-muted">{WEATHER_TONE_COPY[meTone]}</p>
+              </div>
+            </div>
+            <div className="mx-auto flex max-w-2xl flex-col gap-3">
+              <button
+                type="button"
+                onClick={() => setStage("partner")}
+                className="w-full rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-6 py-3.5 font-semibold text-[#130f08] transition-opacity hover:opacity-90"
+              >
+                Now, sense your beloved partner&apos;s weather
+              </button>
+              <button
+                type="button"
+                onClick={() => setStage("me")}
+                className="text-sm text-muted hover:text-text"
+              >
+                Change my weather
+              </button>
+            </div>
+          </section>
+        ) : null}
+
+        {stage === "partner" ? (
+          <section className="space-y-4">
+            <div className="space-y-2 text-center">
+              <h2 className="font-serif text-3xl md:text-4xl">Now sense your beloved partner&apos;s weather</h2>
+              <p className="mx-auto max-w-2xl text-muted">
+                Choose the weather you feel from your partner with care, curiosity, and respect.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+              {WEATHER_OPTIONS.map((option) => (
+                <SmallWeatherCard
+                  key={`partner-${option.id}`}
+                  role="partner"
+                  tone={option.id}
+                  subtitle={option.subtitle}
+                  onClick={() => selectPartnerWeather(option.id)}
+                />
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {stage === "complete" && state.youWeather && state.partnerWeather && tonightPath?.freeRitual ? (
+          <section className="space-y-4 rounded-[24px] border border-accent/40 bg-card p-5 md:p-6">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="overflow-hidden rounded-2xl border border-white/10">
+                <img
+                  src={getWeatherImageUrlByTone("me", meTone)}
+                  alt={`${WEATHER_TONE_LABELS[meTone]} Me`}
+                  className="h-56 w-full object-cover"
+                />
+                <div className="space-y-1 p-4">
+                  <p className="text-xs uppercase tracking-[0.18em] text-accent">Me: {myName}</p>
+                  <p className="font-serif text-2xl">{WEATHER_TONE_LABELS[meTone]}</p>
+                </div>
+              </div>
+              <div className="overflow-hidden rounded-2xl border border-white/10">
+                <img
+                  src={getWeatherImageUrlByTone("partner", partnerTone)}
+                  alt={`${WEATHER_TONE_LABELS[partnerTone]} Partner`}
+                  className="h-56 w-full object-cover"
+                />
+                <div className="space-y-1 p-4">
+                  <p className="text-xs uppercase tracking-[0.18em] text-accent">Partner: {partnerName}</p>
+                  <p className="font-serif text-2xl">{WEATHER_TONE_LABELS[partnerTone]}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2 rounded-xl border border-white/10 bg-white/5 p-4">
+              <p className="text-xs uppercase tracking-[0.16em] text-accent">{tonightPath.homeCard.eyebrow}</p>
+              <h3 className="font-serif text-3xl">{tonightPath.homeCard.title}</h3>
+              <p className="text-muted">{tonightPath.homeCard.body}</p>
+              <p className="pt-1 text-sm">
+                <span className="text-muted">Free ritual:</span>{" "}
+                <span className="font-semibold">{tonightPath.freeRitual.title}</span>
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => navigate("/ritual")}
+                className="flex-1 rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-6 py-3.5 font-semibold text-[#130f08] transition-opacity hover:opacity-90"
+              >
+                Open tonight&apos;s ritual
+              </button>
+              <button
+                type="button"
+                onClick={() => setStage("me")}
+                className="flex-1 rounded-full border border-white/10 bg-white/5 px-6 py-3.5 text-center transition-colors hover:bg-white/10"
+              >
+                Update our weather
+              </button>
+            </div>
+          </section>
         ) : null}
 
         {!hasPremium ? (
@@ -156,11 +284,8 @@ export default function Home() {
               Sacred Voice, oracle prompts, and your shared journey.
             </p>
             <div className="mt-4 flex gap-3">
-              <Link to="/paywall" className="rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] text-[#130f08] px-5 py-2.5 font-semibold">
+              <Link to="/paywall" className="rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-5 py-2.5 font-semibold text-[#130f08]">
                 Unlock for both of us
-              </Link>
-              <Link to="/rituals" className="rounded-full border border-white/10 bg-white/5 px-5 py-2.5 hover:bg-white/10">
-                View full library
               </Link>
             </div>
           </section>
@@ -169,3 +294,4 @@ export default function Home() {
     </Layout>
   );
 }
+
