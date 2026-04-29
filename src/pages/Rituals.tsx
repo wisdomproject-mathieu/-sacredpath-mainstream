@@ -1,35 +1,82 @@
 import { useMemo, useState } from "react";
 import Layout from "../components/Layout";
-import { getPremiumRituals, getDailyFreeRitual, rituals, type WeatherState } from "../data/ritualLibrary";
+import RitualCard from "../components/RitualCard";
+import { useSession } from "../contexts/SessionContext";
+import {
+  getDailyFreeRitual,
+  getPremiumRituals,
+  rituals,
+  type Ritual,
+  type RitualCategory,
+  type WeatherState,
+} from "../data/ritualLibrary";
+
+type DurationFilter = 3 | 5 | 8 | 12 | 20 | "all";
+type IntensityFilter = "gentle" | "medium" | "deep" | "all";
+type GoalFilter = "all" | "reconnect" | "repair" | "desire" | "conversation" | "touch" | "calm" | "clarity";
+type CategoryFilter = RitualCategory | "all";
 
 const WEATHER_FILTERS: Array<WeatherState | "all"> = ["all", "sunny", "warm", "electric", "foggy", "frozen", "stormy"];
+const DURATION_FILTERS: DurationFilter[] = ["all", 3, 5, 8, 12, 20];
+const INTENSITY_FILTERS: IntensityFilter[] = ["all", "gentle", "medium", "deep"];
+const GOAL_FILTERS: GoalFilter[] = ["all", "reconnect", "repair", "desire", "conversation", "touch", "calm", "clarity"];
+const CATEGORY_FILTERS: CategoryFilter[] = ["all", "connection", "repair", "desire", "touch", "conversation", "voice", "oracle", "journey"];
+
+function normalizeGoalMatch(ritual: Ritual, goal: GoalFilter) {
+  if (goal === "all") return true;
+  const hay = `${ritual.title} ${ritual.subtitle} ${ritual.intro} ${ritual.tags.join(" ")}`.toLowerCase();
+  if (goal === "reconnect") return hay.includes("reconnect") || hay.includes("connection");
+  if (goal === "repair") return hay.includes("repair") || ritual.category === "repair";
+  if (goal === "desire") return hay.includes("desire") || ritual.category === "desire";
+  if (goal === "conversation") return hay.includes("conversation") || ritual.category === "conversation";
+  if (goal === "touch") return hay.includes("touch") || ritual.category === "touch";
+  if (goal === "calm") return hay.includes("calm") || hay.includes("ground") || hay.includes("soft");
+  if (goal === "clarity") return hay.includes("clarity") || hay.includes("clear");
+  return true;
+}
 
 export default function Rituals() {
+  const { state } = useSession();
   const [weather, setWeather] = useState<WeatherState | "all">("all");
+  const [duration, setDuration] = useState<DurationFilter>("all");
+  const [goal, setGoal] = useState<GoalFilter>("all");
+  const [intensity, setIntensity] = useState<IntensityFilter>("all");
+  const [category, setCategory] = useState<CategoryFilter>("all");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const hasPremium = typeof window !== "undefined" && window.localStorage.getItem("sacredpath-premium") === "true";
 
-  const freeToday = useMemo(() => getDailyFreeRitual(new Date(), "warm", "sunny"), []);
-  const premium = useMemo(() => getPremiumRituals({ weather, query }), [weather, query]);
+  const myWeather = (state.youWeather ?? "warm") as WeatherState;
+  const partnerWeather = (state.partnerWeather ?? "sunny") as WeatherState;
+  const freeToday = useMemo(() => getDailyFreeRitual(new Date(), myWeather, partnerWeather), [myWeather, partnerWeather]);
 
-  const list = useMemo(() => {
-    const all = [freeToday, ...premium.filter((r) => r.id !== freeToday.id)];
-    return all;
-  }, [premium, freeToday]);
+  const base = useMemo(
+    () =>
+      getPremiumRituals({
+        weather,
+        duration,
+        intensity,
+        category,
+        query,
+      }),
+    [weather, duration, intensity, category, query],
+  );
 
-  const selected = list.find((r) => r.id === selectedId) ?? list[0] ?? rituals[0];
-  const selectedIsLocked = !hasPremium && selected.id !== freeToday.id && selected.tier === "premium";
-  const premiumAnchorId = "premium-subscribe-section";
+  const filtered = useMemo(
+    () => base.filter((ritual) => normalizeGoalMatch(ritual, goal)),
+    [base, goal],
+  );
 
-  const imageFor = (mood: WeatherState) => `${import.meta.env.BASE_URL}assets/weather-mainstream/${mood}.png`;
+  const list = useMemo(() => [freeToday, ...filtered.filter((item) => item.id !== freeToday.id)], [freeToday, filtered]);
+  const selected = list.find((item) => item.id === selectedId) ?? list[0] ?? rituals[0];
+  const selectedLocked = !hasPremium && selected.id !== freeToday.id && selected.tier === "premium";
 
   return (
     <Layout>
       <div className="max-w-6xl mx-auto space-y-6">
         <header className="text-center space-y-3">
           <h1 className="font-serif text-4xl md:text-5xl">A complete intimacy library for the two of you.</h1>
-          <p className="text-muted mt-3 max-w-3xl mx-auto">
+          <p className="text-muted max-w-3xl mx-auto">
             One daily practice is free. Unlock 300+ rituals, guided voice, oracle prompts, and shared journey tools for both partners.
           </p>
         </header>
@@ -38,20 +85,24 @@ export default function Rituals() {
           <p className="text-[11px] uppercase tracking-[0.2em] text-accent">Free today</p>
           <h2 className="font-serif text-2xl mt-2">{freeToday.title}</h2>
           <p className="text-sm text-muted mt-1">{freeToday.subtitle}</p>
-          <p className="text-xs text-muted mt-2">{freeToday.durationMinutes} min · {freeToday.category}</p>
+          <p className="text-xs text-muted mt-2">{freeToday.durationMinutes} min · {freeToday.intensity}</p>
         </section>
 
-        <section className="rounded-2xl border border-white/10 bg-card p-4 grid gap-3 md:grid-cols-[220px_1fr]">
-          <select
-            className="rounded-xl border border-white/10 bg-white/5 px-3 py-2"
-            value={weather}
-            onChange={(e) => setWeather(e.target.value as WeatherState | "all")}
-          >
-            {WEATHER_FILTERS.map((item) => (
-              <option key={item} value={item}>
-                {item === "all" ? "All weather" : `${item[0].toUpperCase()}${item.slice(1)}`}
-              </option>
-            ))}
+        <section className="rounded-2xl border border-white/10 bg-card p-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          <select className="rounded-xl border border-white/10 bg-white/5 px-3 py-2" value={weather} onChange={(e) => setWeather(e.target.value as WeatherState | "all")}>
+            {WEATHER_FILTERS.map((item) => <option key={item} value={item}>{item === "all" ? "Weather: All" : `Weather: ${item}`}</option>)}
+          </select>
+          <select className="rounded-xl border border-white/10 bg-white/5 px-3 py-2" value={duration} onChange={(e) => setDuration((e.target.value === "all" ? "all" : Number(e.target.value)) as DurationFilter)}>
+            {DURATION_FILTERS.map((item) => <option key={String(item)} value={item}>{item === "all" ? "Duration: All" : `Duration: ${item} min`}</option>)}
+          </select>
+          <select className="rounded-xl border border-white/10 bg-white/5 px-3 py-2" value={goal} onChange={(e) => setGoal(e.target.value as GoalFilter)}>
+            {GOAL_FILTERS.map((item) => <option key={item} value={item}>{item === "all" ? "Goal: All" : `Goal: ${item}`}</option>)}
+          </select>
+          <select className="rounded-xl border border-white/10 bg-white/5 px-3 py-2" value={intensity} onChange={(e) => setIntensity(e.target.value as IntensityFilter)}>
+            {INTENSITY_FILTERS.map((item) => <option key={item} value={item}>{item === "all" ? "Intensity: All" : `Intensity: ${item}`}</option>)}
+          </select>
+          <select className="rounded-xl border border-white/10 bg-white/5 px-3 py-2" value={category} onChange={(e) => setCategory(e.target.value as CategoryFilter)}>
+            {CATEGORY_FILTERS.map((item) => <option key={item} value={item}>{item === "all" ? "Category: All" : `Category: ${item}`}</option>)}
           </select>
           <input
             value={query}
@@ -63,90 +114,88 @@ export default function Rituals() {
 
         <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
           <div className="grid gap-3 sm:grid-cols-2">
-            {list.slice(0, 120).map((ritual) => (
-              <button key={ritual.id} onClick={() => setSelectedId(ritual.id)} className={`relative text-left rounded-2xl border overflow-hidden transition ${
-                selected?.id === ritual.id ? "border-accent bg-white/10" : "border-white/10 bg-card hover:bg-white/10"
-              }`}>
-                <img src={imageFor(ritual.imageMood)} alt={ritual.title} className="w-full h-32 object-cover opacity-85" />
-                <div className="absolute inset-0 h-32 bg-gradient-to-t from-black/70 to-transparent" />
-                <div className="p-4">
-                  <p className="text-[11px] uppercase tracking-[0.2em] text-accent">{ritual.id === freeToday.id ? "Free today" : ritual.tier === "premium" ? "Premium" : "Library"}</p>
-                  <p className="mt-2 text-lg font-semibold">{ritual.title}</p>
-                  <p className="text-sm text-muted mt-1">{ritual.subtitle}</p>
-                  <p className="text-xs text-muted mt-2">{ritual.durationMinutes} min · {ritual.category}</p>
-                </div>
-                {!hasPremium && ritual.id !== freeToday.id && ritual.tier === "premium" ? (
-                  <div className="absolute inset-0 bg-black/45 grid place-items-center">
-                    <span className="rounded-full border border-accent/60 bg-black/60 px-3 py-1 text-xs tracking-wide">Locked</span>
-                  </div>
-                ) : null}
-                {selected?.id === ritual.id && (!selectedIsLocked || ritual.id === freeToday.id) ? (
-                  <div className="border-t border-white/10 bg-white/5 p-4">
-                    <p className="text-[11px] uppercase tracking-[0.2em] text-accent mb-2">Steps</p>
-                    <div className="space-y-2">
-                      {ritual.steps.slice(0, 6).map((step, index) => (
-                        <p key={index} className="text-sm">
-                          <span className="text-accent font-semibold mr-2">{index + 1}.</span>
-                          {step}
-                        </p>
-                      ))}
+            {list.slice(0, 160).map((ritual, index) => {
+              const locked = !hasPremium && ritual.id !== freeToday.id && ritual.tier === "premium";
+              return (
+                <div key={ritual.id} className="space-y-3">
+                  <RitualCard
+                    ritual={ritual}
+                    selected={selected.id === ritual.id}
+                    locked={locked}
+                    isFreeToday={ritual.id === freeToday.id}
+                    onClick={() => setSelectedId(ritual.id)}
+                  />
+                  {!hasPremium && index === 4 ? (
+                    <div className="rounded-2xl border border-accent/40 bg-accent/10 p-4">
+                      <p className="text-sm">
+                        Unlock the full library for both of you - $29/year. One subscription gives both connected partners access to 300+ rituals.
+                      </p>
+                      <button className="mt-3 rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-4 py-2 text-[#130f08] font-semibold">
+                        Unlock for both of us
+                      </button>
                     </div>
-                  </div>
-                ) : null}
-              </button>
-            ))}
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
 
-          {selected && (
-            <aside className="rounded-2xl border border-white/10 bg-card p-5 h-max">
-              <h2 className="text-2xl font-serif">{selected.title}</h2>
-              <p className="text-muted mt-1">{selected.subtitle}</p>
-              {selectedIsLocked ? (
-                <div className="mt-4 rounded-xl border border-accent/30 bg-accent/10 p-4">
-                  <p className="text-sm">
-                    Unlock the full library for both of you - $29/year. One subscription gives both partners access to 300+ rituals, Sacred Voice, Oracle, and Journey.
-                  </p>
-                </div>
-              ) : (
+          <aside className="rounded-2xl border border-white/10 bg-card p-5 h-max lg:sticky lg:top-6">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-accent mb-2">Ritual details</p>
+            <h2 className="text-2xl font-serif">{selected.title}</h2>
+            <p className="text-muted mt-1">{selected.subtitle}</p>
+            <p className="text-xs text-muted mt-2">{selected.durationMinutes} min · {selected.intensity} · {selected.category}</p>
+
+            {selectedLocked ? (
+              <div className="mt-4 rounded-xl border border-accent/30 bg-accent/10 p-4">
+                <p className="text-sm">
+                  Unlock the full library for both of you - $29/year. One subscription gives both connected partners access to 300+ rituals, guided voice, oracle prompts, and shared journey tools.
+                </p>
+                <button className="mt-3 rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-4 py-2 text-[#130f08] font-semibold">
+                  Unlock for both of us
+                </button>
+              </div>
+            ) : (
+              <>
+                <p className="text-sm mt-4">{selected.intro}</p>
                 <div className="mt-4 space-y-2">
-                  {selected.steps.slice(0, 6).map((step, index) => (
+                  {selected.steps.slice(0, 7).map((step, index) => (
                     <p key={index} className="text-sm">
                       <span className="text-accent font-semibold mr-2">{index + 1}.</span>
                       {step}
                     </p>
                   ))}
                 </div>
-              )}
-            </aside>
-          )}
+                <p className="text-sm text-muted mt-4">{selected.closing}</p>
+                <div className="mt-4 grid gap-2">
+                  <button className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10">Play Sacred Voice</button>
+                  <button className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10">Save to Journey</button>
+                  <button className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10">Send to Partner</button>
+                  <button className="rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-4 py-2 text-[#130f08] font-semibold">Complete ritual</button>
+                </div>
+              </>
+            )}
+          </aside>
         </section>
 
-        <div className="flex justify-center">
-          <a
-            href={`#${premiumAnchorId}`}
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10 transition-colors"
-          >
-            <span>↓</span>
-            <span>Go to premium</span>
-          </a>
-        </div>
-
-        <section id={premiumAnchorId} className="rounded-2xl border border-accent/40 bg-gradient-to-br from-[#e6b980]/25 to-[#eacda3]/20 p-6 text-center">
-          <p className="font-serif text-2xl md:text-3xl leading-snug">
-            Subscribe for two,
-            <br />
-            great Intomacy,
-            <br />
-            Deep connection.
-            <br />
-            only 29$ per year,
-            <br />
-            for both of you
-          </p>
-          <button className="mt-5 rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-6 py-3 font-semibold text-[#130f08]">
-            Unlock for both of us
-          </button>
-        </section>
+        {!hasPremium ? (
+          <section className="rounded-2xl border border-accent/40 bg-gradient-to-br from-[#e6b980]/25 to-[#eacda3]/20 p-6 text-center">
+            <p className="font-serif text-2xl md:text-3xl leading-snug">
+              Subscribe for two,
+              <br />
+              great Intomacy,
+              <br />
+              Deep connection.
+              <br />
+              only 29$ per year,
+              <br />
+              for both of you
+            </p>
+            <button className="mt-5 rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-6 py-3 font-semibold text-[#130f08]">
+              Unlock for both of us
+            </button>
+          </section>
+        ) : null}
       </div>
     </Layout>
   );
