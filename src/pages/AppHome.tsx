@@ -128,7 +128,6 @@ export default function AppHome() {
         <section className="rounded-[22px] border border-white/10 bg-card p-4 md:p-5">
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="space-y-2">
-              <span className="text-xs uppercase tracking-[0.16em] text-muted">Me</span>
               <input
                 value={state.youName ?? ""}
                 onChange={(e) => setState({ ...state, youName: e.target.value })}
@@ -136,7 +135,6 @@ export default function AppHome() {
               />
             </label>
             <label className="space-y-2">
-              <span className="text-xs uppercase tracking-[0.16em] text-muted">Partner</span>
               <input
                 value={state.partnerName ?? ""}
                 onChange={(e) => setState({ ...state, partnerName: e.target.value })}
