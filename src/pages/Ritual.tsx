@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import Layout from "../components/Layout";
 import Card from "../components/Card";
 import Button from "../components/Button";
@@ -7,6 +7,7 @@ import BackButton from "../components/BackButton";
 import SubscribeButton from "../components/SubscribeButton";
 import { useSession } from "../contexts/SessionContext";
 import { getTonightPath } from "../lib/tonightPath";
+import { getRitualById as getCanonicalRitualById } from "../lib/ritualResolver";
 import { isPremium } from "../lib/premium";
 import {
   WEATHER_TONE_LABELS,
@@ -27,6 +28,7 @@ function fallbackTone(weather: string | undefined): WeatherVisualKey {
 export default function Ritual() {
   const { state } = useSession();
   const navigate = useNavigate();
+  const [search] = useSearchParams();
   const hasPremium = isPremium();
 
   useEffect(() => {
@@ -50,13 +52,16 @@ export default function Ritual() {
   }
 
   const { freeRitual } = result;
+  const overrideRitual = search.get("ritualId") ? getCanonicalRitualById(search.get("ritualId") as string) : null;
+  const ritualTitle = overrideRitual?.title ?? freeRitual.title;
+  const ritualStepsSource = overrideRitual?.steps ?? freeRitual.ritualSteps;
   const youTone = state.youWeatherTone ?? fallbackTone(state.youWeather);
   const partnerTone = state.partnerWeatherTone ?? fallbackTone(state.partnerWeather);
   const youName = state.youName?.trim() || "You";
   const partnerName = state.partnerName?.trim() || "Partner";
   const youTitle = `${WEATHER_TONE_LABELS[youTone]} ${youName}`;
   const partnerTitle = `${WEATHER_TONE_LABELS[partnerTone]} ${partnerName}`;
-  const ritualSteps = freeRitual.ritualSteps.slice(0, 3);
+  const ritualSteps = ritualStepsSource.slice(0, 3);
   const weatherPairLabel = `${WEATHER_TONE_LABELS[youTone]} + ${WEATHER_TONE_LABELS[partnerTone]}`;
 
   return (
@@ -95,7 +100,7 @@ export default function Ritual() {
 
         <Card>
           <p className="text-[11px] uppercase tracking-[0.2em] text-accent mb-2">Ritual in 3 steps</p>
-          <h3 className="font-serif text-2xl mb-4">{freeRitual.title}</h3>
+          <h3 className="font-serif text-2xl mb-4">{ritualTitle}</h3>
           <div className="space-y-3">
             {ritualSteps.map((step, index) => (
               <div key={index} className="flex gap-3 items-start">
@@ -112,6 +117,12 @@ export default function Ritual() {
           <Button variant="secondary" onClick={() => navigate("/deeper")}>
             Go deeper
           </Button>
+          <Link
+            to={`/voice?ritualId=${encodeURIComponent(overrideRitual?.id ?? freeRitual.id)}`}
+            className="block w-full rounded-full bg-white/5 border border-white/10 text-center py-3 px-6 font-semibold hover:bg-white/10 transition-colors"
+          >
+            Play with Sacred Voice
+          </Link>
           <p className="text-sm sm:text-base text-muted leading-relaxed">
             Slow down, breathe together, and reconnect with intention.
             Presence over performance creates deeper trust, safety, and closeness in your shared path.
