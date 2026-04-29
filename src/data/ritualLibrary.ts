@@ -1,10 +1,12 @@
 import {
-  mainstreamRituals200,
-  type MainstreamRitual,
-  type IntimacyWeather,
-} from "./mainstreamRituals200";
+  sacredPathRituals,
+  type RitualCategory as CanonicalCategory,
+  type SacredPathRitual,
+  type WeatherState,
+} from "./sacredPathRituals";
+import { normalizeWeatherPair } from "../lib/weatherPair";
 
-export type WeatherState = "sunny" | "warm" | "electric" | "foggy" | "frozen" | "stormy";
+export type { WeatherState };
 export type RitualTier = "free-daily" | "premium";
 export type RitualCategory =
   | "repair"
@@ -34,61 +36,49 @@ export interface Ritual {
   tags: string[];
 }
 
-function toLowerWeather(value: IntimacyWeather): WeatherState {
-  return value.toLowerCase() as WeatherState;
-}
-
-function toRitualCategory(category: MainstreamRitual["category"]): RitualCategory {
-  if (category === "sensual" || category === "body-worship" || category === "anticipation") return "desire";
-  if (category === "touch") return "touch";
+function toCategory(category: CanonicalCategory): RitualCategory {
   if (category === "repair" || category === "aftercare") return "repair";
-  if (category === "gaze" || category === "choice" || category === "appreciation") return "conversation";
-  if (category === "breath" || category === "arrival" || category === "rest" || category === "devotional") return "connection";
-  if (category === "play" || category === "kink-lite" || category === "bdsm-inspired") return "journey";
+  if (category === "touch" || category === "body-awareness") return "touch";
+  if (category === "conversation" || category === "gaze") return "conversation";
+  if (category === "desire" || category === "play" || category === "devotion") return "desire";
+  if (category === "voice") return "voice";
+  if (category === "journey") return "journey";
   return "connection";
 }
 
-function toDuration(value: number): 3 | 5 | 8 | 12 | 20 {
-  if (value <= 4) return 3;
-  if (value <= 6) return 5;
-  if (value <= 9) return 8;
-  if (value <= 16) return 12;
+function toDuration(value: SacredPathRitual["durationMinutes"]): 3 | 5 | 8 | 12 | 20 {
+  if (value <= 3) return 3;
+  if (value <= 5) return 5;
+  if (value <= 8) return 8;
+  if (value <= 12) return 12;
   return 20;
 }
 
-function toIntensity(value: MainstreamRitual["intensity"]): "gentle" | "medium" | "deep" {
-  if (value === "soft") return "gentle";
-  if (value === "high") return "deep";
-  return "medium";
-}
-
-export const rituals: Ritual[] = mainstreamRituals200.map((ritual) => {
-  const weather = ritual.weatherTags.map(toLowerWeather);
-  return {
-    id: ritual.id,
-    title: ritual.title,
-    subtitle: ritual.subtitle,
-    category: toRitualCategory(ritual.category),
-    weather,
-    durationMinutes: toDuration(ritual.durationMinutes),
-    intensity: toIntensity(ritual.intensity),
-    tier: ritual.premiumTier === "free" ? "free-daily" : "premium",
-    imageMood: weather[0] ?? "warm",
-    intro: ritual.subtitle,
-    steps: ritual.steps,
-    closing: ritual.closing,
-    tags: ritual.bestFor,
-  };
-});
+export const rituals: Ritual[] = sacredPathRituals.map((ritual) => ({
+  id: ritual.id,
+  title: ritual.title,
+  subtitle: ritual.subtitle,
+  category: toCategory(ritual.category),
+  weather: ritual.weather,
+  pairings: ritual.pairings,
+  durationMinutes: toDuration(ritual.durationMinutes),
+  intensity: ritual.intensity,
+  tier: ritual.tier,
+  imageMood: ritual.imageMood,
+  intro: ritual.setup.join(" "),
+  steps: ritual.steps,
+  closing: ritual.closing,
+  voiceScript: ritual.voiceScript,
+  tags: ritual.bestFor,
+}));
 
 const ritualById = new Map(rituals.map((ritual) => [ritual.id, ritual]));
 
 export function getDailyFreeRitual(date: Date, weatherA: WeatherState, weatherB: WeatherState) {
-  const seed = `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}-${weatherA}-${weatherB}`;
+  const pair = normalizeWeatherPair(weatherA, weatherB);
+  const seed = `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}-${pair}`;
   const hash = Array.from(seed).reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) >>> 0, 17);
-  const candidates = rituals.filter(
-    (ritual) => ritual.tier === "free-daily" && (ritual.weather.includes(weatherA) || ritual.weather.includes(weatherB)),
-  );
+  const candidates = rituals.filter((ritual) => ritual.tier === "free-daily" && ritual.pairings?.includes(pair));
   const pool = candidates.length ? candidates : rituals.filter((ritual) => ritual.tier === "free-daily");
   return pool[hash % pool.length] ?? rituals[0];
 }
@@ -117,3 +107,4 @@ export function getPremiumRituals(filters?: {
 export function getRitualFromLibraryById(id: string) {
   return ritualById.get(id) ?? null;
 }
+
