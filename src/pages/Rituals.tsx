@@ -1,31 +1,23 @@
 import { useMemo, useState } from "react";
 import Layout from "../components/Layout";
-import { getPremiumRituals, getFreeRituals } from "../utils/ritualEngine";
-import type { IntimacyWeather } from "../utils/ritualEngine";
+import { getPremiumRituals, getDailyFreeRitual, rituals, type WeatherState } from "../data/ritualLibrary";
 
-const WEATHER_FILTERS: Array<IntimacyWeather | "all"> = ["all", "Sunny", "Warm", "Electric", "Foggy", "Frozen", "Stormy"];
+const WEATHER_FILTERS: Array<WeatherState | "all"> = ["all", "sunny", "warm", "electric", "foggy", "frozen", "stormy"];
 
 export default function Rituals() {
-  const [weather, setWeather] = useState<IntimacyWeather | "all">("all");
+  const [weather, setWeather] = useState<WeatherState | "all">("all");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const freeRituals = useMemo(() => getFreeRituals(), []);
-  const premium = useMemo(() => getPremiumRituals(), []);
+  const freeToday = useMemo(() => getDailyFreeRitual(new Date(), "warm", "sunny"), []);
+  const premium = useMemo(() => getPremiumRituals({ weather, query }), [weather, query]);
 
   const list = useMemo(() => {
-    const all = [...freeRituals, ...premium];
-    return all.filter((r) => {
-      if (weather !== "all" && !r.weatherTags.includes(weather)) return false;
-      if (query.trim()) {
-        const hay = `${r.title} ${r.subtitle} ${r.bestFor.join(" ")}`.toLowerCase();
-        if (!hay.includes(query.toLowerCase().trim())) return false;
-      }
-      return true;
-    });
-  }, [freeRituals, premium, weather, query]);
+    const all = [freeToday, ...premium.filter((r) => r.id !== freeToday.id)];
+    return all;
+  }, [premium, freeToday]);
 
-  const selected = list.find((r) => r.id === selectedId) ?? list[0] ?? freeRituals[0];
+  const selected = list.find((r) => r.id === selectedId) ?? list[0] ?? rituals[0];
 
   return (
     <Layout>
@@ -45,7 +37,7 @@ export default function Rituals() {
           >
             {WEATHER_FILTERS.map((item) => (
               <option key={item} value={item}>
-                {item === "all" ? "All weather" : item}
+                {item === "all" ? "All weather" : `${item[0].toUpperCase()}${item.slice(1)}`}
               </option>
             ))}
           </select>
@@ -59,7 +51,7 @@ export default function Rituals() {
 
         <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
           <div className="grid gap-3 sm:grid-cols-2">
-            {list.slice(0, 80).map((ritual) => (
+            {list.slice(0, 120).map((ritual) => (
               <button
                 key={ritual.id}
                 onClick={() => setSelectedId(ritual.id)}
@@ -67,9 +59,7 @@ export default function Rituals() {
                   selected?.id === ritual.id ? "border-accent bg-white/10" : "border-white/10 bg-card hover:bg-white/10"
                 }`}
               >
-                <p className="text-[11px] uppercase tracking-[0.2em] text-accent">
-                  {ritual.premiumTier === "free" ? "Free today" : "Premium"}
-                </p>
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-accent">{ritual.id === freeToday.id ? "Free today" : "Premium"}</p>
                 <p className="mt-2 text-lg font-semibold">{ritual.title}</p>
                 <p className="text-sm text-muted mt-1">{ritual.subtitle}</p>
                 <p className="text-xs text-muted mt-2">{ritual.durationMinutes} min · {ritual.category}</p>

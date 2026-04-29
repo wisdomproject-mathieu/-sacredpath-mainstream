@@ -4,6 +4,7 @@ import Layout from "../components/Layout";
 import { useSession } from "../contexts/SessionContext";
 import { resolveWeatherRitual } from "../lib/ritualRegistry";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
+import { getDailyFreeRitual, type WeatherState } from "../data/ritualLibrary";
 
 const WEATHER_OPTIONS: Array<{ id: IntimacyWeather; title: string; subtitle: string }> = [
   { id: "sunny", title: "Sunny", subtitle: "Clear, light, easy connection" },
@@ -22,7 +23,11 @@ export default function Home() {
   const partnerWeather = state.partnerWeather ?? "sunny";
 
   const ritual = useMemo(() => resolveWeatherRitual(myWeather, partnerWeather), [myWeather, partnerWeather]);
-  const steps = ritual.freeRitual?.ritualSteps.slice(0, 4) ?? [];
+  const dailyFree = useMemo(
+    () => getDailyFreeRitual(new Date(), myWeather as WeatherState, partnerWeather as WeatherState),
+    [myWeather, partnerWeather],
+  );
+  const steps = dailyFree.steps.slice(0, 4);
 
   return (
     <Layout>
@@ -83,8 +88,8 @@ export default function Home() {
           <h2 className="font-serif text-3xl md:text-4xl">{ritual.homeCard.title}</h2>
           <p className="text-muted max-w-3xl">{ritual.homeCard.body}</p>
           <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-            <p className="text-sm font-semibold">{ritual.freeRitual?.title ?? "Today's Path"}</p>
-            <p className="text-sm text-muted mt-1">{ritual.freeRitual?.subtitle ?? ritual.homeCard.body}</p>
+            <p className="text-sm font-semibold">{dailyFree.title}</p>
+            <p className="text-sm text-muted mt-1">{dailyFree.subtitle}</p>
             <ol className="mt-3 space-y-2">
               {steps.map((step, idx) => (
                 <li key={idx} className="text-sm">
@@ -105,8 +110,8 @@ export default function Home() {
               to="/paywall"
               className="flex-1 bg-white/5 border border-white/10 rounded-full px-6 py-3.5 text-center hover:bg-white/10 transition-colors"
             >
-              Unlock for both of us
-            </Link>
+                  Unlock the full library for both of you - $29/year
+                </Link>
           </div>
         </section>
       </div>

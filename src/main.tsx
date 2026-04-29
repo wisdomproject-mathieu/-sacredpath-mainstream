@@ -10,6 +10,9 @@ import Rituals from "./pages/Rituals";
 import RitualSaved from "./pages/RitualSaved";
 import Deeper from "./pages/Deeper";
 import Paywall from "./pages/Paywall";
+import Voice from "./pages/Voice";
+import Oracle from "./pages/Oracle";
+import Journey from "./pages/Journey";
 import { SessionProvider } from "./contexts/SessionContext";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
@@ -24,6 +27,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/ritual/saved" element={<RitualSaved />} />
           <Route path="/deeper" element={<Deeper />} />
           <Route path="/paywall" element={<Paywall />} />
+          <Route path="/voice" element={<Voice />} />
+          <Route path="/oracle" element={<Oracle />} />
+          <Route path="/journey" element={<Journey />} />
         </Routes>
       </BrowserRouter>
     </SessionProvider>

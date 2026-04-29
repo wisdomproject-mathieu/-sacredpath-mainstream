@@ -12,8 +12,8 @@ export default function Paywall() {
         <div className="text-center mb-12">
           <h1 className="font-serif text-4xl md:text-5xl mb-4">Go deeper than one card.</h1>
           <p className="text-lg text-muted max-w-3xl mx-auto">
-            This is the mainstream upgrade: one fast ritual in under 30 seconds, then a more irresistible premium path for both of you. 
-            Men get help with presence, lasting longer, and steadier erotic energy. Women get slower touch, conscious pacing, softness, and safer intimacy.
+            Unlock the full intimacy library for both of you - $29/year. One subscription. Two partners.
+            Daily rituals, guided voice, oracle prompts, and your shared journey.
           </p>
         </div>
 
