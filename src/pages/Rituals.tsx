@@ -4,20 +4,10 @@ import RitualCard from "../components/RitualCard";
 import BackButton from "../components/BackButton";
 import SubscribeButton from "../components/SubscribeButton";
 import { useSession } from "../contexts/SessionContext";
-import { getDailyFreeRitual, getPremiumRituals, rituals, type Ritual, type RitualCategory, type WeatherState } from "../data/ritualLibrary";
+import { getDailyFreeRitual, rituals, type Ritual } from "../data/ritualLibrary";
 import { isPremium } from "../lib/premium";
 import { getTonightPath } from "../lib/tonightPath";
 
-type DurationFilter = 3 | 5 | 8 | 12 | 20 | "all";
-type IntensityFilter = "gentle" | "medium" | "deep" | "all";
-type GoalFilter = "all" | "reconnect" | "repair" | "desire" | "conversation" | "touch" | "calm" | "clarity";
-type CategoryFilter = RitualCategory | "all";
-
-const WEATHER_FILTERS: Array<WeatherState | "all"> = ["all", "sunny", "warm", "electric", "foggy", "frozen", "stormy"];
-const DURATION_FILTERS: DurationFilter[] = ["all", 3, 5, 8, 12, 20];
-const INTENSITY_FILTERS: IntensityFilter[] = ["all", "gentle", "medium", "deep"];
-const GOAL_FILTERS: GoalFilter[] = ["all", "reconnect", "repair", "desire", "conversation", "touch", "calm", "clarity"];
-const CATEGORY_FILTERS: CategoryFilter[] = ["all", "connection", "repair", "desire", "touch", "conversation", "voice", "oracle", "journey"];
 const STARTER_IDS = ["tk006", "sp203", "tk003", "tk005"];
 const TERRITORY_TILES = [
   { title: "Daily anchors", desc: "Simple rituals for busy days.", count: 28, sample: ["Candle Arrival", "Daily Homecoming"] },
@@ -28,27 +18,8 @@ const TERRITORY_TILES = [
   { title: "Integration & long arc", desc: "Weekly anchors and relationship growth.", count: 19, sample: ["Weekly Repair Check", "Beloved Letter"] },
 ];
 
-function normalizeGoalMatch(ritual: Ritual, goal: GoalFilter) {
-  if (goal === "all") return true;
-  const hay = `${ritual.title} ${ritual.subtitle} ${ritual.intro} ${ritual.tags.join(" ")}`.toLowerCase();
-  if (goal === "reconnect") return hay.includes("reconnect") || hay.includes("connection");
-  if (goal === "repair") return hay.includes("repair") || ritual.category === "repair";
-  if (goal === "desire") return hay.includes("desire") || ritual.category === "desire";
-  if (goal === "conversation") return hay.includes("conversation") || ritual.category === "conversation";
-  if (goal === "touch") return hay.includes("touch") || ritual.category === "touch";
-  if (goal === "calm") return hay.includes("calm") || hay.includes("ground") || hay.includes("soft");
-  if (goal === "clarity") return hay.includes("clarity") || hay.includes("clear");
-  return true;
-}
-
 export default function Rituals() {
   const { state } = useSession();
-  const [weather, setWeather] = useState<WeatherState | "all">("all");
-  const [duration, setDuration] = useState<DurationFilter>("all");
-  const [goal, setGoal] = useState<GoalFilter>("all");
-  const [intensity, setIntensity] = useState<IntensityFilter>("all");
-  const [category, setCategory] = useState<CategoryFilter>("all");
-  const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const hasPremium = isPremium();
   const toggleSelected = (id: string) => {
@@ -68,24 +39,7 @@ export default function Rituals() {
     return dailyDiscovery;
   }, [dailyDiscovery, tonightPath]);
 
-  const base = useMemo(
-    () =>
-      getPremiumRituals({
-        weather,
-        duration,
-        intensity,
-        category,
-        query,
-      }),
-    [weather, duration, intensity, category, query],
-  );
-
-  const filtered = useMemo(
-    () => base.filter((ritual) => normalizeGoalMatch(ritual, goal)),
-    [base, goal],
-  );
-
-  const list = useMemo(() => [freeToday, ...filtered.filter((item) => item.id !== freeToday.id)], [freeToday, filtered]);
+  const list = useMemo(() => [freeToday, ...rituals.filter((item) => item.id !== freeToday.id)], [freeToday]);
   const starterRituals = useMemo(
     () =>
       STARTER_IDS.map((id) => rituals.find((r) => r.id === id)).filter((r): r is Ritual => Boolean(r) && r.id !== freeToday.id).slice(0, 3),
@@ -162,90 +116,6 @@ export default function Rituals() {
             <p className="text-sm text-muted">
               Showing <strong>{list.length}</strong> rituals from a library of <strong>{rituals.length}</strong>.
             </p>
-
-            <section className="rounded-2xl border border-white/10 bg-card p-4 space-y-3">
-              <div className="space-y-2">
-                <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Weather</p>
-                <div className="flex flex-wrap gap-2">
-                  {WEATHER_FILTERS.map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => setWeather(item)}
-                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold capitalize ${weather === item ? "border-accent/70 bg-accent/15" : "border-white/15 bg-white/5 hover:bg-white/10"}`}
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Duration</p>
-                <div className="flex flex-wrap gap-2">
-                  {DURATION_FILTERS.map((item) => (
-                    <button
-                      key={String(item)}
-                      type="button"
-                      onClick={() => setDuration(item)}
-                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${duration === item ? "border-accent/70 bg-accent/15" : "border-white/15 bg-white/5 hover:bg-white/10"}`}
-                    >
-                      {item === "all" ? "all" : `${item} min`}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Goal</p>
-                <div className="flex flex-wrap gap-2">
-                  {GOAL_FILTERS.map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => setGoal(item)}
-                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold capitalize ${goal === item ? "border-accent/70 bg-accent/15" : "border-white/15 bg-white/5 hover:bg-white/10"}`}
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Intensity</p>
-                <div className="flex flex-wrap gap-2">
-                  {INTENSITY_FILTERS.map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => setIntensity(item)}
-                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold capitalize ${intensity === item ? "border-accent/70 bg-accent/15" : "border-white/15 bg-white/5 hover:bg-white/10"}`}
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Category</p>
-                <div className="flex flex-wrap gap-2">
-                  {CATEGORY_FILTERS.map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => setCategory(item)}
-                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold capitalize ${category === item ? "border-accent/70 bg-accent/15" : "border-white/15 bg-white/5 hover:bg-white/10"}`}
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
-                placeholder="Search rituals..."
-              />
-            </section>
 
             <section className="grid gap-3 sm:grid-cols-2">
               {list.slice(0, 160).filter((r) => r.id !== freeToday.id).map((ritual) => {
