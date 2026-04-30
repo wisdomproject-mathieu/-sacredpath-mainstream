@@ -19,6 +19,13 @@ const JOURNEY_KEY = "sacredpath-journey-oracle";
 
 const QUESTION_HELPER =
   "Try: How can I reconnect tonight? What should I understand about my partner? What is blocking intimacy between us?";
+const QUESTION_SUGGESTIONS = [
+  "How can we reconnect tonight without pressure?",
+  "What does my partner need from me emotionally right now?",
+  "What is quietly blocking intimacy between us today?",
+  "How can we repair tension and feel close again tonight?",
+  "What one action would help us feel safer together tonight?",
+];
 
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
@@ -33,6 +40,8 @@ export default function Oracle() {
   const [revealed, setRevealed] = useState(false);
   const [notice, setNotice] = useState("");
   const [revealedCardId, setRevealedCardId] = useState<string | null>(null);
+  const [showQuestionPrompt, setShowQuestionPrompt] = useState(false);
+  const [suggestedQuestion, setSuggestedQuestion] = useState(QUESTION_SUGGESTIONS[0]);
 
   const userWeather = normalizeWeatherName(state.youWeatherTone ?? state.youWeather);
   const partnerWeather = normalizeWeatherName(state.partnerWeatherTone ?? state.partnerWeather);
@@ -70,6 +79,14 @@ export default function Oracle() {
   );
 
   const revealPath = () => {
+    const trimmedQuestion = question.trim();
+    if (!trimmedQuestion) {
+      const pick = QUESTION_SUGGESTIONS[Math.floor(Math.random() * QUESTION_SUGGESTIONS.length)];
+      setSuggestedQuestion(pick);
+      setShowQuestionPrompt(true);
+      return;
+    }
+
     if (typeof window === "undefined") {
       setRevealed(true);
       return;
@@ -282,6 +299,40 @@ export default function Oracle() {
         ) : null}
 
         {notice ? <p className="text-center text-xs text-muted">{notice}</p> : null}
+
+        {showQuestionPrompt ? (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+            <div className="w-full max-w-lg rounded-3xl border border-white/15 bg-[#171224] p-5 shadow-2xl">
+              <h3 className="font-serif text-2xl">No inspiration?</h3>
+              <p className="mt-2 text-sm text-muted">
+                Here is a suggestion for you:
+              </p>
+              <p className="mt-2 rounded-xl border border-white/10 bg-white/5 p-3 text-sm leading-relaxed">
+                “{suggestedQuestion}”
+              </p>
+              <p className="mt-3 text-sm text-white/90">Ask Intimacy Oracle?</p>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuestion(suggestedQuestion);
+                    setShowQuestionPrompt(false);
+                  }}
+                  className="rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-5 py-3 text-sm font-semibold text-[#130f08] hover:opacity-90"
+                >
+                  Use this question
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowQuestionPrompt(false)}
+                  className="rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold hover:bg-white/10"
+                >
+                  I&apos;ll write my own
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
     </Layout>
   );

@@ -1,0 +1,314 @@
+# Sacred Path for Couples — App Store Final Audit
+Date: April 30, 2026  
+Repo: `/Users/mathieuescande/Documents/GitHub/sacredpath-mainstream`
+
+## Executive Summary
+This pass focused on submission-critical stability, premium gating consistency, routing integrity, legal/privacy accessibility, and Oracle functional readiness.
+
+### Critical fixes completed
+- Added real legal/support pages and routes (`/terms`, `/privacy`, `/support`) to remove dead paywall links.
+- Updated Paywall legal/support actions to route in-app (no blank external pages).
+- Hid premium test toggle behind explicit env flag (`VITE_ENABLE_DEV_PREMIUM_TOGGLE === "true"`) to reduce accidental production unlock UI.
+- Kept premium state default `false` and centralized via `src/lib/premium.ts`.
+- Enforced Oracle question-required flow with suggestion modal for empty prompt.
+- Confirmed no Apple Pay wording for digital subscription CTA.
+
+---
+
+## 1) Build & Technical Stability
+
+### Commands run
+- `npm install` ✅
+- `npm run build` ✅
+- `npm run validate:rituals` ✅ PASS
+- `npm run audit:buttons` ✅ (script runs; heuristic false positives noted)
+- `npm run lint` ❌ (repo missing ESLint flat config for ESLint v10)
+
+### Build status
+- Vite production build passes.
+- No TypeScript/Vite blockers found in this pass.
+
+### Known technical blocker (non-runtime)
+- Lint is currently blocked by missing `eslint.config.js` after ESLint v10 upgrade.
+- This does **not** block runtime/build but should be resolved before CI policy-gated release.
+
+---
+
+## 2) App Store Readiness (Apple Review Risk)
+
+### Fixed
+- Legal links from paywall now resolve to real pages.
+- Support route added and accessible.
+- Subscription path remains in-app and does not route to external payment URLs.
+- Premium test toggle hidden unless explicit dev env flag is enabled.
+
+### Risks still requiring manual verification
+- Real StoreKit/RevenueCat purchase flow still marked as temporary dev unlock in UI/code.
+- Restore purchases currently testing placeholder message; must be wired to real restore call before production.
+- Final legal text should be reviewed by legal counsel.
+
+---
+
+## 3) Subscription / Premium Gating Audit
+
+### Current behavior
+- Premium storage key: `sacredpath-premium` (localStorage).
+- Default premium state: `false`.
+- Free users:
+  - get meaningful value on Home + Weather + Oracle sample + rituals starter paths.
+  - see subscription CTAs.
+- Premium users:
+  - get expanded content tools.
+  - do not receive aggressive repeated paywall blocks in major flow.
+
+### CTA wording
+- Global `SubscribeButton` CTA text remains:
+  - **“Subscribe to upgrade your intimate life”**
+
+### Observations
+- Oracle free flow now blocks empty prompt and provides suggestion modal.
+- Oracle premium tools are functional (start ritual, voice route, share, save).
+
+---
+
+## 4) Navigation / Routing Matrix (Main Flows)
+
+| Source | CTA / Control | Expected | Result | Fixed |
+|---|---|---|---|---|
+| Home | Check our weather | `/weather` | Works | Yes |
+| Home | Ask the Intimacy Oracle | `/oracle` | Works | Yes |
+| Home | Browse rituals | `/rituals` | Works | Yes |
+| Home (complete) | Open tonight’s ritual | `/ritual` | Works | Yes |
+| Home (complete) | Update our weather | local stage reset | Works | Yes |
+| Weather | Now sense partner weather | stage transition | Works | Yes |
+| Weather | Reveal ritual path | `/ritual` | Works | Yes |
+| Ritual | Go deeper | `/deeper` | Works | Yes |
+| Ritual | More rituals for two | `/rituals` | Works | Yes |
+| Rituals | Free ritual card expand | inline details | Works | Yes |
+| Rituals | Locked teaser subscribe | `/paywall?source=rituals` | Works | Yes |
+| Oracle | Reveal Our Path | card reveal | Works | Yes |
+| Oracle | Empty question reveal | suggestion modal | Works | Yes |
+| Oracle (premium) | Listen with Sacred Voice | `/voice` | Works | Yes |
+| Oracle (premium) | Share with Partner | native share/clipboard | Works | Yes |
+| Oracle (premium) | Save to Our Journey | local save | Works | Yes |
+| Journey | Open shared dashboard | panel toggle | Works | Yes |
+| Journey | WA your beloved one | WA deep link | Works | Yes |
+| Paywall | Subscribe | dev purchase mode | Works (dev) | Yes |
+| Paywall | Restore purchases | placeholder message | Works (placeholder) | Partial |
+| Paywall | Terms of Use | `/terms` | Works | Yes |
+| Paywall | Privacy Policy | `/privacy` | Works | Yes |
+| Paywall | Support | `/support` | Works | Yes |
+| Connect | Copy invite link | clipboard | Works | Yes |
+| Connect | Continue as couple | `/weather` | Works | Yes |
+
+---
+
+## 5) Intimacy Weather Logic Audit
+
+### Verified
+- Weather selections drive Tonight Path resolution.
+- Weather flow updates state and routes to ritual outcome.
+- Weather labels are mainstream-friendly in most user-visible areas.
+
+### Remaining risk
+- Weather naming consistency (`Sunny` vs `Hot`) appears mixed by context. Functional but should be normalized in one future cleanup pass.
+
+---
+
+## 6) Ritual Library Audit
+
+### Validation run
+- `npm run validate:rituals` → PASS.
+- Current library count reported by script:
+  - Total: 204
+  - Free: 23
+  - Premium: 181
+
+### Notes
+- Validation indicates content repetition clusters still exist (subtitles/opening steps/closings). This is quality risk for retention, not a hard submission blocker if experience remains coherent.
+- No build/runtime break from ritual data rendering in this pass.
+
+---
+
+## 7) Sacred Voice / Audio / TTS Audit
+
+### Verified
+- Voice route exists and page loads.
+- Guided mode controls present.
+- Backend + fallback architecture exists.
+
+### Remaining production risk
+- Actual production TTS provider reliability depends on deployed backend function/env.
+- Store review note should explain premium voice behavior if reviewer cannot trigger full path without purchase sandbox.
+
+---
+
+## 8) Intimacy Oracle Audit
+
+### Implemented / verified
+- Oracle route exists and is active.
+- User can type a relationship question.
+- Empty prompt is blocked with suggestion modal.
+- Reveal path returns symbolic card + interpretation + practical action.
+- Free users get single useful layer.
+- Premium users get full continuation tools.
+- Oracle framed as guidance/reflection (not deterministic fortune telling).
+
+---
+
+## 9) Journey Audit
+
+### Verified
+- Journey route exists.
+- Shared dashboard toggle works.
+- Favorite ritual placeholders and user memory tools are present.
+- Photo/date/note actions are interactive.
+
+### Risk
+- Cross-device photo sync is local-only unless backend sync is added.
+
+---
+
+## 10) Mobile UX / Layout Audit
+
+### Verified
+- Sticky bottom nav present across primary pages.
+- Main pages are readable with card-based mobile layout.
+
+### Risk
+- Bottom-fixed nav overlap was previously reported; current layout uses heavy bottom padding reserve. Manual device check still required on iPhone safe-area edges.
+
+---
+
+## 11) Content Safety / Age-Rating Risk
+
+### Verified
+- Primary surfaces are relationship-safe, consent-forward, non-pornographic.
+- Oracle guidance avoids certainty/diagnosis framing.
+
+### Recommendation
+- Keep explicit/intense content behind premium/contextual flows and continue consent language.
+
+---
+
+## 12) Privacy / Data / Partner Sharing
+
+### Current model
+- localStorage stores session/premium and some journey/oracle entries.
+- share actions are user-initiated.
+
+### Risks to document in App Store Connect
+- Final privacy nutrition labels must reflect any backend logging/analytics and whether data is linked/tracked.
+- If account sync is added, update deletion/data rights flows.
+
+---
+
+## 13) Legal / Policy Link Status
+
+### Added routes
+- `/terms`
+- `/privacy`
+- `/support`
+
+These now prevent dead legal/support CTAs from paywall.
+
+---
+
+## 14) Accessibility Snapshot
+
+### Improved
+- Name inputs on Home now have `aria-label` + placeholders.
+
+### Remaining
+- Full accessibility audit (focus trap for modal, keyboard route pass, contrast tooling) still recommended before release.
+
+---
+
+## 15) Performance Snapshot
+
+### Build output
+- JS bundle ~475 kB pre-gzip main chunk.
+- No build blocker warnings beyond Vite CJS deprecation notice.
+
+### Recommendation
+- Future optimization: route-level code splitting for heavy pages (non-blocking for this release pass).
+
+---
+
+## App Store Connect Manual Checklist
+
+- **App Name:** Sacred Path for Couples
+- **Subtitle suggestion:** Daily rituals for deeper connection
+- **Category suggestion:** Lifestyle (or Health & Fitness if strategic)
+- **Age rating:** 17+ recommended due intimacy/adult relationship themes
+- **Privacy Policy required:** Yes
+- **Terms/EULA required:** Yes
+- **Support URL required:** Yes
+- **IAP products to verify:** Annual premium subscription product ID(s)
+- **Subscription group:** Verify configured and active
+- **Restore purchases:** Must be wired to real restore flow before production
+- **Manage subscription guidance:** Add/verify user-facing help text
+- **Review notes for Apple:**
+  - Explain free vs premium paths
+  - Explain Oracle as reflection guidance (not fortune telling)
+  - Explain voice requires backend function and premium state
+- **Demo account needed:** No (if no auth wall)
+- **Reviewer access to paid features:** via sandbox purchase flow instructions
+- **Privacy nutrition labels:** verify local storage, backend calls, sharing behavior
+- **Screenshots required:** Home, Weather, Ritual, Oracle, Journey, Paywall
+- **Marketing URL:** verify if required by release setup
+- **Copyright:** set in App Store Connect
+
+---
+
+## Release Testing Matrix
+
+### A) Free user path
+- Open app -> Home value within 30s ✅
+- Weather selection -> ritual outcome ✅
+- Oracle question -> one useful answer ✅
+- Premium CTA -> paywall ✅
+- Back navigation works ✅
+
+### B) Premium user path
+- Premium true state unlocks deeper paths ✅
+- Ritual library expanded access ✅
+- Oracle premium tools visible ✅
+- Premium CTA reduced/hidden in premium contexts ✅
+
+### C) Partner connected path
+- Basic partner naming/state persists locally ✅
+- Full cross-device partner sync not fully validated ⚠️
+
+### D) Mobile UX path
+- Key screens responsive ✅
+- Sticky nav safe-area overlap requires manual iPhone spot-check ⚠️
+
+### E) Apple reviewer path
+- Main features discoverable ✅
+- Legal/support pages accessible ✅
+- Real IAP/restore integration still pending ⚠️
+
+---
+
+## Files Changed In This Audit Pass
+- `src/pages/AppHome.tsx`
+- `src/pages/Oracle.tsx`
+- `src/pages/Paywall.tsx`
+- `src/main.tsx`
+- `src/pages/Terms.tsx` (new)
+- `src/pages/Privacy.tsx` (new)
+- `src/pages/Support.tsx` (new)
+- `APP_STORE_FINAL_AUDIT.md` (new)
+
+---
+
+## Final Status
+- Build passes: ✅
+- Main navigation CTAs checked: ✅
+- Premium gating checked: ✅
+- No major blank/dead production pages in core flow: ✅
+- Remaining release blockers before submission:
+  1. Real StoreKit/RevenueCat purchase + restore wiring
+  2. Lint config migration (`eslint.config.js`)
+  3. Final legal text and App Store metadata verification

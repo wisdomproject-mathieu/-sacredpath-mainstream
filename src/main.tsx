@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import "./index.css";
 
@@ -15,6 +15,9 @@ import Voice from "./pages/Voice";
 import IntimacyOracle from "./pages/IntimacyOracle";
 import Journey from "./pages/Journey";
 import Connect from "./pages/Connect";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Support from "./pages/Support";
 import { SessionProvider } from "./contexts/SessionContext";
 
 function ScrollToTop() {
@@ -43,6 +46,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/intimacy-oracle" element={<IntimacyOracle />} />
           <Route path="/journey" element={<Journey />} />
           <Route path="/connect" element={<Connect />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/support" element={<Support />} />
         </Routes>
       </BrowserRouter>
     </SessionProvider>

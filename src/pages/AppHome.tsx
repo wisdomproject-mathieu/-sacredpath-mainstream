@@ -64,6 +64,7 @@ export default function AppHome() {
   const navigate = useNavigate();
   const [hasPremium, setHasPremium] = useState(isPremium());
   const didResetRef = useRef(false);
+  const showDevPremiumToggle = import.meta.env?.VITE_ENABLE_DEV_PREMIUM_TOGGLE === "true";
 
   const [stage, setStage] = useState<HomeCheckinStage>("me");
 
@@ -160,19 +161,21 @@ export default function AppHome() {
           </button>
         </section>
 
-        <section className="rounded-2xl border border-white/10 bg-card p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-accent">Testing mode</p>
-          <p className="mt-1 text-sm text-muted">
-            Current access: <span className="font-semibold text-text">{hasPremium ? "Premium" : "Free"}</span>
-          </p>
-          <button
-            type="button"
-            onClick={togglePremiumMode}
-            className="mt-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold hover:bg-white/10"
-          >
-            Switch to {hasPremium ? "Free" : "Premium"}
-          </button>
-        </section>
+        {showDevPremiumToggle ? (
+          <section className="rounded-2xl border border-white/10 bg-card p-4">
+            <p className="text-xs uppercase tracking-[0.16em] text-accent">Testing mode</p>
+            <p className="mt-1 text-sm text-muted">
+              Current access: <span className="font-semibold text-text">{hasPremium ? "Premium" : "Free"}</span>
+            </p>
+            <button
+              type="button"
+              onClick={togglePremiumMode}
+              className="mt-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold hover:bg-white/10"
+            >
+              Switch to {hasPremium ? "Free" : "Premium"}
+            </button>
+          </section>
+        ) : null}
 
         <section className="rounded-[22px] border border-white/10 bg-card p-4 md:p-5">
           <div className="grid gap-3 sm:grid-cols-2">
@@ -180,6 +183,8 @@ export default function AppHome() {
               <input
                 value={state.youName ?? ""}
                 onChange={(e) => setState({ ...state, youName: e.target.value })}
+                aria-label="Your name"
+                placeholder="Me"
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-text outline-none transition focus:border-accent/60"
               />
             </label>
@@ -187,6 +192,8 @@ export default function AppHome() {
               <input
                 value={state.partnerName ?? ""}
                 onChange={(e) => setState({ ...state, partnerName: e.target.value })}
+                aria-label="Partner name"
+                placeholder="Partner"
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-text outline-none transition focus:border-accent/60"
               />
             </label>

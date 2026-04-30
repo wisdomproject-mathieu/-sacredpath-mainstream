@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Layout from "../components/Layout";
 import Card from "../components/Card";
 import Button from "../components/Button";
@@ -122,8 +122,15 @@ export default function Paywall() {
             >
               Restore purchases
             </Button>
-            <Button variant="secondary" onClick={() => window.open("/terms", "_blank")}>Terms of Use</Button>
-            <Button variant="secondary" onClick={() => window.open("/privacy", "_blank")}>Privacy Policy</Button>
+            <Link to="/terms" className="block">
+              <Button variant="secondary">Terms of Use</Button>
+            </Link>
+            <Link to="/privacy" className="block">
+              <Button variant="secondary">Privacy Policy</Button>
+            </Link>
+            <Link to="/support" className="block sm:col-span-2">
+              <Button variant="secondary">Support</Button>
+            </Link>
           </div>
           {restoreMessage ? <p className="text-xs text-muted text-center">{restoreMessage}</p> : null}
           <p className="text-center text-xs text-muted">
