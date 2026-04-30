@@ -26,8 +26,8 @@ function toState(value: string | undefined): WeatherState | undefined {
 
 const pacingLabel: Record<VoicePacing, string> = {
   quick: "Quick guidance",
-  deep: "Deep guidance",
-  silent: "Silent integration",
+  standard: "Standard guidance",
+  slow: "Slow integration",
 };
 
 export default function Voice() {
@@ -35,7 +35,7 @@ export default function Voice() {
   const { state } = useSession();
   const [search] = useSearchParams();
   const [voiceStyle, setVoiceStyle] = useState<VoiceStyle>("warm");
-  const [pacing, setPacing] = useState<VoicePacing>("deep");
+  const [pacing, setPacing] = useState<VoicePacing>("standard");
   const [status, setStatus] = useState<"idle" | "playing" | "paused">("idle");
   const [notice, setNotice] = useState("");
 
@@ -47,29 +47,23 @@ export default function Voice() {
   const freeDaily = getDailyFreeRitual(new Date(), you, partner);
   const activeRitual = queryRitual ?? (hasPremium ? tonightRitual : freeDaily);
 
-  const estGuidedMinutes = useMemo(() => {
-    const baseWords =
-      activeRitual.title.split(" ").length +
-      activeRitual.subtitle.split(" ").length +
-      activeRitual.setup.join(" ").split(" ").length +
-      activeRitual.steps.join(" ").split(" ").length +
-      activeRitual.closing.split(" ").length +
-      activeRitual.reflectionPrompt.split(" ").length;
-    const speakMs = baseWords * 430;
-    const pauseMs =
-      (pacing === "quick" ? 3 + 3 + 8 + activeRitual.steps.length * 15 + 8 : pacing === "deep" ? 5 + 5 + 15 + activeRitual.steps.length * 30 + 15 : 8 + 8 + 20 + activeRitual.steps.length * 45 + 20) *
-      1000;
-    return Math.max(2, Math.round((speakMs + pauseMs) / 60000));
-  }, [activeRitual, pacing]);
+  const guidedSummary = useMemo(() => {
+    if (pacing === "quick") return "Shorter pauses between steps";
+    if (pacing === "slow") return "Long reflective pauses between steps";
+    return "Balanced pacing with space to feel each step";
+  }, [pacing]);
 
   const onPlay = async () => {
     setNotice("");
     try {
-      await speakRitualGuide(
+      const result = await speakRitualGuide(
         activeRitual,
         { voiceStyle, pacing, includeIntro: true, includeClosing: true },
         setStatus,
       );
+      if (result.usingFallback) {
+        setNotice("Using device voice for this session.");
+      }
     } catch {
       setNotice("Using device voice for this session.");
     }
@@ -103,9 +97,7 @@ export default function Voice() {
           </p>
           <h2 className="font-serif text-2xl">{activeRitual.title}</h2>
           <p className="text-sm text-muted">{activeRitual.subtitle}</p>
-          <p className="text-xs text-muted">
-            Level {activeRitual.level} · {activeRitual.category} · est. {estGuidedMinutes} min guided
-          </p>
+          <p className="text-xs text-muted">Level {activeRitual.level} · {activeRitual.category}</p>
         </Card>
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -129,7 +121,7 @@ export default function Voice() {
           <Card>
             <p className="text-xs uppercase tracking-[0.16em] text-accent mb-2">Pacing</p>
             <div className="grid gap-2">
-              {(["quick", "deep", "silent"] as const).map((mode) => (
+              {(["quick", "standard", "slow"] as const).map((mode) => (
                 <button
                   key={mode}
                   onClick={() => setPacing(mode)}
@@ -141,6 +133,7 @@ export default function Voice() {
                 </button>
               ))}
             </div>
+            <p className="mt-2 text-xs text-muted">{guidedSummary}</p>
           </Card>
         </div>
 
@@ -191,4 +184,3 @@ export default function Voice() {
     </Layout>
   );
 }
-
