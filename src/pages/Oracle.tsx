@@ -230,7 +230,7 @@ export default function Oracle() {
 
   const getOracleSegments = (card = selectedCard, inputQuestion = question) => {
     const promptSummary = summarizeQuestion(inputQuestion);
-    return [
+    const baseSegments = [
       { text: "Hello love.", pauseAfterMs: 2800 },
       { text: "Thank you for coming to the Intimacy Oracle.", pauseAfterMs: 3200 },
       { text: `I can feel the heart of your question about ${promptSummary}.`, pauseAfterMs: 2600 },
@@ -242,6 +242,27 @@ export default function Oracle() {
       { text: `For you: ${card.forYou}`, pauseAfterMs: 3600 },
       { text: `For your partner: ${card.forPartner}`, pauseAfterMs: 3600 },
       { text: `Tonight's action: ${card.action}`, pauseAfterMs: 4200 },
+    ];
+
+    if (hasPremium && card.premiumRitual) {
+      const ritualSegments = [
+        { text: "Now we gently transition into your full ritual.", pauseAfterMs: 3000 },
+        { text: `Full ritual: ${card.premiumRitual.title}.`, pauseAfterMs: 3200 },
+        ...card.premiumRitual.steps.map((step, index) => ({
+          text: `Step ${index + 1}. ${step}`,
+          pauseAfterMs: 4200,
+        })),
+      ];
+      return [
+        ...baseSegments,
+        ...ritualSegments,
+        { text: "Move slowly, and pause where it matters most.", pauseAfterMs: 3200 },
+      ];
+    }
+
+    return [
+      ...baseSegments,
+      { text: "If you want the full ritual guidance, you can unlock premium and continue together.", pauseAfterMs: 3200 },
       { text: "Move slowly, and pause where it matters most.", pauseAfterMs: 3200 },
     ];
   };
