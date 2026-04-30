@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import Card from "../components/Card";
 import Button from "../components/Button";
@@ -100,15 +100,23 @@ export default function Oracle() {
       return;
     }
 
+    let chosenCardForVoice = selectedCard;
+
     if (!hasPremium) {
       const raw = window.localStorage.getItem(DAILY_KEY);
       const parsed = raw ? (JSON.parse(raw) as { date: string; cardId: string; question: string } | null) : null;
       const today = todayKey();
 
       if (parsed && parsed.date === today) {
+        const existingCard = intimacyOracleCards.find((card) => card.id === parsed.cardId);
         setRevealedCardId(parsed.cardId);
         setNotice("Your free Oracle answer for today is already open.");
         setRevealed(true);
+        if (existingCard) {
+          window.setTimeout(() => {
+            void startOracleVoice(existingCard, question);
+          }, 120);
+        }
         return;
       }
 
@@ -118,6 +126,7 @@ export default function Oracle() {
         partnerWeather,
         recentOracleCardIds: recentIds,
       });
+      chosenCardForVoice = chosen;
 
       window.localStorage.setItem(
         DAILY_KEY,
@@ -135,10 +144,14 @@ export default function Oracle() {
       const nextRecent = [...recentIds.filter((id) => id !== selectedCard.id), selectedCard.id].slice(-10);
       window.localStorage.setItem(RECENT_KEY, JSON.stringify(nextRecent));
       setRevealedCardId(selectedCard.id);
+      chosenCardForVoice = selectedCard;
     }
 
     setNotice("");
     setRevealed(true);
+    window.setTimeout(() => {
+      void startOracleVoice(chosenCardForVoice, question);
+    }, 120);
   };
 
   const saveToJourney = () => {
@@ -215,25 +228,25 @@ export default function Oracle() {
     setVoiceStatus("idle");
   };
 
-  const getOracleSegments = () => {
-    const promptSummary = summarizeQuestion(question);
+  const getOracleSegments = (card = selectedCard, inputQuestion = question) => {
+    const promptSummary = summarizeQuestion(inputQuestion);
     return [
-      { text: "Hello love.", pauseAfterMs: 1800 },
-      { text: "Thank you for coming to the Intimacy Oracle.", pauseAfterMs: 2200 },
+      { text: "Hello love.", pauseAfterMs: 2800 },
+      { text: "Thank you for coming to the Intimacy Oracle.", pauseAfterMs: 3200 },
       { text: `I can feel the heart of your question about ${promptSummary}.`, pauseAfterMs: 2600 },
-      { text: `I found a good ritual to practice with your partner. It is called ${selectedCard.title}.`, pauseAfterMs: 3000 },
-      { text: selectedCard.meaning, pauseAfterMs: 2800 },
-      { text: selectedCard.message, pauseAfterMs: 3400 },
-      { text: "Please sit comfortably now.", pauseAfterMs: 2000 },
-      { text: "Take one slow breath in, and a slower breath out.", pauseAfterMs: 3000 },
-      { text: `For you: ${selectedCard.forYou}`, pauseAfterMs: 2600 },
-      { text: `For your partner: ${selectedCard.forPartner}`, pauseAfterMs: 2800 },
-      { text: `Tonight's action: ${selectedCard.action}`, pauseAfterMs: 3200 },
-      { text: "Move slowly, and pause where it matters most.", pauseAfterMs: 2000 },
+      { text: `I found a good ritual to practice with your partner. It is called ${card.title}.`, pauseAfterMs: 4200 },
+      { text: card.meaning, pauseAfterMs: 3800 },
+      { text: card.message, pauseAfterMs: 5200 },
+      { text: "Please sit comfortably now.", pauseAfterMs: 3000 },
+      { text: "Take one slow breath in, and a slower breath out.", pauseAfterMs: 4200 },
+      { text: `For you: ${card.forYou}`, pauseAfterMs: 3600 },
+      { text: `For your partner: ${card.forPartner}`, pauseAfterMs: 3600 },
+      { text: `Tonight's action: ${card.action}`, pauseAfterMs: 4200 },
+      { text: "Move slowly, and pause where it matters most.", pauseAfterMs: 3200 },
     ];
   };
 
-  const playBackendSegment = async () => {
+  const playBackendSegment = async (card = selectedCard) => {
     if (voiceModeRef.current !== "backend") return;
     const segment = speechSegmentsRef.current[segmentIndexRef.current];
     if (!segment) {
@@ -243,7 +256,7 @@ export default function Oracle() {
     }
     try {
       const tts = await synthesizeGuidedVoiceAudio({
-        sessionId: `oracle-${selectedCard.id}-${Date.now()}-${segmentIndexRef.current}`,
+        sessionId: `oracle-${card.id}-${Date.now()}-${segmentIndexRef.current}`,
         text: segment.text,
         voiceStyle: "calm",
       });
@@ -255,7 +268,7 @@ export default function Oracle() {
         queueTimerRef.current = window.setTimeout(() => {
           if (voiceModeRef.current !== "backend") return;
           segmentIndexRef.current += 1;
-          void playBackendSegment();
+          void playBackendSegment(card);
         }, segment.pauseAfterMs);
       };
       audio.onerror = () => {
@@ -311,18 +324,18 @@ export default function Oracle() {
     window.speechSynthesis.speak(utterance);
   };
 
-  const startOracleVoice = async () => {
+  const startOracleVoice = async (card = selectedCard, inputQuestion = question) => {
     if (typeof window === "undefined") {
       setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
       return;
     }
     stopOracleVoice();
     setVoiceStatus("playing");
-    speechSegmentsRef.current = getOracleSegments();
+    speechSegmentsRef.current = getOracleSegments(card, inputQuestion);
     segmentIndexRef.current = 0;
 
     voiceModeRef.current = "backend";
-    void playBackendSegment();
+    void playBackendSegment(card);
   };
 
   const pauseOracleVoice = () => {
@@ -443,15 +456,9 @@ export default function Oracle() {
                 ) : null}
 
                 <div className="grid gap-2 sm:grid-cols-2">
-                  <Link
-                    to="/ritual"
-                    className="rounded-full border border-white/15 bg-white/5 px-4 py-3 text-center text-sm font-semibold hover:bg-white/10"
-                  >
-                    Start Full Ritual
-                  </Link>
                   <button
                     type="button"
-                    onClick={startOracleVoice}
+                    onClick={() => void startOracleVoice(selectedCard, question)}
                     className="rounded-full border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold hover:bg-white/10"
                   >
                     Listen with Sacred Voice

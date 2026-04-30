@@ -14,6 +14,16 @@ type DateEntry = {
   note: string;
 };
 
+type OracleEntry = {
+  date: string;
+  question: string;
+  cardTitle: string;
+  message: string;
+  action: string;
+  userWeather?: string | null;
+  partnerWeather?: string | null;
+};
+
 export default function Journey() {
   const [searchParams] = useSearchParams();
   const hasPremium = isPremium();
@@ -25,6 +35,8 @@ export default function Journey() {
   const [dateNoteInput, setDateNoteInput] = useState("");
   const [specialDates, setSpecialDates] = useState<DateEntry[]>([]);
   const [note, setNote] = useState("");
+  const [savedNotes, setSavedNotes] = useState<string[]>([]);
+  const [oracleEntries, setOracleEntries] = useState<OracleEntry[]>([]);
   const [toast, setToast] = useState("");
 
   useEffect(() => {
@@ -33,7 +45,11 @@ export default function Journey() {
       const storedRituals = JSON.parse(window.localStorage.getItem("sp-journey-favorite-rituals") ?? "[]");
       const storedPhotos = JSON.parse(window.localStorage.getItem("sp-journey-photos") ?? "[]");
       const storedDates = JSON.parse(window.localStorage.getItem("sp-journey-dates") ?? "[]");
+      const storedNotes = JSON.parse(window.localStorage.getItem("sp-journey-notes") ?? "[]");
+      const storedOracle = JSON.parse(window.localStorage.getItem("sacredpath-journey-oracle") ?? "[]");
       setFavoriteRituals(Array.isArray(storedRituals) ? storedRituals : []);
+      setSavedNotes(Array.isArray(storedNotes) ? storedNotes : []);
+      setOracleEntries(Array.isArray(storedOracle) ? storedOracle : []);
       const normalizedPhotos = Array.isArray(storedPhotos)
         ? storedPhotos
             .map((item: unknown, index: number) =>
@@ -65,6 +81,8 @@ export default function Journey() {
       setFavoriteRituals([]);
       setPhotoItems([]);
       setSpecialDates([]);
+      setSavedNotes([]);
+      setOracleEntries([]);
     }
   }, []);
 
@@ -151,6 +169,24 @@ export default function Journey() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  const saveWhisperNote = () => {
+    const trimmed = note.trim();
+    if (!trimmed) return;
+    const next = [trimmed, ...savedNotes].slice(0, 40);
+    setSavedNotes(next);
+    persist("sp-journey-notes", next);
+    setToast("Secret note saved.");
+    window.setTimeout(() => setToast(""), 1800);
+  };
+
+  const removeSavedNote = (value: string) => {
+    const next = savedNotes.filter((item) => item !== value);
+    setSavedNotes(next);
+    persist("sp-journey-notes", next);
+    setToast("Secret note removed.");
+    window.setTimeout(() => setToast(""), 1800);
+  };
+
   return (
     <Layout>
       <div className="max-w-5xl mx-auto space-y-6">
@@ -233,6 +269,9 @@ export default function Journey() {
                 placeholder="Write a whisper or gratitude note..."
                 className="min-h-24 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
               />
+              <Button variant="secondary" onClick={saveWhisperNote}>
+                Add secret note
+              </Button>
               <button
                 type="button"
                 onClick={sendWhatsApp}
@@ -240,6 +279,45 @@ export default function Journey() {
               >
                 WA your beloved one
               </button>
+              <div className="space-y-2">
+                {savedNotes.length === 0 ? (
+                  <p className="text-sm text-muted">No saved secret notes yet.</p>
+                ) : (
+                  savedNotes.slice(0, 6).map((entry, index) => (
+                    <div key={`${entry}-${index}`} className="flex items-start justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                      <p className="text-sm">{entry}</p>
+                      <button
+                        type="button"
+                        onClick={() => removeSavedNote(entry)}
+                        className="rounded-full border border-white/15 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </Card>
+
+            <Card className="space-y-3 md:col-span-2">
+              <h2 className="font-serif text-2xl">Saved Oracle guidance</h2>
+              <p className="text-sm text-muted">
+                Oracle cards saved from Intimacy Oracle appear here.
+              </p>
+              <div className="space-y-2">
+                {oracleEntries.length === 0 ? (
+                  <p className="text-sm text-muted">No Oracle guidance saved yet.</p>
+                ) : (
+                  oracleEntries.slice(0, 8).map((entry, index) => (
+                    <div key={`${entry.cardTitle}-${entry.date}-${index}`} className="rounded-xl border border-white/10 bg-white/5 px-3 py-3">
+                      <p className="text-xs uppercase tracking-[0.15em] text-accent">{entry.cardTitle}</p>
+                      {entry.question ? <p className="mt-1 text-sm text-muted">Question: {entry.question}</p> : null}
+                      <p className="mt-1 text-sm">{entry.message}</p>
+                      <p className="mt-1 text-sm text-accent">Action: {entry.action}</p>
+                    </div>
+                  ))
+                )}
+              </div>
             </Card>
 
             <Card className="space-y-3">
