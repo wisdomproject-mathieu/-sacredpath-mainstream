@@ -51,6 +51,14 @@ export default function Rituals() {
   const renderInlineDetails = (ritual: Ritual) => {
     const locked = !hasPremium && ritual.id !== freeToday.id && ritual.tier === "premium";
     if (locked) return null;
+    const saveFavorite = () => {
+      if (typeof window === "undefined") return;
+      const key = "sp-journey-favorite-rituals";
+      const previous = JSON.parse(window.localStorage.getItem(key) ?? "[]") as string[];
+      const next = [ritual.title, ...previous.filter((item) => item !== ritual.title)].slice(0, 30);
+      window.localStorage.setItem(key, JSON.stringify(next));
+    };
+
     return (
       <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-3">
         <p className="text-sm">{ritual.intro}</p>
@@ -63,6 +71,17 @@ export default function Rituals() {
           ))}
         </div>
         <p className="text-sm text-muted">{ritual.closing}</p>
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={saveFavorite}
+            aria-label="Save ritual to favorite rituals in Intimacy Journey"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-accent/50 bg-accent/10 text-lg leading-none text-accent transition hover:bg-accent/20"
+            title="Save to favorite rituals"
+          >
+            ♥
+          </button>
+        </div>
       </div>
     );
   };

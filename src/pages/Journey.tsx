@@ -117,7 +117,7 @@ export default function Journey() {
         {showDashboard ? (
           <div className="grid gap-4 md:grid-cols-2">
             <Card className="space-y-3">
-              <h2 className="font-serif text-2xl">Favorite rituals (saved to Journey)</h2>
+              <h2 className="font-serif text-2xl">Favorite rituals</h2>
               <div className="flex gap-2">
                 <input
                   value={ritualInput}
