@@ -80,19 +80,22 @@ export async function synthesizeGuidedVoiceAudio({
 
   const endpoint = getTtsEndpoint();
   const publishableKey = getSupabasePublishableKey();
-  if (!endpoint || !publishableKey) {
+  if (!endpoint) {
     throw new Error("Guided voice backend is not configured.");
   }
 
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  // Optional only: some deployments keep the function public and do not require apikey.
+  if (publishableKey) headers.apikey = publishableKey;
+
   const response = await fetch(endpoint, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      apikey: publishableKey,
-    },
+    headers,
     body: JSON.stringify({
       text,
-      provider: "auto",
+      provider: "google",
       lang: "en",
       voiceStyle,
     }),
@@ -119,4 +122,3 @@ export async function synthesizeGuidedVoiceAudio({
     fromCache: false,
   };
 }
-
