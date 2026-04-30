@@ -5,7 +5,7 @@ import BrandHeader from "../components/BrandHeader";
 import SubscribeButton from "../components/SubscribeButton";
 import { useSession } from "../contexts/SessionContext";
 import { getTonightPath } from "../lib/tonightPath";
-import { isPremium } from "../lib/premium";
+import { isPremium, setPremiumForTesting } from "../lib/premium";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
 import {
   getDisplayName,
@@ -62,7 +62,7 @@ function SmallWeatherCard({
 export default function AppHome() {
   const { state, setState } = useSession();
   const navigate = useNavigate();
-  const hasPremium = isPremium();
+  const [hasPremium, setHasPremium] = useState(isPremium());
   const didResetRef = useRef(false);
 
   const [stage, setStage] = useState<HomeCheckinStage>("me");
@@ -109,6 +109,12 @@ export default function AppHome() {
     setStage("complete");
   };
 
+  const togglePremiumMode = () => {
+    const next = !hasPremium;
+    setPremiumForTesting(next);
+    setHasPremium(next);
+  };
+
   return (
     <Layout showHeader={false}>
       <div className="mx-auto max-w-6xl space-y-6 md:space-y-8">
@@ -151,6 +157,20 @@ export default function AppHome() {
           >
             <p className="font-serif text-2xl">Browse rituals</p>
             <p className="mt-1 text-sm text-muted">Explore the library by time, mood, and focus.</p>
+          </button>
+        </section>
+
+        <section className="rounded-2xl border border-white/10 bg-card p-4">
+          <p className="text-xs uppercase tracking-[0.16em] text-accent">Testing mode</p>
+          <p className="mt-1 text-sm text-muted">
+            Current access: <span className="font-semibold text-text">{hasPremium ? "Premium" : "Free"}</span>
+          </p>
+          <button
+            type="button"
+            onClick={togglePremiumMode}
+            className="mt-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold hover:bg-white/10"
+          >
+            Switch to {hasPremium ? "Free" : "Premium"}
           </button>
         </section>
 

@@ -7,7 +7,7 @@ import BackButton from "../components/BackButton";
 import SubscribeButton from "../components/SubscribeButton";
 import { isPremium } from "../lib/premium";
 import { useSession } from "../contexts/SessionContext";
-import { getIntimacyOracleRecommendation, type OracleEnergy, type OracleNeed, type OracleTime } from "../lib/intimacyOracle";
+import { getIntimacyOracleRecommendation, type OracleEnergy, type OracleNeed } from "../lib/intimacyOracle";
 import type { WeatherState } from "../lib/weatherPair";
 
 const DAY_KEY = "sacredpath-oracle-reco-day";
@@ -27,13 +27,6 @@ const ENERGY_OPTIONS: Array<{ id: OracleEnergy; label: string }> = [
   { id: "high", label: "High — we want something deeper" },
 ];
 
-const TIME_OPTIONS: Array<{ id: OracleTime; label: string }> = [
-  { id: "5", label: "5 minutes" },
-  { id: "15", label: "10–15 minutes" },
-  { id: "30", label: "20–30 minutes" },
-  { id: "longer", label: "Longer tonight" },
-];
-
 function toState(value: string | undefined): WeatherState | undefined {
   if (!value) return undefined;
   if (["sunny", "warm", "electric", "foggy", "frozen", "stormy"].includes(value)) return value as WeatherState;
@@ -45,7 +38,6 @@ export default function Oracle() {
   const { state } = useSession();
   const [need, setNeed] = useState<OracleNeed>("feel-close");
   const [energy, setEnergy] = useState<OracleEnergy>("medium");
-  const [time, setTime] = useState<OracleTime>("15");
   const [revealed, setRevealed] = useState(false);
   const [notice, setNotice] = useState("");
 
@@ -56,12 +48,12 @@ export default function Oracle() {
       getIntimacyOracleRecommendation({
         need,
         energy,
-        time,
+        time: "15",
         weatherA,
         weatherB,
         isPremium: hasPremium,
       }),
-    [need, energy, time, weatherA, weatherB, hasPremium],
+    [need, energy, weatherA, weatherB, hasPremium],
   );
 
   const reveal = () => {
@@ -89,7 +81,7 @@ export default function Oracle() {
       title: recommendation.ritual.title,
       need,
       energy,
-      time,
+      time: "15",
     };
     window.localStorage.setItem(key, JSON.stringify([entry, ...previous].slice(0, 120)));
     setNotice("Saved to Journey.");
@@ -134,24 +126,6 @@ export default function Oracle() {
                 onClick={() => setEnergy(item.id)}
                 className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
                   energy === item.id ? "border-accent/80 bg-accent/15" : "border-white/20 bg-white/5 hover:bg-white/10"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </Card>
-
-        <Card className="space-y-3">
-          <p className="text-xs uppercase tracking-[0.16em] text-accent">How much time do you have?</p>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {TIME_OPTIONS.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setTime(item.id)}
-                className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
-                  time === item.id ? "border-accent/80 bg-accent/15" : "border-white/20 bg-white/5 hover:bg-white/10"
                 }`}
               >
                 {item.label}
@@ -215,4 +189,3 @@ export default function Oracle() {
     </Layout>
   );
 }
-
