@@ -28,7 +28,7 @@ export default function RitualCard({ ritual, selected, locked, isFreeToday, onCl
         </p>
         <p className="mt-2 text-lg font-semibold">{ritual.title}</p>
         <p className="text-sm text-muted mt-1">{ritual.subtitle}</p>
-        <p className="text-xs text-muted mt-2">{ritual.durationMinutes} min · {ritual.intensity} · {ritual.category}</p>
+        <p className="text-xs text-muted mt-2 capitalize">{ritual.intensity} · {ritual.category}</p>
       </div>
       {locked ? (
         <div className="absolute inset-0 bg-black/45 grid place-items-center text-center">

@@ -142,7 +142,7 @@ export default function Oracle() {
             <h2 className="font-serif text-3xl">{recommendation.ritual.title}</h2>
             <p className="text-muted">{recommendation.ritual.subtitle}</p>
             <p className="text-xs text-muted">
-              {recommendation.ritual.durationMinutes} min · level {recommendation.ritual.level} · {recommendation.ritual.category}
+              level {recommendation.ritual.level} · {recommendation.ritual.category}
             </p>
             <p className="text-sm">{recommendation.reason}</p>
 
