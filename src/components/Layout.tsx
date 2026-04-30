@@ -11,14 +11,17 @@ interface LayoutProps {
 export default function Layout({ children, showHeader = true, className = "" }: LayoutProps) {
   return (
     <div className={`sp-page ${className}`.trim()}>
-      <div className="sp-container">
+      <div className="sp-container pb-28 md:pb-32">
         {showHeader ? <BrandHeader className="mb-8" /> : null}
         <main>{children}</main>
-        <nav className="mt-10 grid grid-cols-5 gap-2 rounded-2xl border border-white/10 bg-white/5 p-2">
+        <nav
+          className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-[#0f0d1b]/95 px-3 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2 backdrop-blur md:px-4"
+          aria-label="Primary navigation"
+        >
+          <div className="mx-auto grid max-w-3xl grid-cols-4 gap-2 rounded-2xl border border-white/10 bg-white/5 p-2">
           {[
             { to: "/", label: "Home" },
             { to: "/rituals", label: "Rituals" },
-            { to: "/voice", label: "Voice" },
             { to: "/oracle", label: "Oracle" },
             { to: "/journey", label: "Journey" },
           ].map((item) => (
@@ -34,6 +37,7 @@ export default function Layout({ children, showHeader = true, className = "" }: 
               {item.label}
             </NavLink>
           ))}
+          </div>
         </nav>
       </div>
     </div>

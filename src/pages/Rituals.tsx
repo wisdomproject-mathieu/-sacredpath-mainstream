@@ -163,26 +163,86 @@ export default function Rituals() {
               Showing <strong>{list.length}</strong> rituals from a library of <strong>{rituals.length}</strong>.
             </p>
 
-            <section className="rounded-2xl border border-white/10 bg-card p-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-              <select className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm" value={weather} onChange={(e) => setWeather(e.target.value as WeatherState | "all")}>
-                {WEATHER_FILTERS.map((item) => <option key={item} value={item}>{item === "all" ? "Weather: All" : `Weather: ${item}`}</option>)}
-              </select>
-              <select className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm" value={duration} onChange={(e) => setDuration((e.target.value === "all" ? "all" : Number(e.target.value)) as DurationFilter)}>
-                {DURATION_FILTERS.map((item) => <option key={String(item)} value={item}>{item === "all" ? "Duration: All" : `Duration: ${item} min`}</option>)}
-              </select>
-              <select className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm" value={goal} onChange={(e) => setGoal(e.target.value as GoalFilter)}>
-                {GOAL_FILTERS.map((item) => <option key={item} value={item}>{item === "all" ? "Goal: All" : `Goal: ${item}`}</option>)}
-              </select>
-              <select className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm" value={intensity} onChange={(e) => setIntensity(e.target.value as IntensityFilter)}>
-                {INTENSITY_FILTERS.map((item) => <option key={item} value={item}>{item === "all" ? "Intensity: All" : `Intensity: ${item}`}</option>)}
-              </select>
-              <select className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm" value={category} onChange={(e) => setCategory(e.target.value as CategoryFilter)}>
-                {CATEGORY_FILTERS.map((item) => <option key={item} value={item}>{item === "all" ? "Category: All" : `Category: ${item}`}</option>)}
-              </select>
+            <section className="rounded-2xl border border-white/10 bg-card p-4 space-y-3">
+              <div className="space-y-2">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Weather</p>
+                <div className="flex flex-wrap gap-2">
+                  {WEATHER_FILTERS.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setWeather(item)}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold capitalize ${weather === item ? "border-accent/70 bg-accent/15" : "border-white/15 bg-white/5 hover:bg-white/10"}`}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Duration</p>
+                <div className="flex flex-wrap gap-2">
+                  {DURATION_FILTERS.map((item) => (
+                    <button
+                      key={String(item)}
+                      type="button"
+                      onClick={() => setDuration(item)}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${duration === item ? "border-accent/70 bg-accent/15" : "border-white/15 bg-white/5 hover:bg-white/10"}`}
+                    >
+                      {item === "all" ? "all" : `${item} min`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Goal</p>
+                <div className="flex flex-wrap gap-2">
+                  {GOAL_FILTERS.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setGoal(item)}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold capitalize ${goal === item ? "border-accent/70 bg-accent/15" : "border-white/15 bg-white/5 hover:bg-white/10"}`}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Intensity</p>
+                <div className="flex flex-wrap gap-2">
+                  {INTENSITY_FILTERS.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setIntensity(item)}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold capitalize ${intensity === item ? "border-accent/70 bg-accent/15" : "border-white/15 bg-white/5 hover:bg-white/10"}`}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Category</p>
+                <div className="flex flex-wrap gap-2">
+                  {CATEGORY_FILTERS.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setCategory(item)}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold capitalize ${category === item ? "border-accent/70 bg-accent/15" : "border-white/15 bg-white/5 hover:bg-white/10"}`}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
                 placeholder="Search rituals..."
               />
             </section>

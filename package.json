@@ -7,7 +7,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "validate:rituals": "tsx scripts/validateRitualLibrary.ts"
+    "validate:rituals": "tsx scripts/validateRitualLibrary.ts",
+    "audit:buttons": "tsx scripts/auditButtons.ts"
   },
   "dependencies": {
     "picomatch": "^4.0.4",

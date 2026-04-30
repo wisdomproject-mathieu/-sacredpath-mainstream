@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import "./index.css";
 
@@ -12,7 +12,7 @@ import RitualSaved from "./pages/RitualSaved";
 import Deeper from "./pages/Deeper";
 import Paywall from "./pages/Paywall";
 import Voice from "./pages/Voice";
-import Oracle from "./pages/Oracle";
+import IntimacyOracle from "./pages/IntimacyOracle";
 import Journey from "./pages/Journey";
 import Connect from "./pages/Connect";
 import { SessionProvider } from "./contexts/SessionContext";
@@ -39,7 +39,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/deeper" element={<Deeper />} />
           <Route path="/paywall" element={<Paywall />} />
           <Route path="/voice" element={<Voice />} />
-          <Route path="/oracle" element={<Oracle />} />
+          <Route path="/oracle" element={<IntimacyOracle />} />
+          <Route path="/intimacy-oracle" element={<IntimacyOracle />} />
           <Route path="/journey" element={<Journey />} />
           <Route path="/connect" element={<Connect />} />
         </Routes>

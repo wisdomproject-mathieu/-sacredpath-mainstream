@@ -127,6 +127,33 @@ export default function AppHome() {
           </p>
         </header>
 
+        <section className="grid gap-3 md:grid-cols-3">
+          <button
+            type="button"
+            onClick={() => navigate("/weather")}
+            className="rounded-2xl border border-white/10 bg-card p-4 text-left transition hover:bg-white/10"
+          >
+            <p className="font-serif text-2xl">Check our weather</p>
+            <p className="mt-1 text-sm text-muted">Match a ritual to how you both feel.</p>
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate("/oracle")}
+            className="rounded-2xl border border-white/10 bg-card p-4 text-left transition hover:bg-white/10"
+          >
+            <p className="font-serif text-2xl">Ask the Intimacy Oracle</p>
+            <p className="mt-1 text-sm text-muted">Choose what you need tonight and get a guided ritual.</p>
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate("/rituals")}
+            className="rounded-2xl border border-white/10 bg-card p-4 text-left transition hover:bg-white/10"
+          >
+            <p className="font-serif text-2xl">Browse rituals</p>
+            <p className="mt-1 text-sm text-muted">Explore the library by time, mood, and focus.</p>
+          </button>
+        </section>
+
         <section className="rounded-[22px] border border-white/10 bg-card p-4 md:p-5">
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="space-y-2">

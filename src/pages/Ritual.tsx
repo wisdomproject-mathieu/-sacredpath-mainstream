@@ -121,7 +121,7 @@ export default function Ritual() {
             to={`/voice?ritualId=${encodeURIComponent(overrideRitual?.id ?? freeRitual.id)}`}
             className="block w-full rounded-full bg-white/5 border border-white/10 text-center py-3 px-6 font-semibold hover:bg-white/10 transition-colors"
           >
-            Play with Sacred Voice
+            Start guided mode
           </Link>
           <p className="text-sm sm:text-base text-muted leading-relaxed">
             Slow down, breathe together, and reconnect with intention.
