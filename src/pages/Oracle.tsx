@@ -46,6 +46,10 @@ export default function Oracle() {
   const [voiceStatus, setVoiceStatus] = useState<"idle" | "playing" | "paused">("idle");
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const speechSegmentsRef = useRef<Array<{ text: string; pauseAfterMs: number }>>([]);
+  const segmentIndexRef = useRef(0);
+  const voiceModeRef = useRef<"none" | "backend" | "browser">("none");
+  const queueTimerRef = useRef<number | null>(null);
 
   const userWeather = normalizeWeatherName(state.youWeatherTone ?? state.youWeather);
   const partnerWeather = normalizeWeatherName(state.partnerWeatherTone ?? state.partnerWeather);
@@ -192,6 +196,10 @@ export default function Oracle() {
   };
 
   const stopOracleVoice = () => {
+    if (queueTimerRef.current !== null) {
+      window.clearTimeout(queueTimerRef.current);
+      queueTimerRef.current = null;
+    }
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -201,7 +209,106 @@ export default function Oracle() {
       window.speechSynthesis.cancel();
     }
     utteranceRef.current = null;
+    speechSegmentsRef.current = [];
+    segmentIndexRef.current = 0;
+    voiceModeRef.current = "none";
     setVoiceStatus("idle");
+  };
+
+  const getOracleSegments = () => {
+    const promptSummary = summarizeQuestion(question);
+    return [
+      { text: "Hello love.", pauseAfterMs: 1800 },
+      { text: "Thank you for coming to the Intimacy Oracle.", pauseAfterMs: 2200 },
+      { text: `I can feel the heart of your question about ${promptSummary}.`, pauseAfterMs: 2600 },
+      { text: `I found a good ritual to practice with your partner. It is called ${selectedCard.title}.`, pauseAfterMs: 3000 },
+      { text: selectedCard.meaning, pauseAfterMs: 2800 },
+      { text: selectedCard.message, pauseAfterMs: 3400 },
+      { text: "Please sit comfortably now.", pauseAfterMs: 2000 },
+      { text: "Take one slow breath in, and a slower breath out.", pauseAfterMs: 3000 },
+      { text: `For you: ${selectedCard.forYou}`, pauseAfterMs: 2600 },
+      { text: `For your partner: ${selectedCard.forPartner}`, pauseAfterMs: 2800 },
+      { text: `Tonight's action: ${selectedCard.action}`, pauseAfterMs: 3200 },
+      { text: "Move slowly, and pause where it matters most.", pauseAfterMs: 2000 },
+    ];
+  };
+
+  const playBackendSegment = async () => {
+    if (voiceModeRef.current !== "backend") return;
+    const segment = speechSegmentsRef.current[segmentIndexRef.current];
+    if (!segment) {
+      setVoiceStatus("idle");
+      voiceModeRef.current = "none";
+      return;
+    }
+    try {
+      const tts = await synthesizeGuidedVoiceAudio({
+        sessionId: `oracle-${selectedCard.id}-${Date.now()}-${segmentIndexRef.current}`,
+        text: segment.text,
+        voiceStyle: "calm",
+      });
+      if (voiceModeRef.current !== "backend") return;
+      const audio = new Audio(tts.audioUrl);
+      audioRef.current = audio;
+      audio.onended = () => {
+        if (voiceModeRef.current !== "backend") return;
+        queueTimerRef.current = window.setTimeout(() => {
+          if (voiceModeRef.current !== "backend") return;
+          segmentIndexRef.current += 1;
+          void playBackendSegment();
+        }, segment.pauseAfterMs);
+      };
+      audio.onerror = () => {
+        setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
+        setVoiceStatus("idle");
+        voiceModeRef.current = "none";
+      };
+      await audio.play();
+    } catch {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        voiceModeRef.current = "browser";
+        playBrowserSegment();
+        return;
+      }
+      setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
+      setVoiceStatus("idle");
+      voiceModeRef.current = "none";
+    }
+  };
+
+  const playBrowserSegment = () => {
+    if (voiceModeRef.current !== "browser") return;
+    const segment = speechSegmentsRef.current[segmentIndexRef.current];
+    if (!segment) {
+      setVoiceStatus("idle");
+      voiceModeRef.current = "none";
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(segment.text);
+    utteranceRef.current = utterance;
+    utterance.rate = 0.72;
+    utterance.pitch = 0.93;
+    utterance.volume = 1;
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = ["Samantha", "Google UK English Female", "Karen", "Ava", "Google US English"];
+    const selected = preferred
+      .map((name) => voices.find((voice) => voice.name === name))
+      .find(Boolean) ?? voices.find((voice) => voice.lang?.toLowerCase().startsWith("en"));
+    if (selected) utterance.voice = selected;
+    utterance.onend = () => {
+      if (voiceModeRef.current !== "browser") return;
+      queueTimerRef.current = window.setTimeout(() => {
+        if (voiceModeRef.current !== "browser") return;
+        segmentIndexRef.current += 1;
+        playBrowserSegment();
+      }, segment.pauseAfterMs);
+    };
+    utterance.onerror = () => {
+      setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
+      setVoiceStatus("idle");
+      voiceModeRef.current = "none";
+    };
+    window.speechSynthesis.speak(utterance);
   };
 
   const startOracleVoice = async () => {
@@ -211,68 +318,18 @@ export default function Oracle() {
     }
     stopOracleVoice();
     setVoiceStatus("playing");
+    speechSegmentsRef.current = getOracleSegments();
+    segmentIndexRef.current = 0;
 
-    const promptSummary = summarizeQuestion(question);
-    const fullText = [
-      "Hello love.",
-      "Thank you for coming to the Intimacy Oracle.",
-      `I can feel the heart of your question about ${promptSummary}.`,
-      `I found a good ritual to practice with your partner. It is called ${selectedCard.title}.`,
-      selectedCard.meaning,
-      selectedCard.message,
-      "Please sit comfortably now.",
-      "Take one slow breath in, and a slower breath out.",
-      `For you: ${selectedCard.forYou}`,
-      `For your partner: ${selectedCard.forPartner}`,
-      `Tonight's action: ${selectedCard.action}`,
-      "Move slowly, and pause where it matters most.",
-    ].join(" ... ");
-
-    try {
-      const tts = await synthesizeGuidedVoiceAudio({
-        sessionId: `oracle-${selectedCard.id}-${Date.now()}`,
-        text: fullText,
-        voiceStyle: "calm",
-      });
-      const audio = new Audio(tts.audioUrl);
-      audioRef.current = audio;
-      audio.onended = () => setVoiceStatus("idle");
-      audio.onerror = () => {
-        setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
-        setVoiceStatus("idle");
-      };
-      await audio.play();
-      return;
-    } catch {
-      // fallback below
-    }
-
-    if (!("speechSynthesis" in window)) {
-      setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
-      setVoiceStatus("idle");
-      return;
-    }
-
-    const utterance = new SpeechSynthesisUtterance(fullText);
-    utteranceRef.current = utterance;
-    utterance.rate = 0.78;
-    utterance.pitch = 0.95;
-    utterance.volume = 1;
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = ["Samantha", "Google UK English Female", "Karen", "Ava", "Google US English"];
-    const selected = preferred
-      .map((name) => voices.find((voice) => voice.name === name))
-      .find(Boolean) ?? voices.find((voice) => voice.lang?.toLowerCase().startsWith("en"));
-    if (selected) utterance.voice = selected;
-    utterance.onend = () => setVoiceStatus("idle");
-    utterance.onerror = () => {
-      setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
-      setVoiceStatus("idle");
-    };
-    window.speechSynthesis.speak(utterance);
+    voiceModeRef.current = "backend";
+    void playBackendSegment();
   };
 
   const pauseOracleVoice = () => {
+    if (queueTimerRef.current !== null) {
+      window.clearTimeout(queueTimerRef.current);
+      queueTimerRef.current = null;
+    }
     if (audioRef.current) {
       audioRef.current.pause();
       setVoiceStatus("paused");
@@ -290,6 +347,11 @@ export default function Oracle() {
       return;
     }
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    if (voiceModeRef.current === "backend" && !audioRef.current) {
+      setVoiceStatus("playing");
+      void playBackendSegment();
+      return;
+    }
     setVoiceStatus("playing");
     window.speechSynthesis.resume();
   };
