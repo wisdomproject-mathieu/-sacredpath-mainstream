@@ -11,11 +11,11 @@ interface LayoutProps {
 export default function Layout({ children, showHeader = true, className = "" }: LayoutProps) {
   return (
     <div className={`sp-page ${className}`.trim()}>
-      <div className="sp-container pb-[calc(8.5rem+env(safe-area-inset-bottom))] md:pb-[calc(9.5rem+env(safe-area-inset-bottom))]">
+      <div className="sp-container pb-[calc(11rem+env(safe-area-inset-bottom))] md:pb-[calc(11.5rem+env(safe-area-inset-bottom))]">
         {showHeader ? <BrandHeader className="mb-8" /> : null}
         <main>{children}</main>
         <nav
-          className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-[#0f0d1b]/95 px-3 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2 backdrop-blur md:px-4"
+          className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-[#0f0d1b]/95 px-3 pb-[calc(env(safe-area-inset-bottom)+0.6rem)] pt-2 backdrop-blur md:px-4"
           aria-label="Primary navigation"
         >
           <div className="mx-auto grid max-w-3xl grid-cols-4 gap-2 rounded-2xl border border-white/10 bg-white/5 p-2">
