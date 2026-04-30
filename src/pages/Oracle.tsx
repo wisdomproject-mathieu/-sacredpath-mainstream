@@ -168,10 +168,10 @@ export default function Oracle() {
                 Start guided mode
               </Link>
               <Link
-                to={`/ritual?ritualId=${encodeURIComponent(recommendation.ritual.id)}`}
+                to="/deeper"
                 className="rounded-full border border-white/10 bg-white/5 px-4 py-3 text-center text-sm font-semibold hover:bg-white/10"
               >
-                Read ritual
+                Go deeper
               </Link>
               {hasPremium ? (
                 <Button variant="secondary" onClick={saveToJourney}>
