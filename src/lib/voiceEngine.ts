@@ -1,7 +1,8 @@
 import type { SacredPathRitual } from "../data/sacredPathRituals";
+import { synthesizeGuidedVoiceAudio } from "./guidedVoiceTts";
 
 export type VoiceStyle = "warm" | "calm" | "deep" | "soft";
-export type VoicePacing = "quick" | "deep" | "silent";
+export type VoicePacing = "quick" | "standard" | "slow";
 
 export type VoiceSegment = {
   id: string;
@@ -17,6 +18,12 @@ export type VoiceBuildOptions = {
   includeClosing?: boolean;
 };
 
+type VoiceStatus = "idle" | "playing" | "paused";
+
+type SpeakResult = {
+  usingFallback: boolean;
+};
+
 const PACING = {
   quick: {
     title: 3000,
@@ -25,19 +32,19 @@ const PACING = {
     step: 15000,
     closing: 8000,
   },
-  deep: {
+  standard: {
     title: 5000,
     subtitle: 5000,
-    setup: 15000,
+    setup: 12000,
+    step: 25000,
+    closing: 12000,
+  },
+  slow: {
+    title: 7000,
+    subtitle: 7000,
+    setup: 18000,
     step: 30000,
     closing: 15000,
-  },
-  silent: {
-    title: 8000,
-    subtitle: 8000,
-    setup: 20000,
-    step: 45000,
-    closing: 20000,
   },
 } as const;
 
@@ -47,15 +54,89 @@ let speaking = false;
 let paused = false;
 let stopped = false;
 let pauseTimer: number | null = null;
-let activeUtterance: SpeechSynthesisUtterance | null = null;
-let onStatus: ((status: "idle" | "playing" | "paused") => void) | undefined;
+let activeAudio: HTMLAudioElement | null = null;
+let fallbackMode = false;
+let activeSessionId = "";
+let activeVoiceStyle: VoiceStyle = "warm";
+let onStatus: ((status: VoiceStatus) => void) | undefined;
 
-function setStatus(status: "idle" | "playing" | "paused") {
+function setStatus(status: VoiceStatus) {
   onStatus?.(status);
 }
 
-function scheduleNext() {
-  if (stopped) return;
+function clearPauseTimer() {
+  if (pauseTimer !== null) {
+    window.clearTimeout(pauseTimer);
+    pauseTimer = null;
+  }
+}
+
+function scheduleNextAudio(sessionId: string, voiceStyle: VoiceStyle): void {
+  if (stopped || paused) return;
+  if (queueIndex >= queue.length) {
+    speaking = false;
+    setStatus("idle");
+    return;
+  }
+
+  const segment = queue[queueIndex];
+  void (async () => {
+    try {
+      const result = await synthesizeGuidedVoiceAudio({
+        sessionId: `${sessionId}-${segment.id}`,
+        text: segment.text,
+        voiceStyle,
+      });
+      if (stopped) return;
+      const audio = new Audio(result.audioUrl);
+      activeAudio = audio;
+
+      audio.onended = () => {
+        if (stopped) return;
+        clearPauseTimer();
+        pauseTimer = window.setTimeout(() => {
+          if (stopped || paused) return;
+          queueIndex += 1;
+          scheduleNextAudio(sessionId, voiceStyle);
+        }, segment.pauseAfterMs);
+      };
+
+      audio.onerror = () => {
+        // Trigger fallback by stopping this chain.
+        throw new Error("Audio playback failed");
+      };
+
+      await audio.play();
+    } catch (error) {
+      if (stopped) return;
+      console.warn("[Guided Voice] backend segment failed, switching to device voice", error);
+      fallbackMode = true;
+      void speakWithBrowserFallback(queue, onStatus, queueIndex);
+    }
+  })();
+}
+
+function pickFallbackVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
+  const preferred = [
+    "Samantha",
+    "Google UK English Female",
+    "Karen",
+    "Moira",
+    "Ava",
+    "Google US English",
+  ];
+
+  for (const name of preferred) {
+    const found = voices.find((v) => v.name === name);
+    if (found) return found;
+  }
+
+  const enVoice = voices.find((v) => v.lang?.toLowerCase().startsWith("en"));
+  return enVoice ?? voices[0] ?? null;
+}
+
+function scheduleNextFallback() {
+  if (stopped || paused) return;
   if (queueIndex >= queue.length) {
     speaking = false;
     setStatus("idle");
@@ -64,17 +145,23 @@ function scheduleNext() {
 
   const segment = queue[queueIndex];
   const utterance = new SpeechSynthesisUtterance(segment.text);
-  activeUtterance = utterance;
-  utterance.rate = 0.92;
-  utterance.pitch = 1;
+  const voices = window.speechSynthesis.getVoices();
+  const picked = pickFallbackVoice(voices);
+  if (picked) utterance.voice = picked;
+  utterance.rate = 0.82;
+  utterance.pitch = 0.95;
+  utterance.volume = 1;
+
   utterance.onend = () => {
     if (stopped) return;
+    clearPauseTimer();
     pauseTimer = window.setTimeout(() => {
-      if (stopped) return;
+      if (stopped || paused) return;
       queueIndex += 1;
-      scheduleNext();
+      scheduleNextFallback();
     }, segment.pauseAfterMs);
   };
+
   window.speechSynthesis.speak(utterance);
 }
 
@@ -101,12 +188,14 @@ export function buildVoiceSegmentsFromRitual(
       pauseAfterMs: pace.subtitle,
     });
   }
+
   segments.push({
     id: `${ritual.id}-setup`,
     label: "setup",
     text: ritual.setup.join(" "),
     pauseAfterMs: pace.setup,
   });
+
   ritual.steps.forEach((step, index) => {
     segments.push({
       id: `${ritual.id}-step-${index + 1}`,
@@ -115,6 +204,7 @@ export function buildVoiceSegmentsFromRitual(
       pauseAfterMs: pace.step,
     });
   });
+
   if (includeClosing) {
     segments.push({
       id: `${ritual.id}-closing`,
@@ -129,65 +219,112 @@ export function buildVoiceSegmentsFromRitual(
       pauseAfterMs: pace.closing,
     });
   }
+
   return segments;
 }
 
-export async function speakWithGemini() {
-  // TODO: connect Gemini TTS through secure server-side endpoint before production.
-  throw new Error("Gemini TTS endpoint not configured");
-}
+export async function speakWithBrowserFallback(
+  segments: VoiceSegment[],
+  statusCb?: (s: VoiceStatus) => void,
+  startIndex = 0,
+) {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+    throw new Error("Speech synthesis unavailable on this device");
+  }
 
-export async function speakWithBrowserFallback(segments: VoiceSegment[], statusCb?: (s: "idle" | "playing" | "paused") => void) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
   onStatus = statusCb;
   stopVoice();
   queue = segments;
-  queueIndex = 0;
+  queueIndex = startIndex;
   speaking = true;
   paused = false;
   stopped = false;
   setStatus("playing");
-  scheduleNext();
+  scheduleNextFallback();
 }
 
 export async function speakRitualGuide(
   ritual: SacredPathRitual,
   options: VoiceBuildOptions,
-  statusCb?: (s: "idle" | "playing" | "paused") => void,
-) {
+  statusCb?: (s: VoiceStatus) => void,
+): Promise<SpeakResult> {
   const segments = buildVoiceSegmentsFromRitual(ritual, options);
+  if (typeof window === "undefined") {
+    throw new Error("Voice is only available in browser contexts.");
+  }
+
+  stopVoice();
+  onStatus = statusCb;
+  queue = segments;
+  queueIndex = 0;
+  speaking = true;
+  paused = false;
+  stopped = false;
+  fallbackMode = false;
+  activeSessionId = `${ritual.id}-${Date.now()}`;
+  activeVoiceStyle = options.voiceStyle;
+  setStatus("playing");
+
   try {
-    await speakWithGemini();
-  } catch {
+    scheduleNextAudio(activeSessionId, activeVoiceStyle);
+    return { usingFallback: false };
+  } catch (error) {
+    console.warn("[Guided Voice] backend unavailable, using device voice", error);
+    fallbackMode = true;
     await speakWithBrowserFallback(segments, statusCb);
+    return { usingFallback: true };
   }
 }
 
 export function pauseVoice() {
-  if (typeof window === "undefined" || !("speechSynthesis" in window) || !speaking) return;
+  if (!speaking) return;
   paused = true;
-  window.speechSynthesis.pause();
+  clearPauseTimer();
+
+  if (fallbackMode && typeof window !== "undefined" && "speechSynthesis" in window) {
+    window.speechSynthesis.pause();
+  } else if (activeAudio) {
+    activeAudio.pause();
+  }
+
   setStatus("paused");
 }
 
 export function resumeVoice() {
-  if (typeof window === "undefined" || !("speechSynthesis" in window) || !speaking) return;
+  if (!speaking || !paused) return;
   paused = false;
-  window.speechSynthesis.resume();
+
+  if (fallbackMode && typeof window !== "undefined" && "speechSynthesis" in window) {
+    window.speechSynthesis.resume();
+    setStatus("playing");
+    return;
+  }
+
+  if (activeAudio && activeAudio.paused) {
+    void activeAudio.play();
+    setStatus("playing");
+    return;
+  }
+
+  scheduleNextAudio(activeSessionId, activeVoiceStyle);
   setStatus("playing");
 }
 
 export function stopVoice() {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
   stopped = true;
   paused = false;
   speaking = false;
-  if (pauseTimer) {
-    window.clearTimeout(pauseTimer);
-    pauseTimer = null;
+  clearPauseTimer();
+
+  if (typeof window !== "undefined" && "speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
   }
-  window.speechSynthesis.cancel();
-  activeUtterance = null;
+
+  if (activeAudio) {
+    activeAudio.pause();
+    activeAudio.currentTime = 0;
+    activeAudio = null;
+  }
+
   setStatus("idle");
 }
-

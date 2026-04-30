@@ -25,6 +25,7 @@ export default function Journey() {
   const [dateNoteInput, setDateNoteInput] = useState("");
   const [specialDates, setSpecialDates] = useState<DateEntry[]>([]);
   const [note, setNote] = useState("");
+  const [toast, setToast] = useState("");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -87,6 +88,8 @@ export default function Journey() {
     setFavoriteRituals(next);
     persist("sp-journey-favorite-rituals", next);
     setRitualInput("");
+    setToast("Saved to Favorite rituals.");
+    window.setTimeout(() => setToast(""), 1800);
   };
 
   const addDate = () => {
@@ -103,6 +106,8 @@ export default function Journey() {
     persist("sp-journey-dates", next);
     setDateInput("");
     setDateNoteInput("");
+    setToast("Date saved.");
+    window.setTimeout(() => setToast(""), 1800);
   };
 
   const onAddPhoto: ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -115,6 +120,8 @@ export default function Journey() {
       const next = [{ id: `photo-${Date.now()}`, src: image }, ...photoItems].slice(0, 12);
       setPhotoItems(next);
       persist("sp-journey-photos", next);
+      setToast("Picture saved.");
+      window.setTimeout(() => setToast(""), 1800);
     };
     reader.readAsDataURL(file);
     event.currentTarget.value = "";
@@ -124,12 +131,16 @@ export default function Journey() {
     const next = photoItems.filter((item) => item.id !== id);
     setPhotoItems(next);
     persist("sp-journey-photos", next);
+    setToast("Picture removed.");
+    window.setTimeout(() => setToast(""), 1800);
   };
 
   const removeDate = (id: string) => {
     const next = specialDates.filter((item) => item.id !== id);
     setSpecialDates(next);
     persist("sp-journey-dates", next);
+    setToast("Date removed.");
+    window.setTimeout(() => setToast(""), 1800);
   };
 
   const sendWhatsApp = () => {
@@ -143,6 +154,11 @@ export default function Journey() {
   return (
     <Layout>
       <div className="max-w-5xl mx-auto space-y-6">
+        {toast ? (
+          <div className="fixed left-1/2 top-4 z-50 -translate-x-1/2 rounded-full border border-accent/40 bg-[#161126]/95 px-4 py-2 text-xs text-accent shadow-lg">
+            {toast}
+          </div>
+        ) : null}
         <BackButton fallbackPath="/" />
         <header className="text-center">
           <h1 className="font-serif text-4xl md:text-5xl">Intimacy Journey</h1>

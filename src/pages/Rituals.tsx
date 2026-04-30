@@ -22,6 +22,7 @@ export default function Rituals() {
   const { state } = useSession();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [favoriteSet, setFavoriteSet] = useState<Set<string>>(new Set());
+  const [toast, setToast] = useState("");
   const hasPremium = isPremium();
   const toggleSelected = (id: string) => {
     setSelectedId((prev) => (prev === id ? null : id));
@@ -72,6 +73,8 @@ export default function Rituals() {
         : [ritual.title, ...previous.filter((item) => item !== ritual.title)].slice(0, 30);
       window.localStorage.setItem(key, JSON.stringify(next));
       setFavoriteSet(new Set(next));
+      setToast(isSaved ? "Removed from Favorite rituals." : "Saved to Favorite rituals.");
+      window.setTimeout(() => setToast(""), 1800);
     };
 
     return (
@@ -224,6 +227,11 @@ export default function Rituals() {
           </section>
         ) : null}
       </div>
+      {toast ? (
+        <div className="fixed left-1/2 top-4 z-50 -translate-x-1/2 rounded-full border border-accent/40 bg-[#161126]/95 px-4 py-2 text-xs text-accent shadow-lg">
+          {toast}
+        </div>
+      ) : null}
     </Layout>
   );
 }
