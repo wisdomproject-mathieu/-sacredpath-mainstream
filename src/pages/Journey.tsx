@@ -6,6 +6,7 @@ import SubscribeButton from "../components/SubscribeButton";
 import { isPremium } from "../lib/premium";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import type { ChangeEventHandler } from "react";
 
 type DateEntry = {
   id: string;
@@ -104,7 +105,7 @@ export default function Journey() {
     setDateNoteInput("");
   };
 
-  const onAddPhoto: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+  const onAddPhoto: ChangeEventHandler<HTMLInputElement> = (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
