@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import Card from "../components/Card";
@@ -42,6 +42,16 @@ export default function Oracle() {
   const [revealedCardId, setRevealedCardId] = useState<string | null>(null);
   const [showQuestionPrompt, setShowQuestionPrompt] = useState(false);
   const [suggestedQuestion, setSuggestedQuestion] = useState(QUESTION_SUGGESTIONS[0]);
+  const [voiceStatus, setVoiceStatus] = useState<"idle" | "playing" | "paused">("idle");
+  const [ambientOn, setAmbientOn] = useState(false);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const sentenceQueueRef = useRef<string[]>([]);
+  const queueIndexRef = useRef(0);
+  const timeoutRef = useRef<number | null>(null);
+  const stopRequestedRef = useRef(false);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const oscillatorRef = useRef<OscillatorNode | null>(null);
+  const gainRef = useRef<GainNode | null>(null);
 
   const userWeather = normalizeWeatherName(state.youWeatherTone ?? state.youWeather);
   const partnerWeather = normalizeWeatherName(state.partnerWeatherTone ?? state.partnerWeather);
@@ -181,6 +191,139 @@ export default function Oracle() {
 
   const openPaywall = () => navigate("/paywall?source=oracle");
 
+  const stopAmbient = () => {
+    try {
+      oscillatorRef.current?.stop();
+    } catch {
+      // ignore stop race
+    }
+    oscillatorRef.current?.disconnect();
+    gainRef.current?.disconnect();
+    oscillatorRef.current = null;
+    gainRef.current = null;
+    audioCtxRef.current = null;
+  };
+
+  const startAmbient = async () => {
+    if (typeof window === "undefined" || !ambientOn) return;
+    if (audioCtxRef.current) return;
+    const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextCtor) return;
+    const ctx = new AudioContextCtor();
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.value = 174;
+    gain.gain.value = 0.015;
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+    oscillator.start();
+    audioCtxRef.current = ctx;
+    oscillatorRef.current = oscillator;
+    gainRef.current = gain;
+  };
+
+  const clearOracleVoiceTimer = () => {
+    if (timeoutRef.current !== null) {
+      window.clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  };
+
+  const stopOracleVoice = () => {
+    stopRequestedRef.current = true;
+    clearOracleVoiceTimer();
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+    utteranceRef.current = null;
+    setVoiceStatus("idle");
+    stopAmbient();
+  };
+
+  const speakNextSentence = () => {
+    if (stopRequestedRef.current) return;
+    const next = sentenceQueueRef.current[queueIndexRef.current];
+    if (!next) {
+      setVoiceStatus("idle");
+      stopAmbient();
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(next);
+    utteranceRef.current = utterance;
+    utterance.rate = 0.72;
+    utterance.pitch = 0.94;
+    utterance.volume = 1;
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = ["Samantha", "Google UK English Female", "Karen", "Ava", "Google US English"];
+    const selected = preferred
+      .map((name) => voices.find((voice) => voice.name === name))
+      .find(Boolean) ?? voices.find((voice) => voice.lang?.toLowerCase().startsWith("en"));
+    if (selected) utterance.voice = selected;
+
+    utterance.onend = () => {
+      if (stopRequestedRef.current) return;
+      queueIndexRef.current += 1;
+      timeoutRef.current = window.setTimeout(() => {
+        speakNextSentence();
+      }, 2600);
+    };
+    utterance.onerror = () => {
+      setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
+      setVoiceStatus("idle");
+      stopAmbient();
+    };
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const startOracleVoice = async () => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
+      return;
+    }
+    stopRequestedRef.current = false;
+    clearOracleVoiceTimer();
+    window.speechSynthesis.cancel();
+
+    const fullText = [
+      "Take one slow breath.",
+      `Oracle card: ${selectedCard.title}.`,
+      selectedCard.meaning,
+      selectedCard.message,
+      `For you: ${selectedCard.forYou}`,
+      `For your partner: ${selectedCard.forPartner}`,
+      `Tonight's action: ${selectedCard.action}`,
+      "Pause and choose one gentle step you will begin now.",
+    ].join(" ");
+
+    const sentenceParts = fullText
+      .split(/(?<=[.!?])\s+/)
+      .map((part) => part.trim())
+      .filter(Boolean);
+    sentenceQueueRef.current = sentenceParts;
+    queueIndexRef.current = 0;
+    setVoiceStatus("playing");
+    await startAmbient();
+    speakNextSentence();
+  };
+
+  const pauseOracleVoice = () => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    window.speechSynthesis.pause();
+    clearOracleVoiceTimer();
+    setVoiceStatus("paused");
+  };
+
+  const resumeOracleVoice = async () => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    setVoiceStatus("playing");
+    await startAmbient();
+    window.speechSynthesis.resume();
+  };
+
+  useEffect(() => () => stopOracleVoice(), []);
+
   return (
     <Layout>
       <div className="mx-auto max-w-4xl space-y-6">
@@ -267,17 +410,18 @@ export default function Oracle() {
 
                 <div className="grid gap-2 sm:grid-cols-2">
                   <Link
-                    to="/rituals"
+                    to="/ritual"
                     className="rounded-full border border-white/15 bg-white/5 px-4 py-3 text-center text-sm font-semibold hover:bg-white/10"
                   >
                     Start Full Ritual
                   </Link>
-                  <Link
-                    to="/voice"
-                    className="rounded-full border border-white/15 bg-white/5 px-4 py-3 text-center text-sm font-semibold hover:bg-white/10"
+                  <button
+                    type="button"
+                    onClick={startOracleVoice}
+                    className="rounded-full border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold hover:bg-white/10"
                   >
                     Listen with Sacred Voice
-                  </Link>
+                  </button>
                   <button
                     type="button"
                     onClick={shareWithPartner}
@@ -293,6 +437,42 @@ export default function Oracle() {
                     Save to Our Journey
                   </button>
                 </div>
+                <div className="grid gap-2 sm:grid-cols-4">
+                  <button
+                    type="button"
+                    onClick={() => setAmbientOn((prev) => !prev)}
+                    className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold hover:bg-white/10"
+                  >
+                    {ambientOn ? "Ambient On" : "Ambient Off"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={pauseOracleVoice}
+                    disabled={voiceStatus !== "playing"}
+                    className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold disabled:opacity-50"
+                  >
+                    Pause
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resumeOracleVoice}
+                    disabled={voiceStatus !== "paused"}
+                    className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold disabled:opacity-50"
+                  >
+                    Resume
+                  </button>
+                  <button
+                    type="button"
+                    onClick={stopOracleVoice}
+                    disabled={voiceStatus === "idle"}
+                    className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold disabled:opacity-50"
+                  >
+                    Stop
+                  </button>
+                </div>
+                <p className="text-xs text-muted">
+                  Guided mode uses a calm voice with pauses between sentences.
+                </p>
               </div>
             )}
           </Card>
