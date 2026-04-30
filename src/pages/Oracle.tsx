@@ -12,6 +12,7 @@ import {
   selectOracleCard,
 } from "../lib/intimacyOracle";
 import { intimacyOracleCards } from "../data/intimacyOracle";
+import { synthesizeGuidedVoiceAudio } from "../lib/guidedVoiceTts";
 
 const DAILY_KEY = "sacredpath-oracle-daily";
 const RECENT_KEY = "sacredpath-oracle-recent";
@@ -43,15 +44,8 @@ export default function Oracle() {
   const [showQuestionPrompt, setShowQuestionPrompt] = useState(false);
   const [suggestedQuestion, setSuggestedQuestion] = useState(QUESTION_SUGGESTIONS[0]);
   const [voiceStatus, setVoiceStatus] = useState<"idle" | "playing" | "paused">("idle");
-  const [ambientOn, setAmbientOn] = useState(false);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-  const sentenceQueueRef = useRef<string[]>([]);
-  const queueIndexRef = useRef(0);
-  const timeoutRef = useRef<number | null>(null);
-  const stopRequestedRef = useRef(false);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const oscillatorRef = useRef<OscillatorNode | null>(null);
-  const gainRef = useRef<GainNode | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const userWeather = normalizeWeatherName(state.youWeatherTone ?? state.youWeather);
   const partnerWeather = normalizeWeatherName(state.partnerWeatherTone ?? state.partnerWeather);
@@ -191,69 +185,78 @@ export default function Oracle() {
 
   const openPaywall = () => navigate("/paywall?source=oracle");
 
-  const stopAmbient = () => {
-    try {
-      oscillatorRef.current?.stop();
-    } catch {
-      // ignore stop race
-    }
-    oscillatorRef.current?.disconnect();
-    gainRef.current?.disconnect();
-    oscillatorRef.current = null;
-    gainRef.current = null;
-    audioCtxRef.current = null;
-  };
-
-  const startAmbient = async () => {
-    if (typeof window === "undefined" || !ambientOn) return;
-    if (audioCtxRef.current) return;
-    const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AudioContextCtor) return;
-    const ctx = new AudioContextCtor();
-    const oscillator = ctx.createOscillator();
-    const gain = ctx.createGain();
-    oscillator.type = "sine";
-    oscillator.frequency.value = 174;
-    gain.gain.value = 0.015;
-    oscillator.connect(gain);
-    gain.connect(ctx.destination);
-    oscillator.start();
-    audioCtxRef.current = ctx;
-    oscillatorRef.current = oscillator;
-    gainRef.current = gain;
-  };
-
-  const clearOracleVoiceTimer = () => {
-    if (timeoutRef.current !== null) {
-      window.clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
+  const summarizeQuestion = (raw: string) => {
+    const words = raw.trim().split(/\s+/).filter(Boolean).slice(0, 8);
+    if (!words.length) return "your question";
+    return words.join(" ");
   };
 
   const stopOracleVoice = () => {
-    stopRequestedRef.current = true;
-    clearOracleVoiceTimer();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.cancel();
     }
     utteranceRef.current = null;
     setVoiceStatus("idle");
-    stopAmbient();
   };
 
-  const speakNextSentence = () => {
-    if (stopRequestedRef.current) return;
-    const next = sentenceQueueRef.current[queueIndexRef.current];
-    if (!next) {
+  const startOracleVoice = async () => {
+    if (typeof window === "undefined") {
+      setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
+      return;
+    }
+    stopOracleVoice();
+    setVoiceStatus("playing");
+
+    const promptSummary = summarizeQuestion(question);
+    const fullText = [
+      "Hello love.",
+      "Thank you for coming to the Intimacy Oracle.",
+      `I can feel the heart of your question about ${promptSummary}.`,
+      `I found a good ritual to practice with your partner. It is called ${selectedCard.title}.`,
+      selectedCard.meaning,
+      selectedCard.message,
+      "Please sit comfortably now.",
+      "Take one slow breath in, and a slower breath out.",
+      `For you: ${selectedCard.forYou}`,
+      `For your partner: ${selectedCard.forPartner}`,
+      `Tonight's action: ${selectedCard.action}`,
+      "Move slowly, and pause where it matters most.",
+    ].join(" ... ");
+
+    try {
+      const tts = await synthesizeGuidedVoiceAudio({
+        sessionId: `oracle-${selectedCard.id}-${Date.now()}`,
+        text: fullText,
+        voiceStyle: "calm",
+      });
+      const audio = new Audio(tts.audioUrl);
+      audioRef.current = audio;
+      audio.onended = () => setVoiceStatus("idle");
+      audio.onerror = () => {
+        setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
+        setVoiceStatus("idle");
+      };
+      await audio.play();
+      return;
+    } catch {
+      // fallback below
+    }
+
+    if (!("speechSynthesis" in window)) {
+      setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
       setVoiceStatus("idle");
-      stopAmbient();
       return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(next);
+    const utterance = new SpeechSynthesisUtterance(fullText);
     utteranceRef.current = utterance;
-    utterance.rate = 0.72;
-    utterance.pitch = 0.94;
+    utterance.rate = 0.78;
+    utterance.pitch = 0.95;
     utterance.volume = 1;
     const voices = window.speechSynthesis.getVoices();
     const preferred = ["Samantha", "Google UK English Female", "Karen", "Ava", "Google US English"];
@@ -261,64 +264,33 @@ export default function Oracle() {
       .map((name) => voices.find((voice) => voice.name === name))
       .find(Boolean) ?? voices.find((voice) => voice.lang?.toLowerCase().startsWith("en"));
     if (selected) utterance.voice = selected;
-
-    utterance.onend = () => {
-      if (stopRequestedRef.current) return;
-      queueIndexRef.current += 1;
-      timeoutRef.current = window.setTimeout(() => {
-        speakNextSentence();
-      }, 2600);
-    };
+    utterance.onend = () => setVoiceStatus("idle");
     utterance.onerror = () => {
       setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
       setVoiceStatus("idle");
-      stopAmbient();
     };
     window.speechSynthesis.speak(utterance);
   };
 
-  const startOracleVoice = async () => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-      setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
+  const pauseOracleVoice = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setVoiceStatus("paused");
       return;
     }
-    stopRequestedRef.current = false;
-    clearOracleVoiceTimer();
-    window.speechSynthesis.cancel();
-
-    const fullText = [
-      "Take one slow breath.",
-      `Oracle card: ${selectedCard.title}.`,
-      selectedCard.meaning,
-      selectedCard.message,
-      `For you: ${selectedCard.forYou}`,
-      `For your partner: ${selectedCard.forPartner}`,
-      `Tonight's action: ${selectedCard.action}`,
-      "Pause and choose one gentle step you will begin now.",
-    ].join(" ");
-
-    const sentenceParts = fullText
-      .split(/(?<=[.!?])\s+/)
-      .map((part) => part.trim())
-      .filter(Boolean);
-    sentenceQueueRef.current = sentenceParts;
-    queueIndexRef.current = 0;
-    setVoiceStatus("playing");
-    await startAmbient();
-    speakNextSentence();
-  };
-
-  const pauseOracleVoice = () => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
     window.speechSynthesis.pause();
-    clearOracleVoiceTimer();
     setVoiceStatus("paused");
   };
 
-  const resumeOracleVoice = async () => {
+  const resumeOracleVoice = () => {
+    if (audioRef.current) {
+      void audioRef.current.play();
+      setVoiceStatus("playing");
+      return;
+    }
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
     setVoiceStatus("playing");
-    await startAmbient();
     window.speechSynthesis.resume();
   };
 
@@ -437,14 +409,7 @@ export default function Oracle() {
                     Save to Our Journey
                   </button>
                 </div>
-                <div className="grid gap-2 sm:grid-cols-4">
-                  <button
-                    type="button"
-                    onClick={() => setAmbientOn((prev) => !prev)}
-                    className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold hover:bg-white/10"
-                  >
-                    {ambientOn ? "Ambient On" : "Ambient Off"}
-                  </button>
+                <div className="grid gap-2 sm:grid-cols-3">
                   <button
                     type="button"
                     onClick={pauseOracleVoice}
