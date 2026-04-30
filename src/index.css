@@ -36,6 +36,7 @@ html {
   min-height: 100%;
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  scroll-padding-bottom: calc(13rem + env(safe-area-inset-bottom));
 }
 
 body,

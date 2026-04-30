@@ -11,7 +11,10 @@ interface LayoutProps {
 export default function Layout({ children, showHeader = true, className = "" }: LayoutProps) {
   return (
     <div className={`sp-page ${className}`.trim()}>
-      <div className="sp-container pb-[calc(11rem+env(safe-area-inset-bottom))] md:pb-[calc(11.5rem+env(safe-area-inset-bottom))]">
+      <div
+        className="sp-container"
+        style={{ paddingBottom: "calc(13rem + env(safe-area-inset-bottom))" }}
+      >
         {showHeader ? <BrandHeader className="mb-8" /> : null}
         <main>{children}</main>
         <nav
