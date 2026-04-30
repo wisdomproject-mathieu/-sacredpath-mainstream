@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Layout from "../components/Layout";
 import RitualCard from "../components/RitualCard";
 import BackButton from "../components/BackButton";
@@ -21,6 +21,7 @@ const TERRITORY_TILES = [
 export default function Rituals() {
   const { state } = useSession();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [favoriteSet, setFavoriteSet] = useState<Set<string>>(new Set());
   const hasPremium = isPremium();
   const toggleSelected = (id: string) => {
     setSelectedId((prev) => (prev === id ? null : id));
@@ -48,15 +49,29 @@ export default function Rituals() {
   const selected = selectedId ? list.find((item) => item.id === selectedId) ?? null : null;
   const selectedLocked = !!selected && !hasPremium && selected.id !== freeToday.id && selected.tier === "premium";
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const stored = JSON.parse(window.localStorage.getItem("sp-journey-favorite-rituals") ?? "[]") as string[];
+      setFavoriteSet(new Set(stored));
+    } catch {
+      setFavoriteSet(new Set());
+    }
+  }, []);
+
   const renderInlineDetails = (ritual: Ritual) => {
     const locked = !hasPremium && ritual.id !== freeToday.id && ritual.tier === "premium";
     if (locked) return null;
-    const saveFavorite = () => {
+    const isSaved = favoriteSet.has(ritual.title);
+    const toggleFavorite = () => {
       if (typeof window === "undefined") return;
       const key = "sp-journey-favorite-rituals";
       const previous = JSON.parse(window.localStorage.getItem(key) ?? "[]") as string[];
-      const next = [ritual.title, ...previous.filter((item) => item !== ritual.title)].slice(0, 30);
+      const next = isSaved
+        ? previous.filter((item) => item !== ritual.title)
+        : [ritual.title, ...previous.filter((item) => item !== ritual.title)].slice(0, 30);
       window.localStorage.setItem(key, JSON.stringify(next));
+      setFavoriteSet(new Set(next));
     };
 
     return (
@@ -74,12 +89,16 @@ export default function Rituals() {
         <div className="flex justify-end">
           <button
             type="button"
-            onClick={saveFavorite}
-            aria-label="Save ritual to favorite rituals in Intimacy Journey"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-accent/50 bg-accent/10 text-lg leading-none text-accent transition hover:bg-accent/20"
-            title="Save to favorite rituals"
+            onClick={toggleFavorite}
+            aria-label={isSaved ? "Remove ritual from favorite rituals" : "Save ritual to favorite rituals in Intimacy Journey"}
+            className={`inline-flex h-10 w-10 items-center justify-center rounded-full border text-lg leading-none transition ${
+              isSaved
+                ? "border-accent bg-accent text-[#130f08]"
+                : "border-accent/50 bg-accent/10 text-accent hover:bg-accent/20"
+            }`}
+            title={isSaved ? "Remove from favorite rituals" : "Save to favorite rituals"}
           >
-            ♥
+            {isSaved ? "♥" : "♡"}
           </button>
         </div>
       </div>

@@ -5,15 +5,24 @@ import BackButton from "../components/BackButton";
 import SubscribeButton from "../components/SubscribeButton";
 import { isPremium } from "../lib/premium";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+
+type DateEntry = {
+  id: string;
+  date: string;
+  note: string;
+};
 
 export default function Journey() {
+  const [searchParams] = useSearchParams();
   const hasPremium = isPremium();
   const [showDashboard, setShowDashboard] = useState(false);
   const [ritualInput, setRitualInput] = useState("");
   const [favoriteRituals, setFavoriteRituals] = useState<string[]>([]);
-  const [photoItems, setPhotoItems] = useState<string[]>([]);
+  const [photoItems, setPhotoItems] = useState<Array<{ id: string; src: string }>>([]);
   const [dateInput, setDateInput] = useState("");
-  const [specialDates, setSpecialDates] = useState<string[]>([]);
+  const [dateNoteInput, setDateNoteInput] = useState("");
+  const [specialDates, setSpecialDates] = useState<DateEntry[]>([]);
   const [note, setNote] = useState("");
 
   useEffect(() => {
@@ -23,14 +32,47 @@ export default function Journey() {
       const storedPhotos = JSON.parse(window.localStorage.getItem("sp-journey-photos") ?? "[]");
       const storedDates = JSON.parse(window.localStorage.getItem("sp-journey-dates") ?? "[]");
       setFavoriteRituals(Array.isArray(storedRituals) ? storedRituals : []);
-      setPhotoItems(Array.isArray(storedPhotos) ? storedPhotos : []);
-      setSpecialDates(Array.isArray(storedDates) ? storedDates : []);
+      const normalizedPhotos = Array.isArray(storedPhotos)
+        ? storedPhotos
+            .map((item: unknown, index: number) =>
+              typeof item === "string"
+                ? { id: `legacy-${index}`, src: item }
+                : (item as { id: string; src: string }),
+            )
+            .filter((item: { id?: string; src?: string }) => typeof item?.id === "string" && typeof item?.src === "string")
+        : [];
+      setPhotoItems(normalizedPhotos);
+
+      const normalizedDates = Array.isArray(storedDates)
+        ? storedDates
+            .map((item: unknown, index: number) => {
+              if (typeof item === "string") {
+                return { id: `legacy-date-${index}`, date: item, note: "" };
+              }
+              const candidate = item as { id?: string; date?: string; note?: string };
+              return {
+                id: candidate.id ?? `date-${index}`,
+                date: candidate.date ?? "",
+                note: candidate.note ?? "",
+              };
+            })
+            .filter((entry: DateEntry) => Boolean(entry.date))
+        : [];
+      setSpecialDates(normalizedDates);
     } catch {
       setFavoriteRituals([]);
       setPhotoItems([]);
       setSpecialDates([]);
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const incoming = searchParams.get("incomingNote");
+    if (!incoming) return;
+    const decoded = decodeURIComponent(incoming);
+    setNote((prev) => (prev ? `${prev}\n\n${decoded}` : decoded));
+  }, [searchParams]);
 
   const persist = (key: string, value: unknown) => {
     if (typeof window === "undefined") return;
@@ -48,11 +90,18 @@ export default function Journey() {
 
   const addDate = () => {
     if (!dateInput) return;
-    if (specialDates.includes(dateInput)) return;
-    const next = [...specialDates, dateInput].sort();
+    const entry: DateEntry = {
+      id: `${dateInput}-${Date.now()}`,
+      date: dateInput,
+      note: dateNoteInput.trim(),
+    };
+    const exists = specialDates.some((item) => item.date === entry.date && item.note === entry.note);
+    if (exists) return;
+    const next = [...specialDates, entry].sort((a, b) => a.date.localeCompare(b.date));
     setSpecialDates(next);
     persist("sp-journey-dates", next);
     setDateInput("");
+    setDateNoteInput("");
   };
 
   const onAddPhoto: React.ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -62,12 +111,32 @@ export default function Journey() {
     reader.onload = () => {
       const image = typeof reader.result === "string" ? reader.result : "";
       if (!image) return;
-      const next = [image, ...photoItems].slice(0, 12);
+      const next = [{ id: `photo-${Date.now()}`, src: image }, ...photoItems].slice(0, 12);
       setPhotoItems(next);
       persist("sp-journey-photos", next);
     };
     reader.readAsDataURL(file);
     event.currentTarget.value = "";
+  };
+
+  const deletePhoto = (id: string) => {
+    const next = photoItems.filter((item) => item.id !== id);
+    setPhotoItems(next);
+    persist("sp-journey-photos", next);
+  };
+
+  const removeDate = (id: string) => {
+    const next = specialDates.filter((item) => item.id !== id);
+    setSpecialDates(next);
+    persist("sp-journey-dates", next);
+  };
+
+  const sendWhatsApp = () => {
+    const message = note.trim()
+      ? `Your beloved one is sending you this: "${note.trim()}". Click this link to save it to your dashboard together with pictures, important dates, and start browsing the larger intimacy repository ever built on SacredPath: ${window.location.origin}${import.meta.env.BASE_URL}journey?incomingNote=${encodeURIComponent(note.trim())}`
+      : `Your beloved one is sending you a love note. Click this link to save it to your dashboard together with pictures, important dates, and start browsing the larger intimacy repository ever built on SacredPath: ${window.location.origin}${import.meta.env.BASE_URL}journey`;
+    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -104,7 +173,7 @@ export default function Journey() {
           <p className="text-sm text-muted">
             {hasPremium
               ? "Premium active for both partners. Shared dashboard, history, and milestones are unlocked."
-              : "Shared dashboard is available to all couples for ritual and memory saving. Premium unlocks deeper insights and milestones."}
+              : "Your Journey dashboard is personal: save rituals, prepare notes, store pictures, and remember key dates. Premium unlocks deeper insights and milestones."}
           </p>
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
             <Button onClick={() => setShowDashboard((v) => !v)}>
@@ -140,13 +209,20 @@ export default function Journey() {
 
             <Card className="space-y-3">
               <h2 className="font-serif text-2xl">Whisper and gratitude notes</h2>
-              <p className="text-sm text-muted">Placeholder for shared couple notes (full feature coming next).</p>
+              <p className="text-sm text-muted">Prepare private notes here, then send them to your beloved one through WhatsApp.</p>
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Write a whisper or gratitude note..."
                 className="min-h-24 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
               />
+              <button
+                type="button"
+                onClick={sendWhatsApp}
+                className="w-full rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-6 py-3 font-semibold text-[#130f08] transition-opacity hover:opacity-90"
+              >
+                WA your beloved one
+              </button>
             </Card>
 
             <Card className="space-y-3">
@@ -160,12 +236,22 @@ export default function Journey() {
               />
               <div className="grid grid-cols-3 gap-2">
                 {photoItems.slice(0, 6).map((item, index) => (
-                  <img
-                    key={`${item.slice(0, 18)}-${index}`}
-                    src={item}
-                    alt={`Journey memory ${index + 1}`}
-                    className="aspect-square w-full rounded-lg object-cover border border-white/10"
-                  />
+                  <div key={item.id} className="relative">
+                    <img
+                      src={item.src}
+                      alt={`Journey memory ${index + 1}`}
+                      className="aspect-square w-full rounded-lg object-cover border border-white/10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => deletePhoto(item.id)}
+                      className="absolute right-1 top-1 inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/25 bg-black/60 text-xs text-white hover:bg-black/75"
+                      aria-label="Delete picture"
+                      title="Delete picture"
+                    >
+                      ×
+                    </button>
+                  </div>
                 ))}
               </div>
               {photoItems.length === 0 ? <p className="text-sm text-muted">No pictures yet.</p> : null}
@@ -181,14 +267,33 @@ export default function Journey() {
                   onChange={(e) => setDateInput(e.target.value)}
                   className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
                 />
+                <input
+                  type="text"
+                  value={dateNoteInput}
+                  onChange={(e) => setDateNoteInput(e.target.value)}
+                  placeholder="What is this date about?"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
+                />
                 <Button variant="secondary" onClick={addDate}>Add</Button>
               </div>
               <div className="space-y-2">
                 {specialDates.length === 0 ? (
                   <p className="text-sm text-muted">No dates added yet.</p>
                 ) : (
-                  specialDates.slice(0, 10).map((date) => (
-                    <p key={date} className="text-sm">• {date}</p>
+                  specialDates.slice(0, 10).map((entry) => (
+                    <div key={entry.id} className="flex items-start justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                      <p className="text-sm">
+                        <span className="font-semibold">{entry.date}</span>
+                        {entry.note ? ` — ${entry.note}` : ""}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => removeDate(entry.id)}
+                        className="rounded-full border border-white/15 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   ))
                 )}
               </div>
