@@ -42,6 +42,7 @@ export default function Rituals() {
   }, [dailyDiscovery, tonightPath]);
 
   const list = useMemo(() => [freeToday, ...rituals.filter((item) => item.id !== freeToday.id)], [freeToday]);
+  const freePreviewList = useMemo(() => list.filter((r) => r.id !== freeToday.id).slice(0, 48), [list, freeToday.id]);
   const starterRituals = useMemo(
     () =>
       STARTER_IDS.map((id) => rituals.find((r) => r.id === id)).filter((r): r is Ritual => Boolean(r) && r.id !== freeToday.id).slice(0, 3),
@@ -159,7 +160,7 @@ export default function Rituals() {
             </p>
 
             <section className="grid gap-3 sm:grid-cols-2">
-              {list.slice(0, 160).filter((r) => r.id !== freeToday.id).map((ritual) => {
+              {list.filter((r) => r.id !== freeToday.id).map((ritual) => {
                 const locked = !hasPremium && ritual.id !== freeToday.id && ritual.tier === "premium";
                 return (
                   <div key={ritual.id} className="space-y-3">
@@ -205,6 +206,30 @@ export default function Rituals() {
                     <p className="text-xs text-muted mt-2">{tile.count} rituals · {tile.sample.join(" · ")}</p>
                   </button>
                 ))}
+              </div>
+            </section>
+
+            <section className="space-y-3">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-accent">Library preview</p>
+              <p className="text-sm text-muted">
+                Showing <strong>{freePreviewList.length}</strong> ritual cards from <strong>{rituals.length}</strong>. Premium unlocks full details for locked practices.
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {freePreviewList.map((ritual) => {
+                  const locked = ritual.tier === "premium";
+                  return (
+                    <div key={ritual.id} className="space-y-3">
+                      <RitualCard
+                        ritual={ritual}
+                        selected={selected?.id === ritual.id}
+                        locked={locked}
+                        isFreeToday={false}
+                        onClick={() => toggleSelected(ritual.id)}
+                      />
+                      {selected?.id === ritual.id ? renderInlineDetails(ritual) : null}
+                    </div>
+                  );
+                })}
               </div>
             </section>
           </>
