@@ -21,6 +21,7 @@ const JOURNEY_KEY = "sacredpath-journey-oracle";
 type OracleBackendProvider = "gemini" | "polly" | "google";
 const ORACLE_PRIMARY_PROVIDER = (import.meta.env.VITE_ORACLE_PRIMARY_TTS_PROVIDER || "gemini").toLowerCase() as OracleBackendProvider;
 const ORACLE_POLLY_VOICE_ID = import.meta.env.VITE_ORACLE_POLLY_VOICE_ID || "Kimberly";
+const ORACLE_GEMINI_VOICE_NAME = import.meta.env.VITE_ORACLE_GEMINI_VOICE_NAME || "Kimberly";
 const ORACLE_WAVENET_VOICE = import.meta.env.VITE_ORACLE_WAVENET_VOICE || "en-US-Wavenet-F";
 const ORACLE_GEMINI_FALLBACK_MODEL =
   import.meta.env.VITE_ORACLE_GEMINI_TTS_MODEL || "gemini-3.1-flash-tts-preview";
@@ -304,7 +305,7 @@ export default function Oracle() {
         text: segment.text,
         voiceStyle: "calm",
         provider,
-        voiceName: provider === "google" ? ORACLE_WAVENET_VOICE : undefined,
+        voiceName: provider === "google" ? ORACLE_WAVENET_VOICE : provider === "gemini" ? ORACLE_GEMINI_VOICE_NAME : undefined,
         speakingRate: 0.84,
         pitch: -1.2,
         model: provider === "gemini" ? ORACLE_GEMINI_FALLBACK_MODEL : undefined,

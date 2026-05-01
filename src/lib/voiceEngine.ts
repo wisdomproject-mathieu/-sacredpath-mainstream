@@ -48,6 +48,8 @@ const PACING = {
     closing: 15000,
   },
 } as const;
+const GEMINI_VOICE_MODEL = import.meta.env.VITE_ORACLE_GEMINI_TTS_MODEL || "gemini-3.1-flash-tts-preview";
+const GEMINI_VOICE_NAME = import.meta.env.VITE_ORACLE_GEMINI_VOICE_NAME || "Kimberly";
 const POLLY_VOICE_ID = import.meta.env.VITE_ORACLE_POLLY_VOICE_ID || "Kimberly";
 
 let queue: VoiceSegment[] = [];
@@ -84,16 +86,27 @@ function scheduleNextAudio(sessionId: string, voiceStyle: VoiceStyle): void {
   const segment = queue[queueIndex];
   void (async () => {
     try {
-      const result = await synthesizeGuidedVoiceAudio({
+      let result = await synthesizeGuidedVoiceAudio({
         sessionId: `${sessionId}-${segment.id}`,
         text: segment.text,
-        provider: "polly",
+        provider: "gemini",
         voiceStyle,
-        voiceId: POLLY_VOICE_ID,
+        voiceName: GEMINI_VOICE_NAME,
         speakingRate: 0.84,
         pitch: -1.2,
-        format: "mp3",
-      });
+        model: GEMINI_VOICE_MODEL,
+      }).catch(async () =>
+        synthesizeGuidedVoiceAudio({
+          sessionId: `${sessionId}-${segment.id}-polly`,
+          text: segment.text,
+          provider: "polly",
+          voiceStyle,
+          voiceId: POLLY_VOICE_ID,
+          speakingRate: 0.84,
+          pitch: -1.2,
+          format: "mp3",
+        }),
+      );
       if (stopped) return;
       const audio = new Audio(result.audioUrl);
       activeAudio = audio;
