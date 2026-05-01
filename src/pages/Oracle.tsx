@@ -340,27 +340,70 @@ export default function Oracle() {
   };
 
   const playGoogleChunkedSegment = async (text: string): Promise<void> => {
-    const chunks = splitTextForTts(humanizeForVoice(text), 160);
-    for (let index = 0; index < chunks.length; index += 1) {
+    const normalized = humanizeForVoice(text).replace(/\s+/g, " ").trim();
+    const sentences = normalized
+      .split(/(?<=[.!?])\s+/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+    const units = sentences.length ? sentences : [normalized];
+    let spokenChunks = 0;
+
+    for (let sentenceIndex = 0; sentenceIndex < units.length; sentenceIndex += 1) {
       if (voiceModeRef.current !== "google") return;
-      await new Promise<void>((resolve, reject) => {
-        void playGoogleTranslateSegment(chunks[index], {
-          lang: "en",
-          rate: 0.78,
-          onEnded: () => resolve(),
-          onError: () => reject(new Error("google-tts-chunk-failed")),
-        })
-          .then((audio) => {
-            audioRef.current = audio;
-          })
-          .catch(reject);
-      });
-      if (voiceModeRef.current !== "google") return;
-      if (index < chunks.length - 1) {
+      const sentence = units[sentenceIndex];
+      const primaryChunks = splitTextForTts(sentence, 140);
+
+      for (let chunkIndex = 0; chunkIndex < primaryChunks.length; chunkIndex += 1) {
+        if (voiceModeRef.current !== "google") return;
+        const chunk = primaryChunks[chunkIndex];
+        const tryPlay = async (candidate: string): Promise<boolean> => {
+          try {
+            await new Promise<void>((resolve, reject) => {
+              void playGoogleTranslateSegment(candidate, {
+                lang: "en",
+                rate: 0.78,
+                onEnded: () => resolve(),
+                onError: () => reject(new Error("google-tts-chunk-failed")),
+              })
+                .then((audio) => {
+                  audioRef.current = audio;
+                })
+                .catch(reject);
+            });
+            spokenChunks += 1;
+            return true;
+          } catch {
+            return false;
+          }
+        };
+
+        const primaryOk = await tryPlay(chunk);
+        if (!primaryOk) {
+          const retryChunks = splitTextForTts(chunk, 90);
+          let retryOk = false;
+          for (const retryChunk of retryChunks) {
+            if (voiceModeRef.current !== "google") return;
+            const ok = await tryPlay(retryChunk);
+            if (!ok) {
+              retryOk = false;
+              break;
+            }
+            retryOk = true;
+          }
+          if (!retryOk) {
+            continue;
+          }
+        }
+
+        if (voiceModeRef.current !== "google") return;
         await new Promise<void>((resolve) => {
-          queueTimerRef.current = window.setTimeout(() => resolve(), 420);
+          queueTimerRef.current = window.setTimeout(() => resolve(), 340);
         });
       }
+    }
+
+    if (spokenChunks === 0) {
+      throw new Error("google-tts-no-audio");
     }
   };
 
