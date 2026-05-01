@@ -67,10 +67,18 @@ export async function synthesizeGuidedVoiceAudio({
   sessionId,
   text,
   voiceStyle,
+  provider = "google",
+  voiceName,
+  speakingRate,
+  pitch,
 }: {
   sessionId: string;
   text: string;
   voiceStyle?: "warm" | "calm" | "deep" | "soft";
+  provider?: VoiceProvider;
+  voiceName?: string;
+  speakingRate?: number;
+  pitch?: number;
 }): Promise<TtsResult> {
   const cacheKey = buildCacheKey(sessionId, voiceStyle);
   const cached = audioCache.get(cacheKey);
@@ -95,9 +103,13 @@ export async function synthesizeGuidedVoiceAudio({
     headers,
     body: JSON.stringify({
       text,
-      provider: "google",
+      provider,
       lang: "en",
       voiceStyle,
+      voiceName,
+      speakingRate,
+      pitch,
+      engine: provider === "google" ? "wavenet" : undefined,
     }),
   });
 

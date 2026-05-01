@@ -18,6 +18,7 @@ import { playGoogleTranslateSegment } from "../lib/googleTranslateTts";
 const DAILY_KEY = "sacredpath-oracle-daily";
 const RECENT_KEY = "sacredpath-oracle-recent";
 const JOURNEY_KEY = "sacredpath-journey-oracle";
+const ORACLE_WAVENET_VOICE = import.meta.env.VITE_ORACLE_WAVENET_VOICE || "en-US-Wavenet-F";
 
 const QUESTION_HELPER =
   "Try: How can I reconnect tonight? What should I understand about my partner? What is blocking intimacy between us?";
@@ -288,6 +289,10 @@ export default function Oracle() {
         sessionId: `oracle-${card.id}-${Date.now()}-${segmentIndexRef.current}`,
         text: segment.text,
         voiceStyle: "calm",
+        provider: "google",
+        voiceName: ORACLE_WAVENET_VOICE,
+        speakingRate: 0.84,
+        pitch: -1.2,
       });
       if (voiceModeRef.current !== "backend") return;
       const audio = new Audio(tts.audioUrl);
@@ -307,14 +312,8 @@ export default function Oracle() {
       };
       await audio.play();
     } catch {
-      if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        voiceModeRef.current = "browser";
-        playBrowserSegment();
-        return;
-      }
-      setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
-      setVoiceStatus("idle");
-      voiceModeRef.current = "none";
+      voiceModeRef.current = "google";
+      void playGoogleSegment(card);
     }
   };
 
@@ -409,8 +408,8 @@ export default function Oracle() {
     speechSegmentsRef.current = getOracleSegments(card, inputQuestion);
     segmentIndexRef.current = 0;
 
-    voiceModeRef.current = "google";
-    void playGoogleSegment(card);
+    voiceModeRef.current = "backend";
+    void playBackendSegment(card);
   };
 
   const pauseOracleVoice = () => {
