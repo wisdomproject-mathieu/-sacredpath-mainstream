@@ -19,6 +19,8 @@ const DAILY_KEY = "sacredpath-oracle-daily";
 const RECENT_KEY = "sacredpath-oracle-recent";
 const JOURNEY_KEY = "sacredpath-journey-oracle";
 const ORACLE_WAVENET_VOICE = import.meta.env.VITE_ORACLE_WAVENET_VOICE || "en-US-Wavenet-F";
+const ORACLE_GEMINI_FALLBACK_MODEL =
+  import.meta.env.VITE_ORACLE_GEMINI_TTS_MODEL || "gemini-3.1-flash-tts-preview";
 
 const QUESTION_HELPER =
   "Try: How can I reconnect tonight? What should I understand about my partner? What is blocking intimacy between us?";
@@ -276,7 +278,10 @@ export default function Oracle() {
     ];
   };
 
-  const playBackendSegment = async (card = selectedCard) => {
+  const playBackendSegment = async (
+    card = selectedCard,
+    provider: "google" | "gemini" = "google",
+  ) => {
     if (voiceModeRef.current !== "backend") return;
     const segment = speechSegmentsRef.current[segmentIndexRef.current];
     if (!segment) {
@@ -289,10 +294,11 @@ export default function Oracle() {
         sessionId: `oracle-${card.id}-${Date.now()}-${segmentIndexRef.current}`,
         text: segment.text,
         voiceStyle: "calm",
-        provider: "google",
+        provider,
         voiceName: ORACLE_WAVENET_VOICE,
         speakingRate: 0.84,
         pitch: -1.2,
+        model: provider === "gemini" ? ORACLE_GEMINI_FALLBACK_MODEL : undefined,
       });
       if (voiceModeRef.current !== "backend") return;
       const audio = new Audio(tts.audioUrl);
@@ -312,6 +318,10 @@ export default function Oracle() {
       };
       await audio.play();
     } catch {
+      if (provider === "google") {
+        void playBackendSegment(card, "gemini");
+        return;
+      }
       voiceModeRef.current = "google";
       void playGoogleSegment(card);
     }

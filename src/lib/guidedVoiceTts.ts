@@ -71,6 +71,7 @@ export async function synthesizeGuidedVoiceAudio({
   voiceName,
   speakingRate,
   pitch,
+  model,
 }: {
   sessionId: string;
   text: string;
@@ -79,6 +80,7 @@ export async function synthesizeGuidedVoiceAudio({
   voiceName?: string;
   speakingRate?: number;
   pitch?: number;
+  model?: string;
 }): Promise<TtsResult> {
   const cacheKey = buildCacheKey(sessionId, voiceStyle);
   const cached = audioCache.get(cacheKey);
@@ -110,6 +112,7 @@ export async function synthesizeGuidedVoiceAudio({
       speakingRate,
       pitch,
       engine: provider === "google" ? "wavenet" : undefined,
+      model,
     }),
   });
 
