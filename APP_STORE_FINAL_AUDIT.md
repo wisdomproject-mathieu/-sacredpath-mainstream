@@ -43,8 +43,8 @@ This pass focused on submission-critical stability, premium gating consistency, 
 - Premium test toggle hidden unless explicit dev env flag is enabled.
 
 ### Risks still requiring manual verification
-- Real StoreKit/RevenueCat purchase flow still marked as temporary dev unlock in UI/code.
-- Restore purchases currently testing placeholder message; must be wired to real restore call before production.
+- Real StoreKit/RevenueCat native bridge is still required for production iOS purchase/restore execution.
+- Production web builds now show explicit unavailable state instead of fake purchase/restore success.
 - Final legal text should be reviewed by legal counsel.
 
 ---
@@ -309,6 +309,95 @@ These now prevent dead legal/support CTAs from paywall.
 - Premium gating checked: ✅
 - No major blank/dead production pages in core flow: ✅
 - Remaining release blockers before submission:
-  1. Real StoreKit/RevenueCat purchase + restore wiring
-  2. Lint config migration (`eslint.config.js`)
-  3. Final legal text and App Store metadata verification
+  1. Native StoreKit/RevenueCat bridge wiring and App Store product/offering verification
+  2. Final legal text and App Store metadata verification
+
+---
+
+## Release Blocker Closure — IAP Architecture Found
+
+- **Current app shell/framework:** React + TypeScript + Vite web app (`react-router-dom`).
+- **Purchase library status:** No native StoreKit/RevenueCat SDK integration detected in this repo yet.
+- **Current premium state source:** localStorage key `sacredpath-premium` via `src/lib/premium.ts`.
+- **Dev unlock status:** Exists for testing; now gated behind development-only checks and explicit flag pathways.
+- **Product IDs found/missing:** No previously wired production product IDs found; added constants for review:
+  - `com.sacredpathforcouples.premium.monthly`
+  - `com.sacredpathforcouples.premium.yearly`
+  (must be verified against App Store Connect before submission)
+- **Entitlement ID found/missing:** No enforced runtime entitlement before; now centralized as `premium` in `src/lib/entitlements.ts`.
+- **Recommended final integration path:** Add native RevenueCat bridge (or StoreKit entitlement bridge) and map:
+  - purchase -> entitlement activation
+  - restore -> entitlement refresh
+  - startup refresh -> source of truth for premium UI
+
+## Dev Unlock Hardening
+
+- Dev unlock is now isolated and blocked from production unlock behavior.
+- Local premium mutation helpers in `src/lib/premium.ts` only write when dev conditions are met.
+- Purchase/restore in `src/lib/entitlements.ts`:
+  - use bridge when available
+  - allow temporary test unlock only in dev/test contexts
+  - return explicit “unavailable” state in production web builds without native IAP bridge
+- Production purchase CTA no longer hardcodes localStorage premium unlock path.
+
+## Final Command Results (This Closure Pass)
+
+- `npm install`: ✅ success
+- `npm run lint`: ✅ success
+- `npm run build`: ✅ success
+
+## Manual App Store Connect Checklist — Final
+
+### IAP / Subscription
+- [ ] Subscription group created in App Store Connect.
+- [ ] Monthly product ID verified.
+- [ ] Yearly product ID verified.
+- [ ] Product IDs exactly match code constants.
+- [ ] Products attached to RevenueCat offering if RevenueCat used.
+- [ ] RevenueCat entitlement ID exactly matches code.
+- [ ] RevenueCat offering identifier verified.
+- [ ] Subscription pricing approved.
+- [ ] Subscription localization reviewed.
+- [ ] Subscription screenshot added if required.
+- [ ] IAP/subscriptions submitted with app version for review.
+
+### Reviewer Notes
+- [ ] Explain how reviewer reaches paywall.
+- [ ] Explain how reviewer accesses premium features.
+- [ ] Explain Sacred Voice feature.
+- [ ] Explain Intimacy Oracle feature as guided reflection, not prediction.
+- [ ] Provide test account if account/partner connection is required.
+- [ ] Provide sandbox IAP instructions if needed.
+- [ ] Explain that premium unlocks full ritual library, Sacred Voice, Oracle, and Journey.
+
+### Legal
+- [ ] Privacy Policy URL final.
+- [ ] Terms of Use / EULA URL final.
+- [ ] Support URL final.
+- [ ] Legal text reviewed.
+- [ ] Subscription cancellation/restore wording reviewed.
+
+### Privacy Nutrition Labels
+- [ ] Partner name / profile data assessed.
+- [ ] Relationship/intimacy preferences assessed.
+- [ ] Reflection/journal data assessed.
+- [ ] Purchase data assessed.
+- [ ] User ID / device ID assessed.
+- [ ] Analytics assessed.
+- [ ] Crash diagnostics assessed.
+- [ ] Voice/TTS data assessed.
+- [ ] Supabase data processing assessed.
+- [ ] RevenueCat data processing assessed.
+- [ ] Tracking declaration confirmed.
+- [ ] Data linked to user confirmed.
+- [ ] Data used for tracking confirmed or denied.
+
+### Build / Metadata
+- [ ] Bundle ID verified.
+- [ ] Version and build number updated.
+- [ ] App category selected.
+- [ ] Age rating completed consistently with intimacy content.
+- [ ] Screenshots uploaded.
+- [ ] App preview optional.
+- [ ] Copyright completed.
+- [ ] Support contact completed.

@@ -1,13 +1,19 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Layout from "../components/Layout";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import BackButton from "../components/BackButton";
 import SubscribeButton from "../components/SubscribeButton";
+import { isPremium } from "../lib/premium";
+import { purchasePremium, refreshEntitlement, restorePurchases } from "../lib/entitlements";
 
 export default function Paywall() {
   const [searchParams] = useSearchParams();
+  const [hasPremium, setHasPremium] = useState(isPremium());
+  const [purchaseMessage, setPurchaseMessage] = useState("");
+  const [purchaseBusy, setPurchaseBusy] = useState(false);
+  const [restoreBusy, setRestoreBusy] = useState(false);
   const [restoreMessage, setRestoreMessage] = useState("");
   const source = searchParams.get("source");
   const heading = useMemo(() => {
@@ -21,6 +27,48 @@ export default function Paywall() {
     if (source === "saved") return "Keep building your shared memory.";
     return "Unlock the full Sacred Path for both of you.";
   }, [source]);
+
+  useEffect(() => {
+    let active = true;
+
+    void (async () => {
+      const status = await refreshEntitlement();
+      if (!active) return;
+      setHasPremium(status.active);
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const onPurchase = async () => {
+    if (purchaseBusy) return;
+    setPurchaseBusy(true);
+    setPurchaseMessage("");
+    try {
+      const result = await purchasePremium();
+      setPurchaseMessage(result.message);
+      const status = await refreshEntitlement();
+      setHasPremium(status.active);
+    } finally {
+      setPurchaseBusy(false);
+    }
+  };
+
+  const onRestore = async () => {
+    if (restoreBusy) return;
+    setRestoreBusy(true);
+    setRestoreMessage("");
+    try {
+      const result = await restorePurchases();
+      setRestoreMessage(result.message);
+      const status = await refreshEntitlement();
+      setHasPremium(status.active);
+    } finally {
+      setRestoreBusy(false);
+    }
+  };
 
   return (
     <Layout>
@@ -89,7 +137,13 @@ export default function Paywall() {
 
         {/* Action Buttons */}
         <div className="max-w-xl mx-auto space-y-4">
-          <SubscribeButton source="paywall" mode="purchase" />
+          {!hasPremium ? (
+            <SubscribeButton source="paywall" mode="purchase" onSubscribed={onPurchase} disabled={purchaseBusy} />
+          ) : (
+            <Button variant="secondary" disabled>
+              Premium active for both of you
+            </Button>
+          )}
           <p className="text-center text-xs text-muted">
             Payment and subscription management are handled by the App Store.
           </p>
@@ -114,13 +168,8 @@ export default function Paywall() {
             </ul>
           </Card>
           <div className="grid gap-2 sm:grid-cols-2">
-            <Button
-              variant="secondary"
-              onClick={() =>
-                setRestoreMessage("Restore check complete for testing. Connect StoreKit / RevenueCat restore before production.")
-              }
-            >
-              Restore purchases
+            <Button variant="secondary" onClick={onRestore} disabled={restoreBusy}>
+              {restoreBusy ? "Restoring..." : "Restore purchases"}
             </Button>
             <Link to="/terms" className="block">
               <Button variant="secondary">Terms of Use</Button>
@@ -132,9 +181,10 @@ export default function Paywall() {
               <Button variant="secondary">Support</Button>
             </Link>
           </div>
+          {purchaseMessage ? <p className="text-xs text-muted text-center">{purchaseMessage}</p> : null}
           {restoreMessage ? <p className="text-xs text-muted text-center">{restoreMessage}</p> : null}
           <p className="text-center text-xs text-muted">
-            Premium unlocked for testing. Replace with StoreKit / RevenueCat before production.
+            Purchase and restore require StoreKit / RevenueCat entitlement wiring in production iOS builds.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
           <Button variant="secondary" onClick={() => window.history.back()}>Back to ritual</Button>

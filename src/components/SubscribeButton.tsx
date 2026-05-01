@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { PREMIUM_STORAGE_KEY, goToPaywall } from "../lib/premium";
+import { goToPaywall } from "../lib/premium";
+import { purchasePremium } from "../lib/entitlements";
 
 interface SubscribeButtonProps {
   source: string;
@@ -7,6 +9,7 @@ interface SubscribeButtonProps {
   className?: string;
   fullWidth?: boolean;
   onSubscribed?: () => void;
+  disabled?: boolean;
 }
 
 export default function SubscribeButton({
@@ -15,16 +18,25 @@ export default function SubscribeButton({
   className = "",
   fullWidth = true,
   onSubscribed,
+  disabled = false,
 }: SubscribeButtonProps) {
   const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
 
-  const onClick = () => {
+  const onClick = async () => {
     if (mode === "purchase") {
-      // TEMPORARY DEV UNLOCK — replace with StoreKit / RevenueCat subscription purchase before production.
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(PREMIUM_STORAGE_KEY, "true");
+      if (onSubscribed) {
+        onSubscribed();
+        return;
       }
-      onSubscribed?.();
+      if (busy || disabled) return;
+      setBusy(true);
+      try {
+        const result = await purchasePremium();
+        if (result.ok) onSubscribed?.();
+      } finally {
+        setBusy(false);
+      }
       return;
     }
     goToPaywall(navigate, source);
@@ -34,10 +46,11 @@ export default function SubscribeButton({
     <button
       type="button"
       onClick={onClick}
+      disabled={busy || disabled}
       aria-label="Subscribe to upgrade your intimate life"
-      className={`${fullWidth ? "w-full" : ""} min-h-[58px] rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-6 py-3 font-semibold text-[#130f08] transition-opacity hover:opacity-90 ${className}`.trim()}
+      className={`${fullWidth ? "w-full" : ""} min-h-[58px] rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-6 py-3 font-semibold text-[#130f08] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70 ${className}`.trim()}
     >
-      Subscribe to upgrade your intimate life
+      {busy || disabled ? "Processing..." : "Subscribe to upgrade your intimate life"}
     </button>
   );
 }
