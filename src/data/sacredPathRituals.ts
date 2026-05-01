@@ -3,6 +3,7 @@ import {
   type MainstreamRitual,
   type IntimacyWeather as LegacyWeather,
 } from "./mainstreamRituals200";
+import { masterRituals205 } from "./masterRituals205";
 import { normalizeWeatherPair, type WeatherState } from "../lib/weatherPair";
 
 export type { WeatherState };
@@ -269,6 +270,122 @@ function buildVoiceScript(title: string, setup: string[], steps: string[], closi
   ].join(" ");
 }
 
+function territoryCategory(territory: string): RitualCategory {
+  const t = territory.toLowerCase();
+  if (t.includes("repair") || t.includes("storm")) return "repair";
+  if (t.includes("breath")) return "breath";
+  if (t.includes("gaze") || t.includes("mirror")) return "gaze";
+  if (t.includes("touch") || t.includes("sensation")) return "touch";
+  if (t.includes("play")) return "play";
+  if (t.includes("desire") || t.includes("erotic") || t.includes("sexuality")) return "desire";
+  if (t.includes("container") || t.includes("threshold")) return "arrival";
+  if (t.includes("grounding") || t.includes("care")) return "aftercare";
+  if (t.includes("maps") || t.includes("agreements") || t.includes("individuation")) return "conversation";
+  if (t.includes("integration") || t.includes("long arc")) return "journey";
+  if (t.includes("devotion")) return "devotion";
+  return "journey";
+}
+
+function territoryTone(territory: string): RitualTone {
+  const t = territory.toLowerCase();
+  if (t.includes("repair") || t.includes("storm")) return "repair";
+  if (t.includes("play")) return "playful";
+  if (t.includes("erotic") || t.includes("sensation") || t.includes("sexuality")) return "sensual";
+  if (t.includes("devotion")) return "devotional";
+  if (t.includes("maps") || t.includes("agreements")) return "relationship-science";
+  if (t.includes("daily")) return "daily";
+  return "mainstream";
+}
+
+function territoryWeather(territory: string): WeatherState[] {
+  const t = territory.toLowerCase();
+  if (t.includes("repair") || t.includes("storm")) return ["stormy", "frozen", "foggy", "warm"];
+  if (t.includes("grounding") || t.includes("care")) return ["frozen", "foggy", "stormy", "warm"];
+  if (t.includes("play") || t.includes("erotic") || t.includes("sexuality") || t.includes("sensation"))
+    return ["warm", "electric", "sunny"];
+  if (t.includes("breath") || t.includes("container") || t.includes("threshold") || t.includes("daily"))
+    return ["foggy", "warm", "sunny", "electric"];
+  return ["foggy", "warm", "electric", "sunny", "frozen", "stormy"];
+}
+
+function levelIntensity(level: "L1" | "L2" | "L3"): SacredPathRitual["intensity"] {
+  if (level === "L1") return "gentle";
+  if (level === "L3") return "deep";
+  return "medium";
+}
+
+function makeMasterSetup(territory: string): string[] {
+  const category = territoryCategory(territory);
+  if (category === "repair") {
+    return [
+      "Pause escalation and agree that both partners will speak respectfully.",
+      "Set one intention: repair first, then decide next steps together.",
+      "Confirm either partner can pause at any point.",
+    ];
+  }
+  if (category === "desire" || category === "play") {
+    return [
+      "Confirm mutual consent and agree on a clear pause word.",
+      "Choose a pace that feels playful without pressure.",
+      "Name one welcome and one boundary before you begin.",
+    ];
+  }
+  return [
+    "Put devices away and choose one uninterrupted window together.",
+    "Take two slow breaths and agree on a gentle pace.",
+    "Name one intention for this practice in one sentence.",
+  ];
+}
+
+function toMasterRituals(): SacredPathRitual[] {
+  return masterRituals205.map((entry, index) => {
+    const category = territoryCategory(entry.territory);
+    const tone = territoryTone(entry.territory);
+    const weather = territoryWeather(entry.territory);
+    const intensity = levelIntensity(entry.level);
+    const setup = makeMasterSetup(entry.territory);
+    const steps = entry.steps.length >= 4 ? entry.steps.slice(0, 6) : [...entry.steps, "Close by naming one thing you appreciated in each other."];
+    const closing =
+      category === "repair"
+        ? "Close by confirming one repair action for tonight and one caring next step."
+        : "Close with one breath together and one sentence of appreciation each.";
+    const reflectionPrompt =
+      category === "repair"
+        ? "What helped de-escalate most, and what will you repeat next time?"
+        : "What shifted in your connection after this ritual?";
+
+    return {
+      id: `master-${entry.docIndex}`,
+      title: entry.title,
+      subtitle: entry.essence,
+      level: entry.level,
+      tier: entry.level === "L1" && index < 28 ? "free-daily" : "premium",
+      tone,
+      category,
+      durationMinutes: entry.durationMinutes,
+      intensity,
+      weather,
+      pairings: buildPairings(weather, { category, tone }),
+      imageMood: weather[0],
+      bestFor: [entry.territory, category],
+      setup,
+      steps,
+      closing,
+      reflectionPrompt,
+      voiceScript: buildVoiceScript(entry.title, setup, steps, closing),
+      sourceFamily: "expanded-practices",
+      consentNote:
+        category === "desire" || category === "play"
+          ? "Use explicit consent, shared pacing, and stop immediately if either partner feels unsure."
+          : undefined,
+      safetyNote:
+        category === "desire" || category === "play"
+          ? "Only continue where both partners feel safe, willing, and fully respected."
+          : undefined,
+    };
+  });
+}
+
 function customArrivalRituals(): SacredPathRitual[] {
   return [
     {
@@ -491,7 +608,9 @@ function buildRitual(ritual: MainstreamRitual, i: number): SacredPathRitual {
 const baseCanonical = mainstreamRituals200.map(buildRitual);
 const customById = new Map(customArrivalRituals().map((r) => [r.id, r]));
 const withOverrides = baseCanonical.map((r) => customById.get(r.id) ?? r);
-const appended = withOverrides.concat(customArrivalRituals().filter((r) => !withOverrides.some((b) => b.id === r.id)));
+const withCustom = withOverrides.concat(customArrivalRituals().filter((r) => !withOverrides.some((b) => b.id === r.id)));
+const master = toMasterRituals();
+const appended = withCustom.concat(master.filter((r) => !withCustom.some((b) => b.id === r.id)));
 
 export const sacredPathRituals: SacredPathRitual[] = appended;
 export const sacredPathRitualsById = Object.fromEntries(sacredPathRituals.map((r) => [r.id, r]));
