@@ -38,6 +38,7 @@ export default function Journey() {
   const [savedNotes, setSavedNotes] = useState<string[]>([]);
   const [oracleEntries, setOracleEntries] = useState<OracleEntry[]>([]);
   const [toast, setToast] = useState("");
+  const [oracleAccordionOpen, setOracleAccordionOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -237,7 +238,8 @@ export default function Journey() {
         </Card>
 
         {showDashboard ? (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
             <Card className="space-y-3">
               <h2 className="font-serif text-2xl">Favorite rituals</h2>
               <div className="flex gap-2">
@@ -293,27 +295,6 @@ export default function Journey() {
                       >
                         Delete
                       </button>
-                    </div>
-                  ))
-                )}
-              </div>
-            </Card>
-
-            <Card className="space-y-3 md:col-span-2">
-              <h2 className="font-serif text-2xl">Saved Oracle guidance</h2>
-              <p className="text-sm text-muted">
-                Oracle cards saved from Intimacy Oracle appear here.
-              </p>
-              <div className="space-y-2">
-                {oracleEntries.length === 0 ? (
-                  <p className="text-sm text-muted">No Oracle guidance saved yet.</p>
-                ) : (
-                  oracleEntries.slice(0, 8).map((entry, index) => (
-                    <div key={`${entry.cardTitle}-${entry.date}-${index}`} className="rounded-xl border border-white/10 bg-white/5 px-3 py-3">
-                      <p className="text-xs uppercase tracking-[0.15em] text-accent">{entry.cardTitle}</p>
-                      {entry.question ? <p className="mt-1 text-sm text-muted">Question: {entry.question}</p> : null}
-                      <p className="mt-1 text-sm">{entry.message}</p>
-                      <p className="mt-1 text-sm text-accent">Action: {entry.action}</p>
                     </div>
                   ))
                 )}
@@ -392,6 +373,42 @@ export default function Journey() {
                   ))
                 )}
               </div>
+            </Card>
+            </div>
+
+            <Card className="space-y-3">
+              <button
+                type="button"
+                onClick={() => setOracleAccordionOpen((prev) => !prev)}
+                className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-left transition hover:bg-white/10"
+                aria-expanded={oracleAccordionOpen}
+                aria-controls="oracle-guidance-accordion"
+              >
+                <div>
+                  <h2 className="font-serif text-2xl">Saved Oracle guidance</h2>
+                  <p className="text-sm text-muted">Saved guidance from Intimacy Oracle</p>
+                </div>
+                <span className="text-sm font-semibold text-accent">
+                  {oracleAccordionOpen ? "Hide" : "Show"}
+                </span>
+              </button>
+
+              {oracleAccordionOpen ? (
+                <div id="oracle-guidance-accordion" className="space-y-2">
+                  {oracleEntries.length === 0 ? (
+                    <p className="text-sm text-muted">No Oracle guidance saved yet.</p>
+                  ) : (
+                    oracleEntries.slice(0, 8).map((entry, index) => (
+                      <div key={`${entry.cardTitle}-${entry.date}-${index}`} className="rounded-xl border border-white/10 bg-white/5 px-3 py-3">
+                        <p className="text-xs uppercase tracking-[0.15em] text-accent">{entry.cardTitle}</p>
+                        {entry.question ? <p className="mt-1 text-sm text-muted">Question: {entry.question}</p> : null}
+                        <p className="mt-1 text-sm">{entry.message}</p>
+                        <p className="mt-1 text-sm text-accent">Action: {entry.action}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              ) : null}
             </Card>
           </div>
         ) : null}
