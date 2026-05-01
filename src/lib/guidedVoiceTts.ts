@@ -105,22 +105,38 @@ export async function synthesizeGuidedVoiceAudio({
   // Optional only: some deployments keep the function public and do not require apikey.
   if (publishableKey) headers.apikey = publishableKey;
 
+  const bodyPayload: Record<string, unknown> = {
+    text,
+    provider,
+    lang: "en",
+    voiceStyle,
+    voiceName,
+    speakingRate,
+    pitch,
+    engine: provider === "google" ? "wavenet" : provider === "polly" ? "neural" : undefined,
+    model,
+    voiceId,
+    format,
+  };
+
+  if (provider === "polly") {
+    // Compatibility aliases for different backend implementations.
+    bodyPayload.ttsProvider = "polly";
+    bodyPayload.awsVoiceId = voiceId;
+    bodyPayload.languageCode = "en-US";
+    bodyPayload.outputFormat = format ?? "mp3";
+    bodyPayload.polly = {
+      voiceId,
+      engine: "neural",
+      languageCode: "en-US",
+      outputFormat: format ?? "mp3",
+    };
+  }
+
   const response = await fetch(endpoint, {
     method: "POST",
     headers,
-    body: JSON.stringify({
-      text,
-      provider,
-      lang: "en",
-      voiceStyle,
-      voiceName,
-      speakingRate,
-      pitch,
-      engine: provider === "google" ? "wavenet" : undefined,
-      model,
-      voiceId,
-      format,
-    }),
+    body: JSON.stringify(bodyPayload),
   });
 
   if (!response.ok) {

@@ -22,6 +22,8 @@ const ORACLE_POLLY_VOICE_ID = import.meta.env.VITE_ORACLE_POLLY_VOICE_ID || "Kim
 const ORACLE_WAVENET_VOICE = import.meta.env.VITE_ORACLE_WAVENET_VOICE || "en-US-Wavenet-F";
 const ORACLE_GEMINI_FALLBACK_MODEL =
   import.meta.env.VITE_ORACLE_GEMINI_TTS_MODEL || "gemini-3.1-flash-tts-preview";
+const ORACLE_STRICT_POLLY =
+  String(import.meta.env.VITE_ORACLE_STRICT_POLLY ?? "true").toLowerCase() === "true";
 
 const QUESTION_HELPER =
   "Try: How can I reconnect tonight? What should I understand about my partner? What is blocking intimacy between us?";
@@ -303,6 +305,9 @@ export default function Oracle() {
         voiceId: provider === "polly" ? ORACLE_POLLY_VOICE_ID : undefined,
         format: provider === "polly" ? "mp3" : undefined,
       });
+      if (provider === "polly" && tts.provider !== "polly") {
+        throw new Error("Polly provider not returned by backend");
+      }
       if (voiceModeRef.current !== "backend") return;
       const audio = new Audio(tts.audioUrl);
       audioRef.current = audio;
@@ -322,6 +327,12 @@ export default function Oracle() {
       await audio.play();
     } catch {
       if (provider === "polly") {
+        if (ORACLE_STRICT_POLLY) {
+          setNotice("Amazon Polly (Kimberly) is unavailable right now. Please verify backend provider routing to Polly.");
+          setVoiceStatus("idle");
+          voiceModeRef.current = "none";
+          return;
+        }
         void playBackendSegment(card, "google");
         return;
       }
