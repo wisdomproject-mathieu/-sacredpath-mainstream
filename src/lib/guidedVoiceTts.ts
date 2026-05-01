@@ -1,4 +1,4 @@
-export type VoiceProvider = "google" | "gemini" | "edge" | "elevenlabs" | "browser";
+export type VoiceProvider = "google" | "gemini" | "edge" | "elevenlabs" | "polly" | "browser";
 
 export type TtsResult = {
   provider: VoiceProvider;
@@ -41,6 +41,7 @@ export function getVoiceProviderFromHeader(response: Response): VoiceProvider {
   if (header === "gemini") return "gemini";
   if (header === "edge") return "edge";
   if (header === "elevenlabs") return "elevenlabs";
+  if (header === "polly") return "polly";
   return "google";
 }
 
@@ -72,6 +73,8 @@ export async function synthesizeGuidedVoiceAudio({
   speakingRate,
   pitch,
   model,
+  voiceId,
+  format,
 }: {
   sessionId: string;
   text: string;
@@ -81,6 +84,8 @@ export async function synthesizeGuidedVoiceAudio({
   speakingRate?: number;
   pitch?: number;
   model?: string;
+  voiceId?: string;
+  format?: "mp3" | "ogg_vorbis" | "pcm";
 }): Promise<TtsResult> {
   const cacheKey = buildCacheKey(sessionId, voiceStyle);
   const cached = audioCache.get(cacheKey);
@@ -113,6 +118,8 @@ export async function synthesizeGuidedVoiceAudio({
       pitch,
       engine: provider === "google" ? "wavenet" : undefined,
       model,
+      voiceId,
+      format,
     }),
   });
 

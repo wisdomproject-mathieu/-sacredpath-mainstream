@@ -18,6 +18,7 @@ import { playGoogleTranslateSegment } from "../lib/googleTranslateTts";
 const DAILY_KEY = "sacredpath-oracle-daily";
 const RECENT_KEY = "sacredpath-oracle-recent";
 const JOURNEY_KEY = "sacredpath-journey-oracle";
+const ORACLE_POLLY_VOICE_ID = import.meta.env.VITE_ORACLE_POLLY_VOICE_ID || "Kimberly";
 const ORACLE_WAVENET_VOICE = import.meta.env.VITE_ORACLE_WAVENET_VOICE || "en-US-Wavenet-F";
 const ORACLE_GEMINI_FALLBACK_MODEL =
   import.meta.env.VITE_ORACLE_GEMINI_TTS_MODEL || "gemini-3.1-flash-tts-preview";
@@ -280,7 +281,7 @@ export default function Oracle() {
 
   const playBackendSegment = async (
     card = selectedCard,
-    provider: "google" | "gemini" = "google",
+    provider: "polly" | "google" | "gemini" = "polly",
   ) => {
     if (voiceModeRef.current !== "backend") return;
     const segment = speechSegmentsRef.current[segmentIndexRef.current];
@@ -299,6 +300,8 @@ export default function Oracle() {
         speakingRate: 0.84,
         pitch: -1.2,
         model: provider === "gemini" ? ORACLE_GEMINI_FALLBACK_MODEL : undefined,
+        voiceId: provider === "polly" ? ORACLE_POLLY_VOICE_ID : undefined,
+        format: provider === "polly" ? "mp3" : undefined,
       });
       if (voiceModeRef.current !== "backend") return;
       const audio = new Audio(tts.audioUrl);
@@ -318,6 +321,10 @@ export default function Oracle() {
       };
       await audio.play();
     } catch {
+      if (provider === "polly") {
+        void playBackendSegment(card, "google");
+        return;
+      }
       if (provider === "google") {
         void playBackendSegment(card, "gemini");
         return;

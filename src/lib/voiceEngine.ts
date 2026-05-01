@@ -48,6 +48,7 @@ const PACING = {
     closing: 15000,
   },
 } as const;
+const POLLY_VOICE_ID = import.meta.env.VITE_ORACLE_POLLY_VOICE_ID || "Kimberly";
 
 let queue: VoiceSegment[] = [];
 let queueIndex = 0;
@@ -83,30 +84,15 @@ function scheduleNextAudio(sessionId: string, voiceStyle: VoiceStyle): void {
   const segment = queue[queueIndex];
   void (async () => {
     try {
-      const audio = await playGoogleTranslateSegment(segment.text, {
-        lang: "en",
-        rate: 0.82,
-        onEnded: () => {
-          if (stopped) return;
-          clearPauseTimer();
-          pauseTimer = window.setTimeout(() => {
-            if (stopped || paused) return;
-            queueIndex += 1;
-            scheduleNextAudio(sessionId, voiceStyle);
-          }, segment.pauseAfterMs);
-        },
-      });
-      activeAudio = audio;
-      return;
-    } catch {
-      // Continue to backend chain.
-    }
-
-    try {
       const result = await synthesizeGuidedVoiceAudio({
         sessionId: `${sessionId}-${segment.id}`,
         text: segment.text,
+        provider: "polly",
         voiceStyle,
+        voiceId: POLLY_VOICE_ID,
+        speakingRate: 0.84,
+        pitch: -1.2,
+        format: "mp3",
       });
       if (stopped) return;
       const audio = new Audio(result.audioUrl);
@@ -129,6 +115,25 @@ function scheduleNextAudio(sessionId: string, voiceStyle: VoiceStyle): void {
 
       await audio.play();
     } catch (error) {
+      try {
+        const audio = await playGoogleTranslateSegment(segment.text, {
+          lang: "en",
+          rate: 0.82,
+          onEnded: () => {
+            if (stopped) return;
+            clearPauseTimer();
+            pauseTimer = window.setTimeout(() => {
+              if (stopped || paused) return;
+              queueIndex += 1;
+              scheduleNextAudio(sessionId, voiceStyle);
+            }, segment.pauseAfterMs);
+          },
+        });
+        activeAudio = audio;
+        return;
+      } catch {
+        // Continue to device fallback.
+      }
       if (stopped) return;
       console.warn("[Guided Voice] backend segment failed, switching to device voice", error);
       fallbackMode = true;
