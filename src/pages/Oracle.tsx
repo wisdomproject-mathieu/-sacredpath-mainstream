@@ -13,7 +13,7 @@ import {
 } from "../lib/intimacyOracle";
 import { intimacyOracleCards } from "../data/intimacyOracle";
 import { synthesizeGuidedVoiceAudio } from "../lib/guidedVoiceTts";
-import { playGoogleTranslateSegment } from "../lib/googleTranslateTts";
+import { playGoogleTranslateSegment, splitTextForTts } from "../lib/googleTranslateTts";
 
 const DAILY_KEY = "sacredpath-oracle-daily";
 const RECENT_KEY = "sacredpath-oracle-recent";
@@ -304,7 +304,7 @@ export default function Oracle() {
         text: segment.text,
         voiceStyle: "calm",
         provider,
-        voiceName: provider === "gemini" ? ORACLE_POLLY_VOICE_ID : ORACLE_WAVENET_VOICE,
+        voiceName: provider === "google" ? ORACLE_WAVENET_VOICE : undefined,
         speakingRate: 0.84,
         pitch: -1.2,
         model: provider === "gemini" ? ORACLE_GEMINI_FALLBACK_MODEL : undefined,
@@ -339,6 +339,31 @@ export default function Oracle() {
     }
   };
 
+  const playGoogleChunkedSegment = async (text: string): Promise<void> => {
+    const chunks = splitTextForTts(humanizeForVoice(text), 160);
+    for (let index = 0; index < chunks.length; index += 1) {
+      if (voiceModeRef.current !== "google") return;
+      await new Promise<void>((resolve, reject) => {
+        void playGoogleTranslateSegment(chunks[index], {
+          lang: "en",
+          rate: 0.78,
+          onEnded: () => resolve(),
+          onError: () => reject(new Error("google-tts-chunk-failed")),
+        })
+          .then((audio) => {
+            audioRef.current = audio;
+          })
+          .catch(reject);
+      });
+      if (voiceModeRef.current !== "google") return;
+      if (index < chunks.length - 1) {
+        await new Promise<void>((resolve) => {
+          queueTimerRef.current = window.setTimeout(() => resolve(), 420);
+        });
+      }
+    }
+  };
+
   const playGoogleSegment = async (card = selectedCard) => {
     if (voiceModeRef.current !== "google") return;
     const segment = speechSegmentsRef.current[segmentIndexRef.current];
@@ -349,30 +374,13 @@ export default function Oracle() {
     }
 
     try {
-      const audio = await playGoogleTranslateSegment(humanizeForVoice(segment.text), {
-        lang: "en",
-        rate: 0.82,
-        onEnded: () => {
-          if (voiceModeRef.current !== "google") return;
-          queueTimerRef.current = window.setTimeout(() => {
-            if (voiceModeRef.current !== "google") return;
-            segmentIndexRef.current += 1;
-            void playGoogleSegment(card);
-          }, segment.pauseAfterMs);
-        },
-        onError: () => {
-          if (voiceModeRef.current !== "google") return;
-          if (typeof window !== "undefined" && "speechSynthesis" in window) {
-            voiceModeRef.current = "browser";
-            playBrowserSegment();
-            return;
-          }
-          setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
-          setVoiceStatus("idle");
-          voiceModeRef.current = "none";
-        },
-      });
-      audioRef.current = audio;
+      await playGoogleChunkedSegment(segment.text);
+      if (voiceModeRef.current !== "google") return;
+      queueTimerRef.current = window.setTimeout(() => {
+        if (voiceModeRef.current !== "google") return;
+        segmentIndexRef.current += 1;
+        void playGoogleSegment(card);
+      }, segment.pauseAfterMs);
     } catch {
       if (typeof window !== "undefined" && "speechSynthesis" in window) {
         voiceModeRef.current = "browser";
