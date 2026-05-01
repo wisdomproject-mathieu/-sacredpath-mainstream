@@ -18,6 +18,7 @@ import Connect from "./pages/Connect";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Support from "./pages/Support";
+import Tools from "./pages/Tools";
 import { SessionProvider } from "./contexts/SessionContext";
 
 function ScrollToTop() {
@@ -45,6 +46,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/oracle" element={<IntimacyOracle />} />
           <Route path="/intimacy-oracle" element={<IntimacyOracle />} />
           <Route path="/journey" element={<Journey />} />
+          <Route path="/tools" element={<Tools />} />
           <Route path="/connect" element={<Connect />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />

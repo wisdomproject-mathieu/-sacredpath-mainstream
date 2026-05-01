@@ -128,10 +128,7 @@ export default function Rituals() {
         <header className="text-center space-y-3">
           <h1 className="font-serif text-4xl md:text-5xl">A complete intimacy library for the two of you.</h1>
           <p className="text-muted max-w-3xl mx-auto">
-            One daily practice is free. Unlock <span className="text-accent font-semibold">400+ rituals</span>, guided voice, oracle prompts, and shared journey tools for both partners.
-          </p>
-          <p className="mx-auto inline-flex rounded-full border border-accent/35 bg-accent/10 px-4 py-2 text-xs tracking-[0.14em] text-accent uppercase">
-            New rituals and couple features are added continuously in the coming months.
+            One daily practice is free. Unlock <span className="text-accent font-semibold">400+ rituals</span>, guided voice, oracle prompts, and shared journey tools for both partners, with new practices and features added regularly.
           </p>
         </header>
 
@@ -300,22 +297,6 @@ export default function Rituals() {
           </>
         )}
 
-        {!hasPremium ? (
-          <section className="rounded-2xl border border-accent/40 bg-gradient-to-br from-[#e6b980]/25 to-[#eacda3]/20 p-6 text-center">
-            <p className="font-serif text-2xl md:text-3xl leading-snug">
-              Subscribe for two,
-              <br />
-              great Intimacy,
-              <br />
-              Deep connection.
-              <br />
-              only 29$ per year,
-              <br />
-              for both of you
-            </p>
-            <SubscribeButton source="rituals" mode="navigate" className="mt-5" />
-          </section>
-        ) : null}
       </div>
       {toast ? (
         <div className="fixed left-1/2 top-4 z-50 -translate-x-1/2 rounded-full border border-accent/40 bg-[#161126]/95 px-4 py-2 text-xs text-accent shadow-lg">
