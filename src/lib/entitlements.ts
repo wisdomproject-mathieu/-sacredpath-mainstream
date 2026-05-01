@@ -1,11 +1,28 @@
 import { PREMIUM_STORAGE_KEY } from "./premium";
 
-export const ENTITLEMENT_ID = "premium";
-export const IOS_MONTHLY_PRODUCT_ID = "com.sacredpathforcouples.premium.monthly";
-export const IOS_YEARLY_PRODUCT_ID = "com.sacredpathforcouples.premium.yearly";
+export const ENTITLEMENT_ID = import.meta.env.VITE_REVENUECAT_ENTITLEMENT_ID || "premium";
+export const OFFERING_ID = import.meta.env.VITE_REVENUECAT_OFFERING_ID || "default";
+export const IOS_MONTHLY_PRODUCT_ID =
+  import.meta.env.VITE_IAP_MONTHLY_PRODUCT_ID || "com.sacredpathforcouples.premium.monthly";
+export const IOS_YEARLY_PRODUCT_ID =
+  import.meta.env.VITE_IAP_YEARLY_PRODUCT_ID || "com.sacredpathforcouples.premium.yearly";
+
+const REVENUECAT_IOS_API_KEY = import.meta.env.VITE_REVENUECAT_IOS_API_KEY;
 
 // TEMPORARY DEV PREMIUM STATE — replace with StoreKit / RevenueCat entitlement validation before production.
 const DEV_UNLOCK_FLAG = "VITE_ENABLE_DEV_PREMIUM_UNLOCK";
+
+let revenueCatConfigured = false;
+let cachedPackages: SubscriptionPackage[] = [];
+const cachedNativePackageByProductId = new Map<string, unknown>();
+
+export type SubscriptionPackage = {
+  id: string;
+  productId: string;
+  title: string;
+  priceString: string;
+  period?: string;
+};
 
 type PurchaseStatus =
   | "purchased"
@@ -32,10 +49,53 @@ type RevenueCatCustomerInfoLike = {
   };
 };
 
+type RevenueCatOfferingsLike = {
+  current?: {
+    identifier?: string;
+    availablePackages?: Array<{
+      identifier?: string;
+      packageType?: string;
+      product?: {
+        identifier?: string;
+        title?: string;
+        priceString?: string;
+        subscriptionPeriod?: string;
+      };
+      storeProduct?: {
+        identifier?: string;
+        title?: string;
+        priceString?: string;
+        subscriptionPeriod?: string;
+      };
+    }>;
+  };
+  all?: Record<string, {
+    identifier?: string;
+    availablePackages?: Array<{
+      identifier?: string;
+      packageType?: string;
+      product?: {
+        identifier?: string;
+        title?: string;
+        priceString?: string;
+        subscriptionPeriod?: string;
+      };
+      storeProduct?: {
+        identifier?: string;
+        title?: string;
+        priceString?: string;
+        subscriptionPeriod?: string;
+      };
+    }>;
+  }>;
+};
+
 type RevenueCatBridge = {
-  purchasePackage?: (packageId?: string) => Promise<{ customerInfo?: RevenueCatCustomerInfoLike }>;
-  restorePurchases?: () => Promise<{ customerInfo?: RevenueCatCustomerInfoLike }>;
+  configure?: (args: { apiKey: string }) => Promise<void> | void;
+  getOfferings?: () => Promise<RevenueCatOfferingsLike>;
   getCustomerInfo?: () => Promise<RevenueCatCustomerInfoLike>;
+  purchasePackage?: (args: { aPackage: unknown }) => Promise<{ customerInfo?: RevenueCatCustomerInfoLike }>;
+  restorePurchases?: () => Promise<{ customerInfo?: RevenueCatCustomerInfoLike }>;
 };
 
 declare global {
@@ -52,6 +112,13 @@ export function isDevPremiumUnlockAllowed(): boolean {
   return readDevFlag() && !import.meta.env.PROD;
 }
 
+export function isNativeIosRuntime(): boolean {
+  if (typeof window === "undefined") return false;
+  const capacitor = (window as { Capacitor?: { isNativePlatform?: () => boolean; getPlatform?: () => string } })
+    .Capacitor;
+  return Boolean(capacitor?.isNativePlatform?.() && capacitor?.getPlatform?.() === "ios");
+}
+
 function setLocalPremium(active: boolean): void {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(PREMIUM_STORAGE_KEY, active ? "true" : "false");
@@ -62,13 +129,97 @@ function hasActiveEntitlement(customerInfo: RevenueCatCustomerInfoLike | undefin
   return Boolean(customerInfo.entitlements.active[ENTITLEMENT_ID]);
 }
 
-function getBridge(): RevenueCatBridge | undefined {
-  if (typeof window === "undefined") return undefined;
-  return window.RevenueCatBridge;
+async function getNativeRevenueCatBridge(): Promise<RevenueCatBridge | null> {
+  if (!isNativeIosRuntime()) return null;
+
+  try {
+    const module = (await import("@revenuecat/purchases-capacitor")) as {
+      Purchases?: RevenueCatBridge;
+    };
+
+    if (!module.Purchases) return null;
+
+    if (!revenueCatConfigured) {
+      if (!REVENUECAT_IOS_API_KEY) {
+        throw new Error("Missing VITE_REVENUECAT_IOS_API_KEY");
+      }
+      await module.Purchases.configure?.({ apiKey: REVENUECAT_IOS_API_KEY });
+      revenueCatConfigured = true;
+    }
+
+    return module.Purchases;
+  } catch {
+    return null;
+  }
+}
+
+function getLegacyWindowBridge(): RevenueCatBridge | null {
+  if (typeof window === "undefined") return null;
+  return window.RevenueCatBridge ?? null;
+}
+
+function normalizePackagesFromOffering(offerings: RevenueCatOfferingsLike | undefined): SubscriptionPackage[] {
+  const allOfferings = offerings?.all ?? {};
+  const selectedOffering =
+    allOfferings[OFFERING_ID] ??
+    offerings?.current ??
+    Object.values(allOfferings)[0];
+
+  const packages = selectedOffering?.availablePackages ?? [];
+
+  return packages
+    .map((pkg) => {
+      const product = pkg.storeProduct ?? pkg.product;
+      const productId = product?.identifier ?? "";
+      if (!productId) return null;
+      return {
+        id: pkg.identifier || pkg.packageType || productId,
+        productId,
+        title: product?.title || (productId === IOS_YEARLY_PRODUCT_ID ? "Yearly" : "Monthly"),
+        priceString: product?.priceString || "",
+        period: product?.subscriptionPeriod,
+      } satisfies SubscriptionPackage;
+    })
+    .filter((item): item is SubscriptionPackage => Boolean(item));
+}
+
+async function getBridge(): Promise<RevenueCatBridge | null> {
+  const native = await getNativeRevenueCatBridge();
+  if (native) return native;
+  return getLegacyWindowBridge();
+}
+
+export async function getAvailablePackages(): Promise<SubscriptionPackage[]> {
+  const bridge = await getBridge();
+  if (!bridge?.getOfferings) return [];
+
+  try {
+    const offerings = await bridge.getOfferings();
+    cachedNativePackageByProductId.clear();
+    const allOfferings = offerings?.all ?? {};
+    const selectedOffering =
+      allOfferings[OFFERING_ID] ??
+      offerings?.current ??
+      Object.values(allOfferings)[0];
+    const rawPackages = selectedOffering?.availablePackages ?? [];
+    for (const pkg of rawPackages) {
+      const product = pkg.storeProduct ?? pkg.product;
+      const productId = product?.identifier;
+      if (productId) {
+        cachedNativePackageByProductId.set(productId, pkg as unknown);
+      }
+    }
+
+    const packages = normalizePackagesFromOffering(offerings);
+    cachedPackages = packages;
+    return packages;
+  } catch {
+    return [];
+  }
 }
 
 export async function refreshEntitlement(): Promise<PremiumStatus> {
-  const bridge = getBridge();
+  const bridge = await getBridge();
 
   if (bridge?.getCustomerInfo) {
     try {
@@ -97,12 +248,38 @@ export async function getPremiumStatus(): Promise<PremiumStatus> {
   return refreshEntitlement();
 }
 
-export async function purchasePremium(packageId = IOS_YEARLY_PRODUCT_ID): Promise<PurchaseResult> {
-  const bridge = getBridge();
+function findPackageForProductId(productId: string): SubscriptionPackage | null {
+  return cachedPackages.find((pkg) => pkg.productId === productId || pkg.id === productId) ?? null;
+}
+
+export async function purchasePremium(productId = IOS_YEARLY_PRODUCT_ID): Promise<PurchaseResult> {
+  const bridge = await getBridge();
 
   if (bridge?.purchasePackage) {
     try {
-      const result = await bridge.purchasePackage(packageId);
+      if (cachedPackages.length === 0) {
+        await getAvailablePackages();
+      }
+
+      const selected = findPackageForProductId(productId);
+      if (!selected) {
+        return {
+          ok: false,
+          status: "unavailable",
+          message: "Subscription package is unavailable right now. Please try again shortly.",
+        };
+      }
+
+      const nativePackage = cachedNativePackageByProductId.get(selected.productId);
+      if (!nativePackage) {
+        return {
+          ok: false,
+          status: "unavailable",
+          message: "Subscription package metadata is unavailable right now. Please try again.",
+        };
+      }
+
+      const result = await bridge.purchasePackage({ aPackage: nativePackage });
       const active = hasActiveEntitlement(result.customerInfo);
       setLocalPremium(active);
 
@@ -147,7 +324,7 @@ export async function purchasePremium(packageId = IOS_YEARLY_PRODUCT_ID): Promis
 }
 
 export async function restorePurchases(): Promise<PurchaseResult> {
-  const bridge = getBridge();
+  const bridge = await getBridge();
 
   if (bridge?.restorePurchases) {
     try {

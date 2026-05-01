@@ -6,7 +6,14 @@ import Button from "../components/Button";
 import BackButton from "../components/BackButton";
 import SubscribeButton from "../components/SubscribeButton";
 import { isPremium } from "../lib/premium";
-import { purchasePremium, refreshEntitlement, restorePurchases } from "../lib/entitlements";
+import {
+  IOS_YEARLY_PRODUCT_ID,
+  getAvailablePackages,
+  purchasePremium,
+  refreshEntitlement,
+  restorePurchases,
+  type SubscriptionPackage,
+} from "../lib/entitlements";
 
 export default function Paywall() {
   const [searchParams] = useSearchParams();
@@ -15,6 +22,9 @@ export default function Paywall() {
   const [purchaseBusy, setPurchaseBusy] = useState(false);
   const [restoreBusy, setRestoreBusy] = useState(false);
   const [restoreMessage, setRestoreMessage] = useState("");
+  const [packages, setPackages] = useState<SubscriptionPackage[]>([]);
+  const [selectedProductId, setSelectedProductId] = useState(IOS_YEARLY_PRODUCT_ID);
+  const [offeringsMessage, setOfferingsMessage] = useState("");
   const source = searchParams.get("source");
   const heading = useMemo(() => {
     if (source === "home") return "Unlock the full Sacred Path for both of you.";
@@ -35,6 +45,15 @@ export default function Paywall() {
       const status = await refreshEntitlement();
       if (!active) return;
       setHasPremium(status.active);
+
+      const available = await getAvailablePackages();
+      if (!active) return;
+      setPackages(available);
+      if (available.length > 0) {
+        setSelectedProductId(available[0].productId);
+      } else {
+        setOfferingsMessage("Subscription options will appear automatically in iOS sandbox/TestFlight once RevenueCat offerings are available.");
+      }
     })();
 
     return () => {
@@ -47,7 +66,7 @@ export default function Paywall() {
     setPurchaseBusy(true);
     setPurchaseMessage("");
     try {
-      const result = await purchasePremium();
+      const result = await purchasePremium(selectedProductId);
       setPurchaseMessage(result.message);
       const status = await refreshEntitlement();
       setHasPremium(status.active);
@@ -166,6 +185,28 @@ export default function Paywall() {
               <li>Repair milestones</li>
               <li>Weather-based recommendations</li>
             </ul>
+            {packages.length > 0 ? (
+              <div className="mt-4 space-y-2">
+                <p className="text-xs uppercase tracking-[0.14em] text-accent">Available subscriptions</p>
+                {packages.map((pkg) => (
+                  <button
+                    key={pkg.productId}
+                    type="button"
+                    onClick={() => setSelectedProductId(pkg.productId)}
+                    className={`w-full rounded-xl border px-3 py-2 text-left text-sm transition ${
+                      selectedProductId === pkg.productId
+                        ? "border-accent bg-accent/10"
+                        : "border-white/10 bg-white/5 hover:bg-white/10"
+                    }`}
+                  >
+                    <p className="font-semibold">{pkg.title || pkg.productId}</p>
+                    <p className="text-xs text-muted">{pkg.priceString || pkg.productId}</p>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-4 text-xs text-muted">{offeringsMessage || "Loading subscription options..."}</p>
+            )}
           </Card>
           <div className="grid gap-2 sm:grid-cols-2">
             <Button variant="secondary" onClick={onRestore} disabled={restoreBusy}>

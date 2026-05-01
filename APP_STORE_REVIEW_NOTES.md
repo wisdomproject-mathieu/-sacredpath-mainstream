@@ -12,6 +12,7 @@ Premium unlocks:
 - Intimacy Oracle deeper guidance
 - Journey dashboard tools
 - Saved reflections and milestones
+- Premium unlock is handled through Apple in-app subscription flow (via RevenueCat integration in iOS builds).
 
 ## How to reach premium flow
 1. Open Home.
@@ -20,15 +21,17 @@ Premium unlocks:
 
 ## Purchase and restore behavior
 - Purchase and restore are implemented through the in-app entitlement layer.
-- If StoreKit/RevenueCat native bridge is available in the review build, entitlement activates automatically after purchase/restore.
+- In iOS native builds with RevenueCat configured, entitlement activates automatically after purchase/restore.
 - Restore Purchases button is visible on paywall.
+- Sandbox details: [Sandbox test account if required]
+- Product IDs: [Subscription product IDs]
 
 ## How to access key features
 - **Intimacy Weather:** Home -> Check our weather
 - **Ritual Library:** Home -> Browse rituals
 - **Intimacy Oracle:** Home -> Ask the Intimacy Oracle
-- **Sacred Voice:** Available as guided voice flow from Oracle/Ritual-related paths
-- **Journey:** Home or bottom nav -> Journey
+- **Sacred Voice:** Premium feature available as guided voice flow from Oracle/Ritual-related paths
+- **Journey:** Home or bottom nav -> Journey (free starter + premium-expanded tools)
 
 ## Oracle policy framing
 Intimacy Oracle is a guided reflection feature. It does not claim to predict the future, diagnose mental health conditions, or provide medical/therapeutic advice.
@@ -38,6 +41,9 @@ Rituals are written for consenting adults in relationships and emphasize communi
 
 ## Medical/mental health disclaimer
 The app does not provide medical care, mental health treatment, crisis intervention, or emergency support.
+
+## Reviewer instructions
+- [Reviewer instructions]
 
 ## Test account / reviewer access
 - Account login is not required for core browsing flows in the current build.

@@ -401,3 +401,43 @@ These now prevent dead legal/support CTAs from paywall.
 - [ ] App preview optional.
 - [ ] Copyright completed.
 - [ ] Support contact completed.
+
+---
+
+## Native IAP Integration Sprint — Shell Detection
+
+- **Detected shell/framework:** React + TypeScript + Vite (web app).
+- **iOS native project exists:** No (`ios/` directory not present).
+- **Capacitor present:** Added Capacitor config and dependencies in this sprint.
+- **RevenueCat Capacitor SDK present:** Yes (`@revenuecat/purchases-capacitor` installed).
+- **Can real native IAP be fully wired in this repo now:** Partially in code path; native runtime execution is blocked until iOS platform is added and synced.
+- **Exact blocker:** `npx cap add ios` failed on this machine because CocoaPods is not installed, so no iOS project/workspace is generated yet.
+
+## Native IAP Closure Result
+
+- RevenueCat SDK installed: **Yes**.
+- Capacitor iOS exists: **No** (platform add blocked by missing CocoaPods).
+- `purchasePremium` real native path in iOS runtime: **Implemented in code** (loads RevenueCat Capacitor plugin and purchases selected package by offering/product mapping).
+- `restorePurchases` real native path in iOS runtime: **Implemented in code**.
+- Browser fallback safety: **Safe** (no fake production unlock; explicit unavailable message outside native bridge).
+- Dev unlock disabled in production: **Yes**.
+- Sandbox testing completed: **No (manual, pending native iOS project + CocoaPods + Xcode run)**.
+
+### Native IAP commands run
+- `npm install` ✅
+- `npm run lint` ✅
+- `npm run build` ✅
+- `npm run cap:add:ios` ❌ CocoaPods not installed
+- `npm run cap:sync:ios` ❌ iOS platform not added
+
+### Status
+**STATUS B: Not ready for App Store submission.**
+
+Reason: native iOS project is not generated in this environment yet, so real Apple sandbox purchase/restore execution cannot be validated end-to-end despite adapter wiring.
+
+### Remaining unresolved blockers
+1. Install CocoaPods on build machine.
+2. Run `npm run cap:add:ios` successfully.
+3. Run `npm run ios:sync` and open Xcode workspace.
+4. Configure signing + final bundle ID.
+5. Validate sandbox purchase/restore with RevenueCat offering + entitlement active.
