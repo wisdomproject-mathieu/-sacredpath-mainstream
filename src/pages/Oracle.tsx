@@ -13,6 +13,7 @@ import {
 } from "../lib/intimacyOracle";
 import { intimacyOracleCards } from "../data/intimacyOracle";
 import { synthesizeGuidedVoiceAudio } from "../lib/guidedVoiceTts";
+import { playGoogleTranslateSegment } from "../lib/googleTranslateTts";
 
 const DAILY_KEY = "sacredpath-oracle-daily";
 const RECENT_KEY = "sacredpath-oracle-recent";
@@ -48,7 +49,7 @@ export default function Oracle() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const speechSegmentsRef = useRef<Array<{ text: string; pauseAfterMs: number }>>([]);
   const segmentIndexRef = useRef(0);
-  const voiceModeRef = useRef<"none" | "backend" | "browser">("none");
+  const voiceModeRef = useRef<"none" | "google" | "backend" | "browser">("none");
   const queueTimerRef = useRef<number | null>(null);
 
   const userWeather = normalizeWeatherName(state.youWeatherTone ?? state.youWeather);
@@ -208,6 +209,13 @@ export default function Oracle() {
     return words.join(" ");
   };
 
+  const humanizeForVoice = (text: string) =>
+    text
+      .replace(/\s+/g, " ")
+      .replace(/:\s*/g, ". ")
+      .replace(/\.\s+/g, ". ... ")
+      .trim();
+
   const stopOracleVoice = () => {
     if (queueTimerRef.current !== null) {
       window.clearTimeout(queueTimerRef.current);
@@ -310,6 +318,52 @@ export default function Oracle() {
     }
   };
 
+  const playGoogleSegment = async (card = selectedCard) => {
+    if (voiceModeRef.current !== "google") return;
+    const segment = speechSegmentsRef.current[segmentIndexRef.current];
+    if (!segment) {
+      setVoiceStatus("idle");
+      voiceModeRef.current = "none";
+      return;
+    }
+
+    try {
+      const audio = await playGoogleTranslateSegment(humanizeForVoice(segment.text), {
+        lang: "en",
+        rate: 0.82,
+        onEnded: () => {
+          if (voiceModeRef.current !== "google") return;
+          queueTimerRef.current = window.setTimeout(() => {
+            if (voiceModeRef.current !== "google") return;
+            segmentIndexRef.current += 1;
+            void playGoogleSegment(card);
+          }, segment.pauseAfterMs);
+        },
+        onError: () => {
+          if (voiceModeRef.current !== "google") return;
+          if (typeof window !== "undefined" && "speechSynthesis" in window) {
+            voiceModeRef.current = "browser";
+            playBrowserSegment();
+            return;
+          }
+          setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
+          setVoiceStatus("idle");
+          voiceModeRef.current = "none";
+        },
+      });
+      audioRef.current = audio;
+    } catch {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        voiceModeRef.current = "browser";
+        playBrowserSegment();
+        return;
+      }
+      setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
+      setVoiceStatus("idle");
+      voiceModeRef.current = "none";
+    }
+  };
+
   const playBrowserSegment = () => {
     if (voiceModeRef.current !== "browser") return;
     const segment = speechSegmentsRef.current[segmentIndexRef.current];
@@ -320,8 +374,8 @@ export default function Oracle() {
     }
     const utterance = new SpeechSynthesisUtterance(segment.text);
     utteranceRef.current = utterance;
-    utterance.rate = 0.72;
-    utterance.pitch = 0.93;
+    utterance.rate = 0.68;
+    utterance.pitch = 0.9;
     utterance.volume = 1;
     const voices = window.speechSynthesis.getVoices();
     const preferred = ["Samantha", "Google UK English Female", "Karen", "Ava", "Google US English"];
@@ -355,8 +409,8 @@ export default function Oracle() {
     speechSegmentsRef.current = getOracleSegments(card, inputQuestion);
     segmentIndexRef.current = 0;
 
-    voiceModeRef.current = "backend";
-    void playBackendSegment(card);
+    voiceModeRef.current = "google";
+    void playGoogleSegment(card);
   };
 
   const pauseOracleVoice = () => {

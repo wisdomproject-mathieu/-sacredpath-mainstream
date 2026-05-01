@@ -1,4 +1,5 @@
 import type { SacredPathRitual } from "../data/sacredPathRituals";
+import { playGoogleTranslateSegment } from "./googleTranslateTts";
 import { synthesizeGuidedVoiceAudio } from "./guidedVoiceTts";
 
 export type VoiceStyle = "warm" | "calm" | "deep" | "soft";
@@ -81,6 +82,26 @@ function scheduleNextAudio(sessionId: string, voiceStyle: VoiceStyle): void {
 
   const segment = queue[queueIndex];
   void (async () => {
+    try {
+      const audio = await playGoogleTranslateSegment(segment.text, {
+        lang: "en",
+        rate: 0.82,
+        onEnded: () => {
+          if (stopped) return;
+          clearPauseTimer();
+          pauseTimer = window.setTimeout(() => {
+            if (stopped || paused) return;
+            queueIndex += 1;
+            scheduleNextAudio(sessionId, voiceStyle);
+          }, segment.pauseAfterMs);
+        },
+      });
+      activeAudio = audio;
+      return;
+    } catch {
+      // Continue to backend chain.
+    }
+
     try {
       const result = await synthesizeGuidedVoiceAudio({
         sessionId: `${sessionId}-${segment.id}`,
