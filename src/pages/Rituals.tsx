@@ -23,6 +23,10 @@ export default function Rituals() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [favoriteSet, setFavoriteSet] = useState<Set<string>>(new Set());
   const [toast, setToast] = useState("");
+  const [premiumIntensityFilter, setPremiumIntensityFilter] = useState<"all" | "gentle" | "medium" | "deep">("all");
+  const [premiumCategoryFilter, setPremiumCategoryFilter] = useState<
+    "all" | "repair" | "desire" | "conversation" | "connection" | "touch" | "journey" | "voice"
+  >("all");
   const hasPremium = isPremium();
   const toggleSelected = (id: string) => {
     setSelectedId((prev) => (prev === id ? null : id));
@@ -43,6 +47,14 @@ export default function Rituals() {
 
   const list = useMemo(() => [freeToday, ...rituals.filter((item) => item.id !== freeToday.id)], [freeToday]);
   const freePreviewList = useMemo(() => list.filter((r) => r.id !== freeToday.id).slice(0, 48), [list, freeToday.id]);
+  const premiumFilteredList = useMemo(() => {
+    return list.filter((ritual) => {
+      if (ritual.id === freeToday.id) return false;
+      if (premiumIntensityFilter !== "all" && ritual.intensity !== premiumIntensityFilter) return false;
+      if (premiumCategoryFilter !== "all" && ritual.category !== premiumCategoryFilter) return false;
+      return true;
+    });
+  }, [list, freeToday.id, premiumIntensityFilter, premiumCategoryFilter]);
   const starterRituals = useMemo(
     () =>
       STARTER_IDS.map((id) => rituals.find((r) => r.id === id)).filter((r): r is Ritual => Boolean(r) && r.id !== freeToday.id).slice(0, 3),
@@ -116,22 +128,75 @@ export default function Rituals() {
         <header className="text-center space-y-3">
           <h1 className="font-serif text-4xl md:text-5xl">A complete intimacy library for the two of you.</h1>
           <p className="text-muted max-w-3xl mx-auto">
-            One daily practice is free. Unlock 300+ rituals, guided voice, oracle prompts, and shared journey tools for both partners.
+            One daily practice is free. Unlock <span className="text-accent font-semibold">400+ rituals</span>, guided voice, oracle prompts, and shared journey tools for both partners.
+          </p>
+          <p className="mx-auto inline-flex rounded-full border border-accent/35 bg-accent/10 px-4 py-2 text-xs tracking-[0.14em] text-accent uppercase">
+            New rituals and couple features are added continuously in the coming months.
           </p>
         </header>
 
-        <section className="space-y-3">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-accent">
-            {tonightPath?.freeRitual ? "Tonight's Path (free)" : "Daily discovery"}
-          </p>
-          <RitualCard
-            ritual={freeToday}
-            selected={selected?.id === freeToday.id}
-            locked={false}
-            isFreeToday={true}
-            onClick={() => toggleSelected(freeToday.id)}
-          />
-          {selected?.id === freeToday.id ? renderInlineDetails(freeToday) : null}
+        <section className="grid gap-4 lg:grid-cols-[1.6fr_1fr]">
+          <div className="space-y-3">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-accent">
+              {tonightPath?.freeRitual ? "Tonight's Path (free)" : "Daily discovery"}
+            </p>
+            <RitualCard
+              ritual={freeToday}
+              selected={selected?.id === freeToday.id}
+              locked={false}
+              isFreeToday={true}
+              onClick={() => toggleSelected(freeToday.id)}
+            />
+            {selected?.id === freeToday.id ? renderInlineDetails(freeToday) : null}
+          </div>
+
+          {hasPremium ? (
+            <div className="rounded-2xl border border-white/10 bg-card p-4 space-y-3 h-fit">
+              <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Sort & filter</p>
+              <p className="text-xs text-muted">Use filters to navigate the full ritual library faster.</p>
+              <label className="block text-xs text-muted">Intensity</label>
+              <select
+                value={premiumIntensityFilter}
+                onChange={(e) => setPremiumIntensityFilter(e.target.value as "all" | "gentle" | "medium" | "deep")}
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
+              >
+                <option value="all">All intensities</option>
+                <option value="gentle">Gentle</option>
+                <option value="medium">Medium</option>
+                <option value="deep">Deep</option>
+              </select>
+              <label className="block text-xs text-muted">Category</label>
+              <select
+                value={premiumCategoryFilter}
+                onChange={(e) =>
+                  setPremiumCategoryFilter(
+                    e.target.value as
+                      | "all"
+                      | "repair"
+                      | "desire"
+                      | "conversation"
+                      | "connection"
+                      | "touch"
+                      | "journey"
+                      | "voice",
+                  )
+                }
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
+              >
+                <option value="all">All categories</option>
+                <option value="repair">Repair</option>
+                <option value="desire">Desire</option>
+                <option value="conversation">Conversation</option>
+                <option value="connection">Connection</option>
+                <option value="touch">Touch</option>
+                <option value="journey">Journey</option>
+                <option value="voice">Voice</option>
+              </select>
+              <p className="text-xs text-muted">
+                Showing <span className="text-text font-semibold">{premiumFilteredList.length}</span> rituals.
+              </p>
+            </div>
+          ) : null}
         </section>
 
         {selectedLocked ? (
@@ -160,7 +225,7 @@ export default function Rituals() {
             </p>
 
             <section className="grid gap-3 sm:grid-cols-2">
-              {list.filter((r) => r.id !== freeToday.id).map((ritual) => {
+              {premiumFilteredList.map((ritual) => {
                 const locked = !hasPremium && ritual.id !== freeToday.id && ritual.tier === "premium";
                 return (
                   <div key={ritual.id} className="space-y-3">

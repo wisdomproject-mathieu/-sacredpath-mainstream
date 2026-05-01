@@ -25,10 +25,10 @@ export default function RitualCard({ ritual, selected, locked, isFreeToday, onCl
       <img
         src={imageSrc}
         alt={ritual.title}
-        className="w-full h-32 object-cover opacity-90"
+        className="w-full h-32 object-cover opacity-58 saturate-75"
         style={{ objectPosition: imagePosition }}
       />
-      <div className="absolute inset-0 h-32 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
+      <div className="absolute inset-0 h-32 bg-gradient-to-t from-[#060710]/92 via-[#0b1020]/68 to-[#0e1530]/28" />
       <div className="p-4">
         <p className="text-[11px] uppercase tracking-[0.2em] text-accent">
           {isFreeToday ? "Free today" : locked ? "Premium" : "Unlocked"}
