@@ -18,12 +18,12 @@ import { playGoogleTranslateSegment } from "../lib/googleTranslateTts";
 const DAILY_KEY = "sacredpath-oracle-daily";
 const RECENT_KEY = "sacredpath-oracle-recent";
 const JOURNEY_KEY = "sacredpath-journey-oracle";
+type OracleBackendProvider = "gemini" | "polly" | "google";
+const ORACLE_PRIMARY_PROVIDER = (import.meta.env.VITE_ORACLE_PRIMARY_TTS_PROVIDER || "gemini").toLowerCase() as OracleBackendProvider;
 const ORACLE_POLLY_VOICE_ID = import.meta.env.VITE_ORACLE_POLLY_VOICE_ID || "Kimberly";
 const ORACLE_WAVENET_VOICE = import.meta.env.VITE_ORACLE_WAVENET_VOICE || "en-US-Wavenet-F";
 const ORACLE_GEMINI_FALLBACK_MODEL =
   import.meta.env.VITE_ORACLE_GEMINI_TTS_MODEL || "gemini-3.1-flash-tts-preview";
-const ORACLE_STRICT_POLLY =
-  String(import.meta.env.VITE_ORACLE_STRICT_POLLY ?? "true").toLowerCase() === "true";
 
 const QUESTION_HELPER =
   "Try: How can I reconnect tonight? What should I understand about my partner? What is blocking intimacy between us?";
@@ -281,9 +281,15 @@ export default function Oracle() {
     ];
   };
 
+  const nextProvider = (provider: OracleBackendProvider): OracleBackendProvider | null => {
+    if (provider === "gemini") return "polly";
+    if (provider === "polly") return "google";
+    return null;
+  };
+
   const playBackendSegment = async (
     card = selectedCard,
-    provider: "polly" | "google" | "gemini" = "polly",
+    provider: OracleBackendProvider = ORACLE_PRIMARY_PROVIDER,
   ) => {
     if (voiceModeRef.current !== "backend") return;
     const segment = speechSegmentsRef.current[segmentIndexRef.current];
@@ -298,16 +304,13 @@ export default function Oracle() {
         text: segment.text,
         voiceStyle: "calm",
         provider,
-        voiceName: ORACLE_WAVENET_VOICE,
+        voiceName: provider === "gemini" ? ORACLE_POLLY_VOICE_ID : ORACLE_WAVENET_VOICE,
         speakingRate: 0.84,
         pitch: -1.2,
         model: provider === "gemini" ? ORACLE_GEMINI_FALLBACK_MODEL : undefined,
         voiceId: provider === "polly" ? ORACLE_POLLY_VOICE_ID : undefined,
         format: provider === "polly" ? "mp3" : undefined,
       });
-      if (provider === "polly" && tts.provider !== "polly") {
-        throw new Error("Polly provider not returned by backend");
-      }
       if (voiceModeRef.current !== "backend") return;
       const audio = new Audio(tts.audioUrl);
       audioRef.current = audio;
@@ -326,18 +329,9 @@ export default function Oracle() {
       };
       await audio.play();
     } catch {
-      if (provider === "polly") {
-        if (ORACLE_STRICT_POLLY) {
-          setNotice("Amazon Polly (Kimberly) is unavailable right now. Please verify backend provider routing to Polly.");
-          setVoiceStatus("idle");
-          voiceModeRef.current = "none";
-          return;
-        }
-        void playBackendSegment(card, "google");
-        return;
-      }
-      if (provider === "google") {
-        void playBackendSegment(card, "gemini");
+      const fallback = nextProvider(provider);
+      if (fallback) {
+        void playBackendSegment(card, fallback);
         return;
       }
       voiceModeRef.current = "google";
