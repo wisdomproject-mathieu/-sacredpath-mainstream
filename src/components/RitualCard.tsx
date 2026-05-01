@@ -1,4 +1,5 @@
 import type { Ritual } from "../data/ritualLibrary";
+import { getWeatherImagePosition } from "../lib/weatherAssets";
 
 type RitualCardProps = {
   ritual: Ritual;
@@ -10,6 +11,7 @@ type RitualCardProps = {
 
 export default function RitualCard({ ritual, selected, locked, isFreeToday, onClick }: RitualCardProps) {
   const imageSrc = `${import.meta.env.BASE_URL}assets/weather-mainstream/${ritual.imageMood}.png`;
+  const imagePosition = getWeatherImagePosition(ritual.imageMood);
 
   return (
     <button
@@ -20,7 +22,12 @@ export default function RitualCard({ ritual, selected, locked, isFreeToday, onCl
         selected ? "border-accent bg-white/10" : "border-white/10 bg-card hover:bg-white/10"
       }`}
     >
-      <img src={imageSrc} alt={ritual.title} className="w-full h-32 object-cover opacity-90" />
+      <img
+        src={imageSrc}
+        alt={ritual.title}
+        className="w-full h-32 object-cover opacity-90"
+        style={{ objectPosition: imagePosition }}
+      />
       <div className="absolute inset-0 h-32 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
       <div className="p-4">
         <p className="text-[11px] uppercase tracking-[0.2em] text-accent">
