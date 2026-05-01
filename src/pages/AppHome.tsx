@@ -10,6 +10,7 @@ import type { IntimacyWeather } from "../lib/ritualRegistry";
 import {
   getDisplayName,
   getWeatherImageUrlByTone,
+  getWeatherImagePosition,
   getWeatherVisualKey,
   WEATHER_TONE_COPY,
   WEATHER_TONE_LABELS,
@@ -49,8 +50,13 @@ function SmallWeatherCard({
         selected ? "border-accent ring-2 ring-accent/40" : "border-white/10 hover:border-white/25"
       }`}
     >
-      <img src={image} alt={WEATHER_TONE_LABELS[tone]} className="h-28 w-full object-cover md:h-32" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+      <img
+        src={image}
+        alt={WEATHER_TONE_LABELS[tone]}
+        className="h-28 w-full object-cover md:h-32"
+        style={{ objectPosition: getWeatherImagePosition(tone) }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/28 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 p-2 text-left">
         <p className="text-sm font-semibold text-white">{WEATHER_TONE_LABELS[tone]}</p>
         <p className="text-[11px] leading-tight text-white/80">{subtitle}</p>

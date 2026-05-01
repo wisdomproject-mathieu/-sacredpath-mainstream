@@ -44,6 +44,15 @@ export const WEATHER_TONE_COPY: Record<WeatherVisualKey, string> = {
   sunny: "Desire, heat, hunger.",
 };
 
+export const WEATHER_IMAGE_POSITION: Record<WeatherVisualKey, string> = {
+  sunny: "50% 46%",
+  warm: "50% 48%",
+  electric: "50% 44%",
+  foggy: "50% 42%",
+  frozen: "50% 42%",
+  stormy: "50% 42%",
+};
+
 export function getDisplayName(name: string | undefined, fallback: string) {
   const value = name?.trim();
   return value || fallback;
@@ -76,4 +85,8 @@ export function getWeatherImageUrl(
 
 export function getWeatherImageUrlByTone(role: WeatherRole, tone: WeatherVisualKey) {
   return WEATHER_IMAGE_MAP[role][tone];
+}
+
+export function getWeatherImagePosition(tone: WeatherVisualKey) {
+  return WEATHER_IMAGE_POSITION[tone] ?? "50% 45%";
 }

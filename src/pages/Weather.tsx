@@ -7,6 +7,7 @@ import { useSession } from "../contexts/SessionContext";
 import type { IntimacyWeather } from "../lib/ritualRegistry";
 import {
   getWeatherImageUrlByTone,
+  getWeatherImagePosition,
   getDisplayName,
   getWeatherVisualKey,
   WEATHER_TONE_LABELS,
@@ -52,7 +53,12 @@ function WeatherPill({
       onClick={onClick}
       className={`group relative rounded-2xl overflow-hidden border transition-all ${selected ? "border-accent ring-2 ring-accent/30" : "border-white/10"}`}
     >
-      <img src={image} alt={option.title} className="w-full aspect-[4/3] object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+      <img
+        src={image}
+        alt={option.title}
+        className="w-full aspect-[4/3] object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+        style={{ objectPosition: getWeatherImagePosition(option.key) }}
+      />
       <div className="absolute inset-0 bg-black/60 p-2 sm:p-3 flex flex-col justify-end">
         <p className="text-xs sm:text-sm font-semibold text-text">{option.title}.</p>
         <p className="text-[11px] sm:text-xs text-muted truncate">{option.subtitle}</p>
@@ -75,7 +81,12 @@ function WeatherPreview({
   
   return (
     <Card>
-      <img src={image} alt={`${tone} weather`} className="w-full aspect-[3/4] object-cover rounded-xl border border-white/5 mb-4" />
+      <img
+        src={image}
+        alt={`${tone} weather`}
+        className="w-full aspect-[3/4] object-cover rounded-xl border border-white/5 mb-4"
+        style={{ objectPosition: getWeatherImagePosition(tone) }}
+      />
       <p className="font-serif text-lg sm:text-xl text-center">{title}</p>
     </Card>
   );
