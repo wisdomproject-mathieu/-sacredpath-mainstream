@@ -1,0 +1,4 @@
+project_id = "sacredpath-mainstream"
+
+[functions.sacred-voice-tts]
+verify_jwt = false
