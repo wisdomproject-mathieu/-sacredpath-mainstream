@@ -19,7 +19,7 @@ const DAILY_KEY = "sacredpath-oracle-daily";
 const RECENT_KEY = "sacredpath-oracle-recent";
 const JOURNEY_KEY = "sacredpath-journey-oracle";
 type OracleBackendProvider = "gemini" | "polly" | "google";
-const ORACLE_PRIMARY_PROVIDER = (import.meta.env.VITE_ORACLE_PRIMARY_TTS_PROVIDER || "gemini").toLowerCase() as OracleBackendProvider;
+const ORACLE_PRIMARY_PROVIDER = (import.meta.env.VITE_ORACLE_PRIMARY_TTS_PROVIDER || "polly").toLowerCase() as OracleBackendProvider;
 const ORACLE_POLLY_VOICE_ID = import.meta.env.VITE_ORACLE_POLLY_VOICE_ID || "Kimberly";
 const ORACLE_GEMINI_VOICE_NAME = import.meta.env.VITE_ORACLE_GEMINI_VOICE_NAME || "Kimberly";
 const ORACLE_WAVENET_VOICE = import.meta.env.VITE_ORACLE_WAVENET_VOICE || "en-US-Wavenet-F";
@@ -282,6 +282,14 @@ export default function Oracle() {
     ];
   };
 
+  const buildOracleNarration = (card = selectedCard, inputQuestion = question) => {
+    const segments = getOracleSegments(card, inputQuestion);
+    return segments
+      .map((segment) => humanizeForVoice(segment.text))
+      .filter(Boolean)
+      .join(" ... ");
+  };
+
   const nextProvider = (provider: OracleBackendProvider): OracleBackendProvider | null => {
     if (provider === "gemini") return "polly";
     if (provider === "polly") return "google";
@@ -482,8 +490,39 @@ export default function Oracle() {
     speechSegmentsRef.current = getOracleSegments(card, inputQuestion);
     segmentIndexRef.current = 0;
 
-    voiceModeRef.current = "backend";
-    void playBackendSegment(card);
+    const narration = buildOracleNarration(card, inputQuestion);
+
+    try {
+      const tts = await synthesizeGuidedVoiceAudio({
+        sessionId: `oracle-full-${card.id}-${Date.now()}`,
+        text: narration,
+        voiceStyle: "calm",
+        provider: ORACLE_PRIMARY_PROVIDER,
+        voiceName: ORACLE_PRIMARY_PROVIDER === "google" ? ORACLE_WAVENET_VOICE : undefined,
+        speakingRate: 0.78,
+        pitch: -1.4,
+        model: ORACLE_PRIMARY_PROVIDER === "gemini" ? ORACLE_GEMINI_FALLBACK_MODEL : undefined,
+        voiceId: ORACLE_PRIMARY_PROVIDER === "polly" ? ORACLE_POLLY_VOICE_ID : undefined,
+        format: ORACLE_PRIMARY_PROVIDER === "polly" ? "mp3" : undefined,
+      });
+      const audio = new Audio(tts.audioUrl);
+      audioRef.current = audio;
+      voiceModeRef.current = "backend";
+      audio.onended = () => {
+        setVoiceStatus("idle");
+        voiceModeRef.current = "none";
+      };
+      audio.onerror = () => {
+        voiceModeRef.current = "google";
+        void playGoogleSegment(card);
+      };
+      await audio.play();
+      return;
+    } catch {
+      // Fallback to segmented backend > google > browser path.
+      voiceModeRef.current = "backend";
+      void playBackendSegment(card);
+    }
   };
 
   const pauseOracleVoice = () => {
