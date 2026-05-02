@@ -48,9 +48,10 @@ const PACING = {
     closing: 15000,
   },
 } as const;
-const GEMINI_VOICE_MODEL = import.meta.env.VITE_ORACLE_GEMINI_TTS_MODEL || "gemini-3.1-flash-tts-preview";
-const GEMINI_VOICE_NAME = import.meta.env.VITE_ORACLE_GEMINI_VOICE_NAME || "Kimberly";
-const POLLY_VOICE_ID = import.meta.env.VITE_ORACLE_POLLY_VOICE_ID || "Kimberly";
+
+const GEMINI_VOICE_MODEL = import.meta.env.VITE_ORACLE_GEMINI_TTS_MODEL || "gemini-2.5-flash-preview-tts";
+const GEMINI_VOICE_NAME = import.meta.env.VITE_ORACLE_GEMINI_VOICE_NAME || "Sulafat";
+const ELEVENLABS_VOICE_ID = import.meta.env.VITE_ORACLE_ELEVENLABS_VOICE_ID || import.meta.env.VITE_ELEVENLABS_VOICE_ID || "";
 
 let queue: VoiceSegment[] = [];
 let queueIndex = 0;
@@ -86,7 +87,7 @@ function scheduleNextAudio(sessionId: string, voiceStyle: VoiceStyle): void {
   const segment = queue[queueIndex];
   void (async () => {
     try {
-      let result = await synthesizeGuidedVoiceAudio({
+      const result = await synthesizeGuidedVoiceAudio({
         sessionId: `${sessionId}-${segment.id}`,
         text: segment.text,
         provider: "gemini",
@@ -95,18 +96,20 @@ function scheduleNextAudio(sessionId: string, voiceStyle: VoiceStyle): void {
         speakingRate: 0.84,
         pitch: -1.2,
         model: GEMINI_VOICE_MODEL,
+        format: "wav",
       }).catch(async () =>
         synthesizeGuidedVoiceAudio({
-          sessionId: `${sessionId}-${segment.id}-polly`,
+          sessionId: `${sessionId}-${segment.id}-elevenlabs`,
           text: segment.text,
-          provider: "polly",
+          provider: "elevenlabs",
           voiceStyle,
-          voiceId: POLLY_VOICE_ID,
+          voiceId: ELEVENLABS_VOICE_ID || undefined,
           speakingRate: 0.84,
           pitch: -1.2,
           format: "mp3",
         }),
       );
+
       if (stopped) return;
       const audio = new Audio(result.audioUrl);
       activeAudio = audio;
@@ -122,8 +125,8 @@ function scheduleNextAudio(sessionId: string, voiceStyle: VoiceStyle): void {
       };
 
       audio.onerror = () => {
-        // Trigger fallback by stopping this chain.
-        throw new Error("Audio playback failed");
+        fallbackMode = true;
+        void speakWithBrowserFallback(queue, onStatus, queueIndex);
       };
 
       await audio.play();
