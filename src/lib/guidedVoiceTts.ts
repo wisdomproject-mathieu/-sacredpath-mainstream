@@ -7,7 +7,7 @@ export type TtsResult = {
 };
 
 const FUNCTION_NAME = "sacred-voice-tts";
-const audioCache = new Map<string, string>();
+const audioCache = new Map<string, { provider: VoiceProvider; audioUrl: string }>();
 
 function buildCacheKey(sessionId: string, voiceStyle: string | undefined) {
   return `${sessionId}:${voiceStyle ?? "default"}`;
@@ -30,9 +30,13 @@ function getTtsEndpoint() {
 }
 
 function getSupabasePublishableKey() {
-  return typeof import.meta !== "undefined" && typeof import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY === "string"
-    ? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY.trim()
-    : "";
+  const currentEnv = typeof import.meta !== "undefined" ? import.meta.env : undefined;
+  const publishable =
+    typeof currentEnv?.VITE_SUPABASE_PUBLISHABLE_KEY === "string"
+      ? currentEnv.VITE_SUPABASE_PUBLISHABLE_KEY.trim()
+      : "";
+  const anon = typeof currentEnv?.VITE_SUPABASE_ANON_KEY === "string" ? currentEnv.VITE_SUPABASE_ANON_KEY.trim() : "";
+  return publishable || anon;
 }
 
 export function getVoiceProviderFromHeader(response: Response): VoiceProvider {
@@ -42,7 +46,7 @@ export function getVoiceProviderFromHeader(response: Response): VoiceProvider {
   if (header === "edge") return "edge";
   if (header === "elevenlabs") return "elevenlabs";
   if (header === "polly") return "polly";
-  return "google";
+  return "gemini";
 }
 
 async function parseErrorMessage(response: Response) {
@@ -58,8 +62,8 @@ async function parseErrorMessage(response: Response) {
 }
 
 export function clearGuidedVoiceAudioCache() {
-  for (const url of audioCache.values()) {
-    URL.revokeObjectURL(url);
+  for (const cached of audioCache.values()) {
+    URL.revokeObjectURL(cached.audioUrl);
   }
   audioCache.clear();
 }
@@ -68,7 +72,7 @@ export async function synthesizeGuidedVoiceAudio({
   sessionId,
   text,
   voiceStyle,
-  provider = "google",
+  provider = "gemini",
   voiceName,
   speakingRate,
   pitch,
@@ -85,28 +89,37 @@ export async function synthesizeGuidedVoiceAudio({
   pitch?: number;
   model?: string;
   voiceId?: string;
-  format?: "mp3" | "ogg_vorbis" | "pcm";
+  format?: "mp3" | "ogg_vorbis" | "pcm" | "wav";
 }): Promise<TtsResult> {
+  const cleanedText = text.replace(/\s+/g, " ").trim();
+  if (!cleanedText) {
+    throw new Error("Guided voice needs non-empty text.");
+  }
+
   const cacheKey = buildCacheKey(sessionId, voiceStyle);
   const cached = audioCache.get(cacheKey);
   if (cached) {
-    return { provider: "google", audioUrl: cached, fromCache: true };
+    return { provider: cached.provider, audioUrl: cached.audioUrl, fromCache: true };
   }
 
   const endpoint = getTtsEndpoint();
   const publishableKey = getSupabasePublishableKey();
   if (!endpoint) {
-    throw new Error("Guided voice backend is not configured.");
+    throw new Error("Guided voice backend is not configured. Set VITE_SUPABASE_URL or VITE_SACRED_VOICE_TTS_URL.");
   }
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
-  // Optional only: some deployments keep the function public and do not require apikey.
-  if (publishableKey) headers.apikey = publishableKey;
+
+  // Supabase Edge Functions commonly require both apikey and Authorization when JWT verification is enabled.
+  if (publishableKey) {
+    headers.apikey = publishableKey;
+    headers.Authorization = `Bearer ${publishableKey}`;
+  }
 
   const bodyPayload: Record<string, unknown> = {
-    text,
+    text: cleanedText,
     provider,
     lang: "en",
     voiceStyle,
@@ -120,7 +133,7 @@ export async function synthesizeGuidedVoiceAudio({
   };
 
   if (provider === "polly") {
-    // Compatibility aliases for different backend implementations.
+    // Compatibility aliases for earlier Codex attempts. The new backend safely maps unsupported Polly calls.
     bodyPayload.ttsProvider = "polly";
     bodyPayload.awsVoiceId = voiceId;
     bodyPayload.languageCode = "en-US";
@@ -151,11 +164,16 @@ export async function synthesizeGuidedVoiceAudio({
   }
 
   const blob = await response.blob();
+  if (!blob.size) {
+    throw new Error("Guided voice returned an empty audio file.");
+  }
+
   const audioUrl = URL.createObjectURL(blob);
-  audioCache.set(cacheKey, audioUrl);
+  const resolvedProvider = getVoiceProviderFromHeader(response);
+  audioCache.set(cacheKey, { provider: resolvedProvider, audioUrl });
 
   return {
-    provider: getVoiceProviderFromHeader(response),
+    provider: resolvedProvider,
     audioUrl,
     fromCache: false,
   };
