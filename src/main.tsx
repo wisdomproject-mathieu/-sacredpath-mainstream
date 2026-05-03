@@ -20,12 +20,15 @@ import Privacy from "./pages/Privacy";
 import Support from "./pages/Support";
 import Tools from "./pages/Tools";
 import { SessionProvider } from "./contexts/SessionContext";
+import FloatingMusicButton from "./components/FloatingMusicButton";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
+
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [pathname]);
+
   return null;
 }
 
@@ -34,6 +37,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <SessionProvider>
       <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, "")}>
         <ScrollToTop />
+
         <Routes>
           <Route path="/" element={<AppHome />} />
           <Route path="/weather" element={<Weather />} />
@@ -52,6 +56,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/support" element={<Support />} />
         </Routes>
+
+        <FloatingMusicButton />
       </BrowserRouter>
     </SessionProvider>
   </React.StrictMode>

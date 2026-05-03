@@ -1,0 +1,132 @@
+import { useEffect, useRef, useState } from "react";
+import { Music, Pause } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+type Track = {
+  id: string;
+  name: string;
+  description: string;
+  freqs: number[];
+  lfo?: number;
+};
+
+const TRACKS: Track[] = [
+  { id: "calm", name: "Calm", description: "Soft low drone", freqs: [110, 165, 220], lfo: 0.08 },
+  { id: "focus", name: "Focus", description: "Steady alpha tone", freqs: [220, 277.18], lfo: 0.05 },
+  { id: "deep", name: "Deep", description: "Grounding bass", freqs: [82.4, 123.47, 164.81], lfo: 0.04 },
+  { id: "ethereal", name: "Ethereal", description: "Floating high pad", freqs: [261.63, 392, 523.25, 659.25], lfo: 0.12 },
+];
+
+type ActiveAudio = {
+  ctx: AudioContext;
+  master: GainNode;
+  nodes: { osc: OscillatorNode; gain: GainNode; lfo?: OscillatorNode; lfoGain?: GainNode }[];
+};
+
+const FloatingMusicButton = () => {
+  const [open, setOpen] = useState(false);
+  const [activeTrackId, setActiveTrackId] = useState<string | null>(null);
+  const audioRef = useRef<ActiveAudio | null>(null);
+
+  const stop = (fadeMs = 600) => {
+    const a = audioRef.current;
+    if (!a) { setActiveTrackId(null); return; }
+    const now = a.ctx.currentTime;
+    a.master.gain.cancelScheduledValues(now);
+    a.master.gain.setValueAtTime(a.master.gain.value, now);
+    a.master.gain.linearRampToValueAtTime(0.0001, now + fadeMs / 1000);
+    setTimeout(() => {
+      try {
+        a.nodes.forEach(({ osc, lfo }) => { osc.stop(); lfo?.stop(); });
+        a.ctx.close();
+      } catch { /* noop */ }
+      if (audioRef.current === a) audioRef.current = null;
+    }, fadeMs + 50);
+    setActiveTrackId(null);
+  };
+
+  const play = (track: Track) => {
+    if (audioRef.current) stop(250);
+    setTimeout(() => {
+      const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const ctx = new Ctx();
+      const master = ctx.createGain();
+      master.gain.value = 0.0001;
+      master.connect(ctx.destination);
+
+      const nodes: ActiveAudio["nodes"] = track.freqs.map((f, i) => {
+        const osc = ctx.createOscillator();
+        osc.type = i === 0 ? "sine" : i % 2 === 0 ? "triangle" : "sine";
+        osc.frequency.value = f;
+        const gain = ctx.createGain();
+        gain.gain.value = 0.18 / track.freqs.length;
+        osc.connect(gain).connect(master);
+
+        let lfo: OscillatorNode | undefined;
+        let lfoGain: GainNode | undefined;
+        if (track.lfo) {
+          lfo = ctx.createOscillator();
+          lfo.frequency.value = track.lfo + i * 0.02;
+          lfoGain = ctx.createGain();
+          lfoGain.gain.value = 1.5;
+          lfo.connect(lfoGain).connect(osc.frequency);
+          lfo.start();
+        }
+        osc.start();
+        return { osc, gain, lfo, lfoGain };
+      });
+
+      const now = ctx.currentTime;
+      master.gain.linearRampToValueAtTime(0.5, now + 1.4);
+      audioRef.current = { ctx, master, nodes };
+      setActiveTrackId(track.id);
+      setOpen(false);
+    }, audioRef.current ? 280 : 0);
+  };
+
+  const handleMainClick = () => {
+    if (activeTrackId) { stop(); return; }
+    setOpen((v) => !v);
+  };
+
+  useEffect(() => () => stop(0), []);
+
+  const isPlaying = !!activeTrackId;
+
+  return (
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 print:hidden">
+      {open && !isPlaying && (
+        <div className="animate-scale-in rounded-2xl border border-border bg-background/95 backdrop-blur-md shadow-2xl p-2 w-56">
+          <p className="px-3 py-2 text-xs uppercase tracking-widest text-muted-foreground">Meditation music</p>
+          <div className="flex flex-col gap-1">
+            {TRACKS.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => play(t)}
+                className="flex flex-col items-start text-left rounded-xl px-3 py-2 hover:bg-accent transition-colors"
+              >
+                <span className="text-sm font-medium text-foreground">{t.name}</span>
+                <span className="text-xs text-muted-foreground">{t.description}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <button
+        type="button"
+        aria-label={isPlaying ? "Stop meditation music" : "Open meditation music"}
+        onClick={handleMainClick}
+        className={cn(
+          "h-14 w-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300",
+          "bg-primary text-primary-foreground hover:scale-105",
+          isPlaying && "animate-pulse ring-4 ring-primary/30",
+        )}
+      >
+        {isPlaying ? <Pause className="h-6 w-6" /> : <Music className="h-6 w-6" />}
+      </button>
+    </div>
+  );
+};
+
+export default FloatingMusicButton;
