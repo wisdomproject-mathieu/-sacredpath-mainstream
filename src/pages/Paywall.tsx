@@ -99,7 +99,7 @@ export default function Paywall() {
         <div className="text-center mb-12">
           <h1 className="font-serif text-4xl md:text-5xl mb-4">{heading}</h1>
           <p className="text-lg text-muted max-w-3xl mx-auto">
-            Unlock the full intimacy library for both of you - $29/year. One subscription. Two partners.
+            Unlock the full intimacy library for both of you - $29.99 per year. One subscription. Two partners.
             Daily rituals, guided voice, oracle prompts, and your shared journey.
           </p>
           <p className="text-sm text-muted max-w-3xl mx-auto mt-3">
@@ -193,7 +193,7 @@ export default function Paywall() {
               <strong>Product:</strong> Sacred Path Premium
             </p>
             <p className="text-sm">
-              <strong>Price:</strong> $29/year
+              <strong>Price:</strong> $29.99 per year
             </p>
             <p className="text-sm">
               <strong>Access:</strong> One subscription unlocks the premium path for both connected partners.

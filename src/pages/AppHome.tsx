@@ -329,7 +329,7 @@ export default function AppHome() {
         {!hasPremium ? (
           <section className="rounded-2xl border border-accent/30 bg-accent/10 p-5">
             <p className="text-sm">
-              Unlock the full intimacy library for both of you - $29/year. One subscription. Two partners. 300+ rituals,
+              Unlock the full intimacy library for both of you - $29.99 per year. One subscription. Two partners. 300+ rituals,
               Sacred Voice, oracle prompts, and your shared journey.
             </p>
             <div className="mt-4 flex gap-3">

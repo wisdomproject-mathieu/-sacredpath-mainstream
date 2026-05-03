@@ -27,8 +27,12 @@ Sacred Voice is a premium feature that uses guided voice playback for selected r
 ## Content rating
 The app is relationship and intimacy focused. It should be submitted with a 17+ rating and “Infrequent/Mild Sexual Content & Nudity” selected where appropriate. The app does not contain pornography or explicit visual sexual content.
 
+The app should be submitted as 17+ due to intimacy-focused content. In App Store Connect, select the sexual content/intimacy content options conservatively and consistently with the final in-app wording.
+
 ## Privacy and legal
 The app includes in-app links to Terms of Use and Privacy Policy from the Paywall screen.
+
+Before submission, confirm whether the production app stores any user data in Supabase or another backend. If no personal data is collected, use Data Not Collected. If email, user content, relationship check-ins, voice requests, or identifiers are stored, disclose them accurately in App Store privacy nutrition labels.
 
 ## Partner subscription model
 One subscription unlocks the premium journey for the couple. The app is designed around shared relationship value, not separate purchases for each partner.

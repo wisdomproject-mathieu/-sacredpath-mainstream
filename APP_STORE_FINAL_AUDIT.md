@@ -16,6 +16,7 @@ Repository: `/Users/mathieuescande/Documents/GitHub/sacredpath-mainstream`
 - [ ] StoreKit products must be created in App Store Connect (Manual)
 - [ ] Age rating should be 17+ (Manual)
 - [ ] TestFlight sandbox purchase and restore required before submission (Manual)
+- [ ] Manual — Confirm App Store Connect bundle ID exactly matches capacitor.config.ts appId: com.sacredpathforcouples.app. StoreKit products should remain com.sacredpathforcouples.premium.yearly and com.sacredpathforcouples.premium.monthly under the same app/subscription group.
 
 ## Completed in this pass
 1. Removed obvious Finder duplicates:
@@ -69,9 +70,15 @@ Current iOS project includes:
 Manual Xcode check still required:
 - confirm full required iPhone/iPad icon set is generated from final branding
 - confirm launch screen appearance on target devices
+- Recommended before TestFlight — Replace default white LaunchScreen.storyboard with a branded background/logo. Do not submit with an obviously unfinished default launch screen.
 
 ## Ritual content TODO
 Ritual library repetition should be reviewed before final submission, but it is not a hard blocker.
+
+## Age rating and privacy labels reminder
+The app should be submitted as 17+ due to intimacy-focused content. In App Store Connect, select the sexual content/intimacy content options conservatively and consistently with the final in-app wording.
+
+Before submission, confirm whether the production app stores any user data in Supabase or another backend. If no personal data is collected, use Data Not Collected. If email, user content, relationship check-ins, voice requests, or identifiers are stored, disclose them accurately in App Store privacy nutrition labels.
 
 ## Manual App Store Connect / Xcode actions remaining
 1. Confirm bundle identifier in Xcode matches App Store Connect app record.
