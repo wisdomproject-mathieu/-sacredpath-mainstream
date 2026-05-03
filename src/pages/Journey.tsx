@@ -112,7 +112,11 @@ export default function Journey() {
   };
 
   const addDate = () => {
-    if (!dateInput) return;
+    if (!dateInput) {
+      setToast("Select a date first.");
+      window.setTimeout(() => setToast(""), 1800);
+      return;
+    }
     const entry: DateEntry = {
       id: `${dateInput}-${Date.now()}`,
       date: dateInput,
@@ -336,7 +340,7 @@ export default function Journey() {
             <Card className="space-y-3">
               <h2 className="font-serif text-2xl">Calendar placeholders</h2>
               <p className="text-sm text-muted">Add key dates for your relationship journey.</p>
-              <div className="flex gap-2">
+              <div className="grid gap-2 md:grid-cols-[1fr_1fr_auto]">
                 <input
                   type="date"
                   value={dateInput}
@@ -349,8 +353,13 @@ export default function Journey() {
                   onChange={(e) => setDateNoteInput(e.target.value)}
                   placeholder="What is this date about?"
                   className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") addDate();
+                  }}
                 />
-                <Button variant="secondary" onClick={addDate}>Add</Button>
+                <Button type="button" variant="secondary" className="w-auto shrink-0" onClick={addDate}>
+                  Add
+                </Button>
               </div>
               <div className="space-y-2">
                 {specialDates.length === 0 ? (
