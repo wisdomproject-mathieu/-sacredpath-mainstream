@@ -1,5 +1,4 @@
 export const PREMIUM_STORAGE_KEY = "sacredpath-premium";
-// TEMPORARY DEV PREMIUM STATE — replace with StoreKit / RevenueCat entitlement validation before production.
 
 export function isPremium(): boolean {
   if (typeof window === "undefined") return false;
@@ -7,7 +6,7 @@ export function isPremium(): boolean {
 }
 
 function isDevPremiumWriteAllowed(): boolean {
-  return import.meta.env.DEV || String(import.meta.env.VITE_ENABLE_DEV_PREMIUM_UNLOCK ?? "").toLowerCase() === "true";
+  return import.meta.env.DEV;
 }
 
 export function setPremiumForTesting(value: boolean): void {

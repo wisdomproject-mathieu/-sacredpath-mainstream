@@ -1,58 +1,34 @@
 # App Store Review Notes — Sacred Path for Couples
 
 ## App purpose
-Sacred Path for Couples is an adults-only relationship app that offers guided connection rituals, reflective prompts, and practical communication tools. The app is designed to help couples reconnect through consent-forward, emotionally safe practices.
+Sacred Path for Couples is a relationship and intimacy guidance app for couples. It provides emotional check-ins, guided rituals, reflective prompts, an intimacy oracle, and voice-guided practices designed to support communication, presence, repair, and reconnection.
 
-## Subscription overview
-The app includes free value and a premium subscription.
+## Important clarification
+The Intimacy Oracle is a symbolic reflection and journaling tool. It does not predict the future, provide fortune-telling, or make deterministic claims. It gives reflective relationship prompts to help users think about communication, repair, desire, presence, and emotional safety.
 
-Premium unlocks:
-- Full ritual library
-- Sacred Voice guided audio
-- Intimacy Oracle deeper guidance
-- Journey dashboard tools
-- Saved reflections and milestones
-- Premium unlock is handled through Apple in-app subscription flow (via RevenueCat integration in iOS builds).
+## Subscription
+Sacred Path Premium is an auto-renewable subscription.
 
-## How to reach premium flow
-1. Open Home.
-2. Tap a premium call-to-action (for example in Rituals, Oracle, Journey, or Home).
-3. This opens the Paywall screen.
+Products:
+- com.sacredpathforcouples.premium.yearly
+- com.sacredpathforcouples.premium.monthly
 
-## Purchase and restore behavior
-- Purchase and restore are implemented through the in-app entitlement layer.
-- In iOS native builds with RevenueCat configured, entitlement activates automatically after purchase/restore.
-- Restore Purchases button is visible on paywall.
-- Sandbox details: [Sandbox test account if required]
-- Product IDs: [Subscription product IDs]
+The subscription unlocks premium rituals, Sacred Voice, Intimacy Oracle, Journey tools, and deeper practices for both partners.
 
-## How to access key features
-- **Intimacy Weather:** Home -> Check our weather
-- **Ritual Library:** Home -> Browse rituals
-- **Intimacy Oracle:** Home -> Ask the Intimacy Oracle
-- **Sacred Voice:** Premium feature available as guided voice flow from Oracle/Ritual-related paths
-- **Journey:** Home or bottom nav -> Journey (free starter + premium-expanded tools)
+## Restore Purchases
+Restore Purchases is available on the Paywall screen before purchase.
 
-## Oracle policy framing
-Intimacy Oracle is a guided reflection feature. It does not claim to predict the future, diagnose mental health conditions, or provide medical/therapeutic advice.
+## Reviewer access
+The free experience allows access to the main app flow and a free daily ritual. Premium content is unlocked through the App Store sandbox subscription flow.
 
-## Safety and consent framing
-Rituals are written for consenting adults in relationships and emphasize communication, boundaries, and mutual respect.
+## Sacred Voice
+Sacred Voice is a premium feature that uses guided voice playback for selected rituals. To test it, open a ritual or Sacred Voice section and select a guided practice.
 
-## Medical/mental health disclaimer
-The app does not provide medical care, mental health treatment, crisis intervention, or emergency support.
+## Content rating
+The app is relationship and intimacy focused. It should be submitted with a 17+ rating and “Infrequent/Mild Sexual Content & Nudity” selected where appropriate. The app does not contain pornography or explicit visual sexual content.
 
-## Reviewer instructions
-- [Reviewer instructions]
+## Privacy and legal
+The app includes in-app links to Terms of Use and Privacy Policy from the Paywall screen.
 
-## Test account / reviewer access
-- Account login is not required for core browsing flows in the current build.
-- If partner-connect or backend-gated features are reviewed, provide test credentials here if required:
-  - Test email: `<ADD_IF_NEEDED>`
-  - Test password: `<ADD_IF_NEEDED>`
-
-## IAP sandbox note
-If App Review tests paid flows in sandbox, please use the app's in-app purchase flow from the Paywall screen and Restore Purchases button.
-
-## Contact for review questions
-Support: see in-app Support page (`/support`) and configured support URL in App Store Connect.
+## Partner subscription model
+One subscription unlocks the premium journey for the couple. The app is designed around shared relationship value, not separate purchases for each partner.

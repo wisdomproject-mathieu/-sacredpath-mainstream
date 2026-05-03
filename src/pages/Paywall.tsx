@@ -9,6 +9,7 @@ import { isPremium } from "../lib/premium";
 import {
   IOS_YEARLY_PRODUCT_ID,
   getAvailablePackages,
+  getSubscriptionsUnavailableMessage,
   purchasePremium,
   refreshEntitlement,
   restorePurchases,
@@ -52,7 +53,7 @@ export default function Paywall() {
       if (available.length > 0) {
         setSelectedProductId(available[0].productId);
       } else {
-        setOfferingsMessage("Subscription options will appear automatically in iOS sandbox/TestFlight once RevenueCat offerings are available.");
+        setOfferingsMessage(getSubscriptionsUnavailableMessage());
       }
     })();
 
@@ -163,6 +164,27 @@ export default function Paywall() {
               Premium active for both of you
             </Button>
           )}
+          <Card>
+            <p className="text-sm">
+              Sacred Path Premium unlocks the full ritual library, Sacred Voice, Intimacy Oracle, Journey tools, and deeper practices for both partners.
+            </p>
+            <p className="text-sm mt-3">Yearly subscription: $29.99 per year.</p>
+            <p className="text-sm">Monthly subscription: $2.99 per month.</p>
+            <p className="text-sm mt-3">
+              Payment will be charged to your Apple ID account at confirmation of purchase. Subscription automatically renews unless canceled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours before the end of the current period. You can manage or cancel your subscription in your App Store account settings.
+            </p>
+            <p className="text-sm mt-3">
+              By subscribing, you agree to our{" "}
+              <Link to="/terms" className="underline">
+                Terms of Use
+              </Link>{" "}
+              and{" "}
+              <Link to="/privacy" className="underline">
+                Privacy Policy
+              </Link>
+              .
+            </p>
+          </Card>
           <p className="text-center text-xs text-muted">
             Payment and subscription management are handled by the App Store.
           </p>
@@ -225,7 +247,7 @@ export default function Paywall() {
           {purchaseMessage ? <p className="text-xs text-muted text-center">{purchaseMessage}</p> : null}
           {restoreMessage ? <p className="text-xs text-muted text-center">{restoreMessage}</p> : null}
           <p className="text-center text-xs text-muted">
-            Purchase and restore require StoreKit / RevenueCat entitlement wiring in production iOS builds.
+            If subscriptions are unavailable, please try again later.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
           <Button variant="secondary" onClick={() => window.history.back()}>Back to ritual</Button>

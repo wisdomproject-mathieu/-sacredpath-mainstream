@@ -9,9 +9,6 @@ export const IOS_YEARLY_PRODUCT_ID =
 
 const REVENUECAT_IOS_API_KEY = import.meta.env.VITE_REVENUECAT_IOS_API_KEY;
 
-// TEMPORARY DEV PREMIUM STATE — replace with StoreKit / RevenueCat entitlement validation before production.
-const DEV_UNLOCK_FLAG = "VITE_ENABLE_DEV_PREMIUM_UNLOCK";
-
 let revenueCatConfigured = false;
 let cachedPackages: SubscriptionPackage[] = [];
 const cachedNativePackageByProductId = new Map<string, unknown>();
@@ -104,12 +101,8 @@ declare global {
   }
 }
 
-function readDevFlag(): boolean {
-  return import.meta.env.DEV || String(import.meta.env[DEV_UNLOCK_FLAG] ?? "").toLowerCase() === "true";
-}
-
 export function isDevPremiumUnlockAllowed(): boolean {
-  return readDevFlag() && !import.meta.env.PROD;
+  return import.meta.env.DEV;
 }
 
 export function isNativeIosRuntime(): boolean {
@@ -218,6 +211,13 @@ export async function getAvailablePackages(): Promise<SubscriptionPackage[]> {
   }
 }
 
+export function getSubscriptionsUnavailableMessage(): string {
+  if (isNativeIosRuntime() && !REVENUECAT_IOS_API_KEY) {
+    return "Subscriptions are temporarily unavailable. Please try again later.";
+  }
+  return "Subscriptions are temporarily unavailable. Please try again later.";
+}
+
 export async function refreshEntitlement(): Promise<PremiumStatus> {
   const bridge = await getBridge();
 
@@ -318,8 +318,7 @@ export async function purchasePremium(productId = IOS_YEARLY_PRODUCT_ID): Promis
   return {
     ok: false,
     status: "unavailable",
-    message:
-      "In-app purchase is not available in this build yet. Connect StoreKit / RevenueCat before App Store submission.",
+    message: getSubscriptionsUnavailableMessage(),
   };
 }
 
@@ -369,7 +368,6 @@ export async function restorePurchases(): Promise<PurchaseResult> {
   return {
     ok: false,
     status: "unavailable",
-    message:
-      "Restore is not available in this build yet. Connect StoreKit / RevenueCat restore before App Store submission.",
+    message: "Restore is temporarily unavailable. Please try again later.",
   };
 }
