@@ -99,7 +99,7 @@ export default function Paywall() {
         <div className="text-center mb-12">
           <h1 className="font-serif text-4xl md:text-5xl mb-4">{heading}</h1>
           <p className="text-lg text-muted max-w-3xl mx-auto">
-            Unlock the full practice library for both of you - $29.99 per year. One subscription. Two partners.
+            One subscription unlocks premium for two partners - $29.99 per year.
             Daily rituals, guided voice, oracle prompts, and your shared journey.
           </p>
           <p className="text-sm text-muted max-w-3xl mx-auto mt-3">
@@ -187,6 +187,9 @@ export default function Paywall() {
           </Card>
           <p className="text-center text-xs text-muted">
             Payment and subscription management are handled by the App Store.
+          </p>
+          <p className="text-center text-xs text-muted">
+            Partner access currently uses an invite link (no separate partner code flow in this build).
           </p>
           <Card>
             <p className="text-sm">

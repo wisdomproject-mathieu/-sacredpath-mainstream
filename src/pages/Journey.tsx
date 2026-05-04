@@ -168,8 +168,8 @@ export default function Journey() {
 
   const sendWhatsApp = () => {
     const message = note.trim()
-      ? `Your beloved one is sending you this: "${note.trim()}". Click this link to save it to your dashboard together with pictures, important dates, and start browsing the larger intimacy repository ever built on SacredPath: ${window.location.origin}${import.meta.env.BASE_URL}journey?incomingNote=${encodeURIComponent(note.trim())}`
-      : `Your beloved one is sending you a love note. Click this link to save it to your dashboard together with pictures, important dates, and start browsing the larger intimacy repository ever built on SacredPath: ${window.location.origin}${import.meta.env.BASE_URL}journey`;
+      ? `A private whisper from your beloved: "${note.trim()}". Open your shared Journey to save it: ${window.location.origin}${import.meta.env.BASE_URL}journey?incomingNote=${encodeURIComponent(note.trim())}`
+      : `A private whisper from your beloved is waiting. Open your shared Journey: ${window.location.origin}${import.meta.env.BASE_URL}journey`;
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank", "noopener,noreferrer");
   };
@@ -267,27 +267,47 @@ export default function Journey() {
             </Card>
 
             <Card className="space-y-3">
-              <h2 className="font-serif text-2xl">Whisper and gratitude notes</h2>
-              <p className="text-sm text-muted">Prepare private notes here, then send them to your beloved one through WhatsApp.</p>
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder="Write a whisper or gratitude note..."
-                className="min-h-24 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
-              />
-              <Button variant="secondary" onClick={saveWhisperNote}>
-                Add secret note
-              </Button>
-              <button
-                type="button"
-                onClick={sendWhatsApp}
-                className="w-full rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-6 py-3 font-semibold text-[#130f08] transition-opacity hover:opacity-90"
-              >
-                WA your beloved one
-              </button>
+              <div className="flex items-center gap-2">
+                <span className="rounded-full border border-accent/50 px-2 py-1 text-[11px] uppercase tracking-[0.18em] text-accent">
+                  Premium
+                </span>
+                <h2 className="font-serif text-2xl">Private whispers</h2>
+              </div>
+              <p className="text-sm text-muted">
+                Hidden mainstream feature for love notes and gratitude whispers. Save it privately, then send it in one tap.
+              </p>
+              {hasPremium ? (
+                <>
+                  <textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder="Write a private whisper or gratitude note..."
+                    className="min-h-24 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
+                  />
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <Button variant="secondary" onClick={saveWhisperNote}>
+                      Save whisper
+                    </Button>
+                    <button
+                      type="button"
+                      onClick={sendWhatsApp}
+                      className="w-full rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-6 py-3 font-semibold text-[#130f08] transition-opacity hover:opacity-90"
+                    >
+                      Send to beloved on WhatsApp
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-muted">
+                    Unlock Premium to use private whispers and one-tap WhatsApp sharing.
+                  </p>
+                  <SubscribeButton source="journey-benefits" mode="navigate" />
+                </>
+              )}
               <div className="space-y-2">
                 {savedNotes.length === 0 ? (
-                  <p className="text-sm text-muted">No saved secret notes yet.</p>
+                  <p className="text-sm text-muted">No saved whispers yet.</p>
                 ) : (
                   savedNotes.slice(0, 6).map((entry, index) => (
                     <div key={`${entry}-${index}`} className="flex items-start justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2">

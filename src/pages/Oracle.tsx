@@ -455,7 +455,7 @@ export default function Oracle() {
               <div className="rounded-2xl border border-accent/30 bg-accent/10 p-4 space-y-3">
                 <h3 className="font-serif text-2xl">Unlock the full ritual for both of you</h3>
                 <p className="text-sm text-muted">
-                  One subscription opens the deeper path for both partners: full ritual, Sacred Voice guidance, partner sharing, Journey saving, and deeper interpretation.
+                  One subscription unlocks premium for two partners: full ritual, Sacred Voice guidance, partner sharing, Journey saving, and deeper interpretation.
                 </p>
                 <button
                   type="button"

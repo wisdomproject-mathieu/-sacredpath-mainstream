@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import type { ChangeEventHandler } from "react";
 import Layout from "../components/Layout";
 import Card from "../components/Card";
 import Button from "../components/Button";
@@ -22,12 +23,13 @@ const DURATION_OPTIONS = [3, 5, 10] as const;
 const BOX_CYCLE_SECONDS = 16;
 const FOUR_SEVEN_EIGHT_SECONDS = 19;
 
-const BREATHING_BACKGROUNDS = [
-  { id: "candle", label: "Candle", gradient: "linear-gradient(135deg, #4f2c17 0%, #7a4a2b 35%, #2a1b14 100%)" },
-  { id: "ocean", label: "Ocean", gradient: "linear-gradient(135deg, #123652 0%, #1f596c 40%, #0f2134 100%)" },
-  { id: "forest", label: "Forest", gradient: "linear-gradient(135deg, #1b3b2c 0%, #2d5b3f 40%, #12231b 100%)" },
-  { id: "night", label: "Night", gradient: "linear-gradient(135deg, #23183d 0%, #192646 45%, #0c101f 100%)" },
+const FRAME_SIZES = [
+  { id: "compact", label: "Compact", className: "h-60 w-60" },
+  { id: "balanced", label: "Balanced", className: "h-72 w-72" },
+  { id: "immersive", label: "Immersive", className: "h-80 w-80" },
 ] as const;
+
+type FrameSizeId = (typeof FRAME_SIZES)[number]["id"];
 
 function formatClock(totalSeconds: number) {
   const mins = Math.floor(totalSeconds / 60);
@@ -55,8 +57,9 @@ export default function Tools() {
   const [toolMode, setToolMode] = useState<ToolMode>("timer");
   const [durationMin, setDurationMin] = useState<(typeof DURATION_OPTIONS)[number]>(3);
   const [breathingMode, setBreathingMode] = useState<BreathingMode>("box");
-  const [breathingBackgroundId, setBreathingBackgroundId] =
-    useState<(typeof BREATHING_BACKGROUNDS)[number]["id"]>("candle");
+  const [selectedPhotoId, setSelectedPhotoId] = useState<string>("");
+  const [photoItems, setPhotoItems] = useState<Array<{ id: string; src: string }>>([]);
+  const [frameSize, setFrameSize] = useState<FrameSizeId>("balanced");
   const [remainingSeconds, setRemainingSeconds] = useState(durationMin * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [phaseIndex, setPhaseIndex] = useState(0);
@@ -64,14 +67,52 @@ export default function Tools() {
   const [musicState, setMusicState] = useState(getMusicState());
 
   const phases = useMemo(() => getPhases(breathingMode), [breathingMode]);
-  const breathingBackground =
-    BREATHING_BACKGROUNDS.find((background) => background.id === breathingBackgroundId) ??
-    BREATHING_BACKGROUNDS[0];
+  const frameSizeClass = FRAME_SIZES.find((size) => size.id === frameSize)?.className ?? "h-72 w-72";
+  const selectedPhoto = photoItems.find((item) => item.id === selectedPhotoId)?.src;
 
   useEffect(() => {
     initMusicState();
     return subscribeMusic(setMusicState);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const storedPhotos = JSON.parse(window.localStorage.getItem("sp-journey-photos") ?? "[]");
+      const normalized = Array.isArray(storedPhotos)
+        ? storedPhotos
+            .map((item: unknown, index: number) =>
+              typeof item === "string"
+                ? { id: `legacy-${index}`, src: item }
+                : (item as { id?: string; src?: string }),
+            )
+            .filter((item: { id?: string; src?: string }) => typeof item.id === "string" && typeof item.src === "string")
+            .map((item: { id: string; src: string }) => ({ id: item.id, src: item.src }))
+        : [];
+      setPhotoItems(normalized.slice(0, 12));
+      if (normalized[0]?.id) setSelectedPhotoId(normalized[0].id);
+    } catch {
+      setPhotoItems([]);
+    }
+  }, []);
+
+  const onAddPhoto: ChangeEventHandler<HTMLInputElement> = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = typeof reader.result === "string" ? reader.result : "";
+      if (!image) return;
+      const next = [{ id: `photo-${Date.now()}`, src: image }, ...photoItems].slice(0, 12);
+      setPhotoItems(next);
+      setSelectedPhotoId(next[0].id);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("sp-journey-photos", JSON.stringify(next));
+      }
+    };
+    reader.readAsDataURL(file);
+    event.currentTarget.value = "";
+  };
 
   useEffect(() => {
     setRemainingSeconds(durationMin * 60);
@@ -230,25 +271,51 @@ export default function Tools() {
                 </button>
               </div>
 
-              <p className="text-[11px] uppercase tracking-[0.2em] text-accent">Calm background</p>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {BREATHING_BACKGROUNDS.map((background) => (
+              <p className="text-[11px] uppercase tracking-[0.2em] text-accent">Picture selector</p>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={onAddPhoto}
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-accent file:px-3 file:py-1 file:text-xs file:font-semibold file:text-[#130f08]"
+              />
+              <div className="grid grid-cols-3 gap-2">
+                {photoItems.length === 0 ? (
+                  <p className="col-span-3 text-sm text-muted">
+                    Add a picture to personalize your breathing square.
+                  </p>
+                ) : null}
+                {photoItems.map((item) => (
                   <button
-                    key={background.id}
+                    key={item.id}
                     type="button"
-                    onClick={() => setBreathingBackgroundId(background.id)}
+                    onClick={() => setSelectedPhotoId(item.id)}
                     className={`overflow-hidden rounded-xl border px-2 py-2 text-xs font-semibold ${
-                      breathingBackgroundId === background.id
+                      selectedPhotoId === item.id
                         ? "border-accent ring-2 ring-accent/35"
                         : "border-white/10"
                     }`}
-                    aria-label={`Select ${background.label} breathing background`}
+                    aria-label="Select breathing picture"
                   >
-                    <span
-                      className="mb-2 block h-12 w-full rounded-lg"
-                      style={{ background: background.gradient }}
+                    <img
+                      src={item.src}
+                      alt="Breathing focus"
+                      className="h-12 w-full rounded-lg object-cover"
                     />
-                    <span className="text-white/90">{background.label}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-accent">Frame size</p>
+              <div className="grid grid-cols-3 gap-2">
+                {FRAME_SIZES.map((size) => (
+                  <button
+                    key={size.id}
+                    type="button"
+                    onClick={() => setFrameSize(size.id)}
+                    className={`rounded-xl border px-3 py-2 text-xs font-semibold ${
+                      frameSize === size.id ? "border-accent bg-accent/15" : "border-white/10 bg-white/5"
+                    }`}
+                  >
+                    {size.label}
                   </button>
                 ))}
               </div>
@@ -281,9 +348,16 @@ export default function Tools() {
           ) : null}
 
           <div
-            className="relative mx-auto h-60 w-60 overflow-hidden rounded-3xl border border-white/15"
-            style={{ background: breathingBackground.gradient }}
+            className={`relative mx-auto overflow-hidden rounded-3xl border border-white/15 ${frameSizeClass}`}
+            style={{ background: "linear-gradient(135deg, #221934 0%, #101626 100%)" }}
           >
+            {selectedPhoto ? (
+              <img
+                src={selectedPhoto}
+                alt="Selected breathing focus"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            ) : null}
             <div className="absolute inset-0 bg-gradient-to-b from-black/12 via-black/20 to-black/42" />
 
             {toolMode === "breathing" && breathingMode === "box" ? (

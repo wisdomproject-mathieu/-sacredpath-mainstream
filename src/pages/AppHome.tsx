@@ -220,8 +220,9 @@ export default function AppHome() {
           <section className="space-y-4">
             <div className="space-y-2 text-center">
               <h2 className="font-serif text-3xl md:text-4xl">How are you feeling today?</h2>
-              <p className="mx-auto max-w-2xl text-muted">
-                Choose the feeling that best matches your mood. Your partner can do the same, and we will suggest a gentle practice.
+              <p className="mx-auto max-w-2xl text-balance text-base leading-relaxed text-muted">
+                Choose the feeling that best matches your mood.
+                Your partner can do the same, and we will suggest a gentle practice for both of you.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
@@ -339,7 +340,7 @@ export default function AppHome() {
         {!hasPremium ? (
           <section className="rounded-2xl border border-accent/30 bg-accent/10 p-5">
             <p className="text-sm">
-              Unlock the full library for both of you - $29.99 per year. One subscription opens deeper practices, guided voice, oracle prompts, and your shared journey.
+              One subscription unlocks premium for two partners: deeper practices, guided voice, oracle prompts, and your shared journey.
             </p>
             <div className="mt-4 flex gap-3">
               <SubscribeButton source="home" mode="navigate" />

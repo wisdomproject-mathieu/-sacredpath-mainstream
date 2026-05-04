@@ -45,12 +45,12 @@ export const WEATHER_TONE_COPY: Record<WeatherVisualKey, string> = {
 };
 
 export const WEATHER_IMAGE_POSITION: Record<WeatherVisualKey, string> = {
-  sunny: "50% 30%",
-  warm: "50% 30%",
-  electric: "50% 30%",
-  foggy: "50% 30%",
-  frozen: "50% 30%",
-  stormy: "50% 30%",
+  electric: "50% 42%",
+  foggy: "50% 38%",
+  frozen: "50% 34%",
+  warm: "50% 44%",
+  sunny: "50% 46%",
+  stormy: "50% 36%",
 };
 
 export function getDisplayName(name: string | undefined, fallback: string) {
