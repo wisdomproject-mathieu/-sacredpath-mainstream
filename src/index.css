@@ -322,14 +322,16 @@ main {
 
 .sp-brand-banner {
   display: block;
-  width: 100%;
+  width: 106%;
   height: auto;
-  margin-left: 0;
+  margin-left: -3%;
   border-radius: inherit;
   object-fit: cover;
   object-position: center;
   background: #130f22;
-  transform: none;
+  transform: scale(1.02);
+  transform-origin: center;
+  clip-path: inset(8px 8px 8px 8px round 26px);
 }
 
 @media (max-width: 640px) {

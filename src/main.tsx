@@ -20,7 +20,6 @@ import Privacy from "./pages/Privacy";
 import Support from "./pages/Support";
 import Tools from "./pages/Tools";
 import { SessionProvider } from "./contexts/SessionContext";
-import FloatingMusicButton from "./components/FloatingMusicButton";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -57,7 +56,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/support" element={<Support />} />
         </Routes>
 
-        <FloatingMusicButton />
       </BrowserRouter>
     </SessionProvider>
   </React.StrictMode>
