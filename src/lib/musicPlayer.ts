@@ -15,9 +15,15 @@ const baseUrl = import.meta.env.BASE_URL ?? "/";
 const withBase = (path: string) =>
   `${baseUrl}${path.replace(/^\//, "")}`.replace(/([^:]\/)\/+/g, "$1");
 
-const TRACK_URLS: Record<MusicTrack, string> = {
-  tantra: withBase("assets/audio/ambient-tantra.wav"),
-  meditation: withBase("assets/audio/ambient-meditation.wav"),
+const TRACK_URLS: Record<MusicTrack, string[]> = {
+  tantra: [
+    withBase("assets/audio/ambient-tantra.m4a"),
+    withBase("assets/audio/ambient-tantra.wav"),
+  ],
+  meditation: [
+    withBase("assets/audio/ambient-meditation.m4a"),
+    withBase("assets/audio/ambient-meditation.wav"),
+  ],
 };
 
 let audioEl: HTMLAudioElement | null = null;
@@ -46,7 +52,7 @@ function ensureAudioElement(): boolean {
   if (typeof window === "undefined") return false;
   if (audioEl) return true;
 
-  const el = new Audio(TRACK_URLS[state.track]);
+  const el = new Audio();
   el.loop = true;
   el.preload = "auto";
   el.volume = state.volume;
@@ -66,10 +72,20 @@ function ensureAudioElement(): boolean {
 
 async function playCurrentTrack(): Promise<void> {
   if (!ensureAudioElement() || !audioEl) return;
-  audioEl.src = TRACK_URLS[state.track];
   audioEl.volume = state.volume;
   audioEl.currentTime = 0;
-  await audioEl.play();
+
+  let lastError: unknown = null;
+  for (const candidate of TRACK_URLS[state.track]) {
+    try {
+      audioEl.src = candidate;
+      await audioEl.play();
+      return;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError ?? new Error("No playable ambient track found.");
 }
 
 export function initMusicState(): void {
