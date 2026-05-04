@@ -133,9 +133,9 @@ export default function AppHome() {
 
         <header className="space-y-3 text-center">
           <h1 className="font-serif text-4xl leading-[1.02] sm:text-5xl md:text-6xl">
-            Understand how
+            Understand the mood
             <br />
-            you both feel in seconds.
+            between you in seconds.
           </h1>
           <p className="mx-auto max-w-3xl text-base leading-relaxed text-muted md:text-lg">
             Choose your connection weather, receive one gentle practice, and reconnect without pressure.

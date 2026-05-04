@@ -20,6 +20,7 @@ const FREE_LIBRARY_MENU = [
 export default function Rituals() {
   const { state } = useSession();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showMenuUpgradeBanner, setShowMenuUpgradeBanner] = useState(false);
   const [favoriteSet, setFavoriteSet] = useState<Set<string>>(new Set());
   const [toast, setToast] = useState("");
   const [premiumIntensityFilter, setPremiumIntensityFilter] = useState<"all" | "gentle" | "medium" | "deep">("all");
@@ -258,6 +259,27 @@ export default function Rituals() {
         ) : (
           <>
             <section className="space-y-3">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-accent">LIBRARY CONTENT</p>
+              <div className="grid gap-3 md:grid-cols-2">
+                {FREE_LIBRARY_MENU.map((tile) => (
+                  <button
+                    key={tile.title}
+                    onClick={() => {
+                      setShowMenuUpgradeBanner(true);
+                      setSelectedId("premium-teaser");
+                    }}
+                    className="rounded-2xl border border-white/10 bg-card p-4 text-left hover:bg-white/10 transition"
+                  >
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Included in full library</p>
+                    <h3 className="font-serif text-2xl mt-1">{tile.title}</h3>
+                    <p className="text-sm text-muted mt-1">{tile.desc}</p>
+                    <p className="text-xs text-muted mt-2">Unlock full practice</p>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section className="space-y-3">
               <p className="text-[11px] uppercase tracking-[0.2em] text-accent">MORE PRACTICES TO EXPLORE</p>
               <p className="text-sm text-muted">A small preview from the full library.</p>
               <div className="flex gap-3 overflow-x-auto pb-1">
@@ -277,52 +299,18 @@ export default function Rituals() {
                 ))}
               </div>
             </section>
-
-            <section className="space-y-3">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-accent">LIBRARY CONTENT</p>
-              <div className="grid gap-3 md:grid-cols-2">
-                {FREE_LIBRARY_MENU.map((tile) => (
-                  <button
-                    key={tile.title}
-                    onClick={() => toggleSelected("premium-teaser")}
-                    className="rounded-2xl border border-white/10 bg-card p-4 text-left hover:bg-white/10 transition"
-                  >
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Included in full library</p>
-                    <h3 className="font-serif text-2xl mt-1">{tile.title}</h3>
-                    <p className="text-sm text-muted mt-1">{tile.desc}</p>
-                    <p className="text-xs text-muted mt-2">Unlock full practice</p>
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            <section className="space-y-3">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-accent">Library preview</p>
-              <p className="text-sm text-muted">
-                Showing <strong>{freePreviewList.length}</strong> ritual cards from <strong>{rituals.length}</strong>. Premium unlocks full details for locked practices.
-              </p>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {freePreviewList.map((ritual) => {
-                  const locked = ritual.tier === "premium";
-                  return (
-                    <div key={ritual.id} className="space-y-3">
-                      <RitualCard
-                        ritual={ritual}
-                        selected={selected?.id === ritual.id}
-                        locked={locked}
-                        isFreeToday={false}
-                        showImage={false}
-                        statusLabel={locked ? "UNLOCK" : "AVAILABLE"}
-                        onClick={() => toggleSelected(ritual.id)}
-                      />
-                      {selected?.id === ritual.id ? renderInlineDetails(ritual) : null}
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
           </>
         )}
+
+        {!hasPremium && showMenuUpgradeBanner ? (
+          <section className="rounded-2xl border border-accent/30 bg-accent/10 p-4 md:p-5 space-y-3">
+            <h3 className="font-serif text-2xl">Unlock full practice</h3>
+            <p className="text-sm text-muted">
+              One subscription opens the full library for both of you.
+            </p>
+            <SubscribeButton source="rituals" mode="navigate" />
+          </section>
+        ) : null}
 
       </div>
       {toast ? (
