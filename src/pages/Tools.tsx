@@ -3,8 +3,17 @@ import Layout from "../components/Layout";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import BackButton from "../components/BackButton";
+import {
+  getMusicState,
+  initMusicState,
+  setMusicTrack,
+  setMusicVolume,
+  subscribeMusic,
+  toggleMusicPlayback,
+  type MusicTrack,
+} from "../lib/musicPlayer";
 
-type ToolMode = "timer" | "breathing";
+type ToolMode = "timer" | "breathing" | "music";
 type BreathingMode = "box" | "478";
 
 type BreathPhase = {
@@ -46,8 +55,14 @@ export default function Tools() {
   const [isRunning, setIsRunning] = useState(false);
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [phaseRemaining, setPhaseRemaining] = useState(getPhases("box")[0].seconds);
+  const [musicState, setMusicState] = useState(getMusicState());
 
   const phases = useMemo(() => getPhases(breathingMode), [breathingMode]);
+
+  useEffect(() => {
+    initMusicState();
+    return subscribeMusic(setMusicState);
+  }, []);
 
   useEffect(() => {
     setRemainingSeconds(durationMin * 60);
@@ -140,12 +155,12 @@ export default function Tools() {
 
         <header className="text-center space-y-2">
           <h1 className="font-serif text-4xl md:text-5xl">Tools</h1>
-          <p className="text-muted">Simple timer and guided breathing for calming and reconnection.</p>
+          <p className="text-muted">Simple timer, guided breathing, and ambient music for calming and reconnection.</p>
         </header>
 
         <Card className="space-y-4">
           <p className="text-[11px] uppercase tracking-[0.2em] text-accent">Choose tool</p>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <button
               type="button"
               onClick={() => setToolMode("timer")}
@@ -163,6 +178,15 @@ export default function Tools() {
               }`}
             >
               Breathing
+            </button>
+            <button
+              type="button"
+              onClick={() => setToolMode("music")}
+              className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
+                toolMode === "music" ? "border-accent bg-accent/15" : "border-white/10 bg-white/5"
+              }`}
+            >
+              Music
             </button>
           </div>
 
@@ -207,13 +231,57 @@ export default function Tools() {
               </div>
             </>
           ) : null}
+
+          {toolMode === "music" ? (
+            <>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-accent">Music style</p>
+              <div className="grid grid-cols-2 gap-2">
+                {(["tantra", "meditation"] as MusicTrack[]).map((track) => (
+                  <button
+                    key={track}
+                    type="button"
+                    onClick={() => void setMusicTrack(track)}
+                    className={`rounded-xl border px-4 py-2 text-sm font-semibold capitalize ${
+                      musicState.track === track ? "border-accent bg-accent/15" : "border-white/10 bg-white/5"
+                    }`}
+                  >
+                    {track}
+                  </button>
+                ))}
+              </div>
+              <label className="block text-sm text-muted">
+                Volume
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={Math.round(musicState.volume * 100)}
+                  onChange={(e) => setMusicVolume(Number(e.target.value) / 100)}
+                  className="mt-2 w-full"
+                />
+              </label>
+              <Button onClick={() => void toggleMusicPlayback()}>
+                {musicState.isPlaying ? "Pause music" : "Play music"}
+              </Button>
+              {musicState.error ? <p className="text-xs text-red-300">{musicState.error}</p> : null}
+            </>
+          ) : null}
         </Card>
 
         <Card className="text-center space-y-4">
           <p className="text-[11px] uppercase tracking-[0.2em] text-accent">
-            {toolMode === "timer" ? "Session timer" : "Guided breathing"}
+            {toolMode === "timer" ? "Session timer" : toolMode === "breathing" ? "Guided breathing" : "Ambient music"}
           </p>
-          <p className="font-serif text-6xl leading-none">{formatClock(remainingSeconds)}</p>
+          {toolMode !== "music" ? <p className="font-serif text-6xl leading-none">{formatClock(remainingSeconds)}</p> : null}
+
+          {toolMode === "music" ? (
+            <div className="space-y-1">
+              <p className="text-2xl font-semibold capitalize text-accent">{musicState.track}</p>
+              <p className="text-sm text-muted">
+                {musicState.isPlaying ? "Playing while you browse the app" : "Ready to play in background while browsing"}
+              </p>
+            </div>
+          ) : null}
 
           {toolMode === "breathing" ? (
             <div className="space-y-1">
@@ -251,11 +319,13 @@ export default function Tools() {
             </div>
           ) : null}
 
-          <div className="grid grid-cols-3 gap-2">
-            <Button onClick={onStart} disabled={isRunning}>Start</Button>
-            <Button variant="secondary" onClick={onPause} disabled={!isRunning}>Pause</Button>
-            <Button variant="secondary" onClick={onReset}>Reset</Button>
-          </div>
+          {toolMode !== "music" ? (
+            <div className="grid grid-cols-3 gap-2">
+              <Button onClick={onStart} disabled={isRunning}>Start</Button>
+              <Button variant="secondary" onClick={onPause} disabled={!isRunning}>Pause</Button>
+              <Button variant="secondary" onClick={onReset}>Reset</Button>
+            </div>
+          ) : null}
         </Card>
       </div>
     </Layout>
