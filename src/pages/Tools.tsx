@@ -16,6 +16,15 @@ const DURATION_OPTIONS = [3, 5, 10] as const;
 const BOX_CYCLE_SECONDS = 16;
 const FOUR_SEVEN_EIGHT_SECONDS = 19;
 
+const FOCUS_IMAGES = [
+  { id: "warm", label: "Warm", src: `${import.meta.env.BASE_URL}assets/weather-mainstream/warm.png` },
+  { id: "electric", label: "Electric", src: `${import.meta.env.BASE_URL}assets/weather-mainstream/electric.png` },
+  { id: "foggy", label: "Foggy", src: `${import.meta.env.BASE_URL}assets/weather-mainstream/foggy.png` },
+  { id: "frozen", label: "Frozen", src: `${import.meta.env.BASE_URL}assets/weather-mainstream/frozen.png` },
+  { id: "hot", label: "Hot", src: `${import.meta.env.BASE_URL}assets/weather-mainstream/sunny.png` },
+  { id: "stormy", label: "Stormy", src: `${import.meta.env.BASE_URL}assets/weather-mainstream/stormy.png` },
+] as const;
+
 function formatClock(totalSeconds: number) {
   const mins = Math.floor(totalSeconds / 60);
   const secs = totalSeconds % 60;
@@ -42,12 +51,14 @@ export default function Tools() {
   const [toolMode, setToolMode] = useState<ToolMode>("timer");
   const [durationMin, setDurationMin] = useState<(typeof DURATION_OPTIONS)[number]>(3);
   const [breathingMode, setBreathingMode] = useState<BreathingMode>("box");
+  const [focusImageId, setFocusImageId] = useState<(typeof FOCUS_IMAGES)[number]["id"]>("warm");
   const [remainingSeconds, setRemainingSeconds] = useState(durationMin * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [phaseRemaining, setPhaseRemaining] = useState(getPhases("box")[0].seconds);
 
   const phases = useMemo(() => getPhases(breathingMode), [breathingMode]);
+  const focusImage = FOCUS_IMAGES.find((img) => img.id === focusImageId) ?? FOCUS_IMAGES[0];
 
   useEffect(() => {
     setRemainingSeconds(durationMin * 60);
@@ -208,6 +219,22 @@ export default function Tools() {
             </>
           ) : null}
 
+          <p className="text-[11px] uppercase tracking-[0.2em] text-accent">Focus picture</p>
+          <div className="grid grid-cols-3 gap-2">
+            {FOCUS_IMAGES.map((img) => (
+              <button
+                key={img.id}
+                type="button"
+                onClick={() => setFocusImageId(img.id)}
+                className={`overflow-hidden rounded-xl border ${
+                  focusImageId === img.id ? "border-accent ring-2 ring-accent/40" : "border-white/10"
+                }`}
+                aria-label={`Select ${img.label} focus image`}
+              >
+                <img src={img.src} alt={img.label} className="h-16 w-full object-cover" />
+              </button>
+            ))}
+          </div>
         </Card>
 
         <Card className="text-center space-y-4">
@@ -223,34 +250,43 @@ export default function Tools() {
             </div>
           ) : null}
 
-          {toolMode === "breathing" && breathingMode === "box" ? (
-            <div className="mx-auto mt-2 grid place-items-center">
-              <svg viewBox="0 0 240 240" className="h-60 w-60">
-                <rect x="30" y="30" width="180" height="180" rx="16" fill="none" stroke="rgba(230,185,128,0.45)" strokeWidth="2" />
-                <circle
-                  cx={boxCoords.x}
-                  cy={boxCoords.y}
-                  r="8"
-                  fill="#e6b980"
-                  stroke="rgba(19,15,8,0.75)"
-                  strokeWidth="1.5"
-                  opacity={isRunning ? 1 : 0.85}
-                />
-              </svg>
-            </div>
-          ) : null}
+          <div className="relative mx-auto h-60 w-60 overflow-hidden rounded-3xl border border-white/15 bg-white/5">
+            <img
+              src={focusImage.src}
+              alt={`${focusImage.label} focus`}
+              className="absolute inset-0 h-full w-full object-cover opacity-50"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/25 to-black/45" />
 
-          {toolMode === "breathing" && breathingMode === "478" ? (
-            <div className="mx-auto mt-2 grid h-60 w-60 place-items-center rounded-full border border-white/10 bg-white/5">
-              <div
-                className="h-36 w-36 rounded-full bg-gradient-to-br from-[#e6b980] to-[#f6c77d]"
-                style={{
-                  animation: `breathe-478 ${FOUR_SEVEN_EIGHT_SECONDS}s ease-in-out infinite`,
-                  animationPlayState: isRunning ? "running" : "paused",
-                }}
-              />
-            </div>
-          ) : null}
+            {toolMode === "breathing" && breathingMode === "box" ? (
+              <div className="absolute inset-0 grid place-items-center">
+                <svg viewBox="0 0 240 240" className="h-52 w-52">
+                  <rect x="30" y="30" width="180" height="180" rx="16" fill="none" stroke="rgba(230,185,128,0.45)" strokeWidth="2" />
+                  <circle
+                    cx={boxCoords.x}
+                    cy={boxCoords.y}
+                    r="8"
+                    fill="#e6b980"
+                    stroke="rgba(19,15,8,0.75)"
+                    strokeWidth="1.5"
+                    opacity={isRunning ? 1 : 0.85}
+                  />
+                </svg>
+              </div>
+            ) : null}
+
+            {toolMode === "breathing" && breathingMode === "478" ? (
+              <div className="absolute inset-0 grid place-items-center">
+                <div
+                  className="h-36 w-36 rounded-full bg-gradient-to-br from-[#e6b980] to-[#f6c77d]"
+                  style={{
+                    animation: `breathe-478 ${FOUR_SEVEN_EIGHT_SECONDS}s ease-in-out infinite`,
+                    animationPlayState: isRunning ? "running" : "paused",
+                  }}
+                />
+              </div>
+            ) : null}
+          </div>
 
           <div className="grid grid-cols-3 gap-2">
             <Button onClick={onStart} disabled={isRunning}>Start</Button>
