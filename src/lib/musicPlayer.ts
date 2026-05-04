@@ -22,7 +22,7 @@ let modulationTimer: number | null = null;
 const state: MusicState = {
   isPlaying: false,
   track: "tantra",
-  volume: 0.45,
+  volume: 0.7,
   ready: false,
   error: "",
 };
@@ -41,7 +41,8 @@ function persist(): void {
 
 function applyVolume(): void {
   if (!masterGain) return;
-  masterGain.gain.setTargetAtTime(state.volume, audioContext?.currentTime ?? 0, 0.08);
+  const safeVolume = Math.max(0.05, Math.min(1, state.volume));
+  masterGain.gain.setTargetAtTime(safeVolume, audioContext?.currentTime ?? 0, 0.08);
 }
 
 function stopTimers(): void {
@@ -95,25 +96,25 @@ function ensureContext(): boolean {
 function startTantra(): void {
   if (!audioContext || !masterGain) return;
   ambienceGain = audioContext.createGain();
-  ambienceGain.gain.value = 0.25;
+  ambienceGain.gain.value = 0.38;
   ambienceGain.connect(masterGain);
 
   droneOscA = audioContext.createOscillator();
   droneOscA.type = "sine";
-  droneOscA.frequency.value = 110;
+  droneOscA.frequency.value = 196;
   droneOscA.connect(ambienceGain);
   droneOscA.start();
 
   droneOscB = audioContext.createOscillator();
-  droneOscB.type = "triangle";
-  droneOscB.frequency.value = 220;
+  droneOscB.type = "sine";
+  droneOscB.frequency.value = 294;
   droneOscB.connect(ambienceGain);
   droneOscB.start();
 
   modulationTimer = window.setInterval(() => {
     if (!audioContext || !ambienceGain) return;
-    const next = 0.18 + Math.random() * 0.12;
-    ambienceGain.gain.setTargetAtTime(next, audioContext.currentTime, 1.8);
+    const next = 0.28 + Math.random() * 0.2;
+    ambienceGain.gain.setTargetAtTime(next, audioContext.currentTime, 1.6);
   }, 2400);
 }
 
@@ -137,18 +138,18 @@ function playBell(frequency: number, duration = 1.2): void {
 function startMeditation(): void {
   if (!audioContext || !masterGain) return;
   ambienceGain = audioContext.createGain();
-  ambienceGain.gain.value = 0.13;
+  ambienceGain.gain.value = 0.3;
   ambienceGain.connect(masterGain);
 
   droneOscA = audioContext.createOscillator();
   droneOscA.type = "sine";
-  droneOscA.frequency.value = 174;
+  droneOscA.frequency.value = 220;
   droneOscA.connect(ambienceGain);
   droneOscA.start();
 
   droneOscB = audioContext.createOscillator();
   droneOscB.type = "sine";
-  droneOscB.frequency.value = 261.63;
+  droneOscB.frequency.value = 329.63;
   droneOscB.connect(ambienceGain);
   droneOscB.start();
 
@@ -202,8 +203,19 @@ export async function toggleMusicPlayback(): Promise<void> {
     return;
   }
   if (!ensureContext() || !audioContext) return;
-  if (audioContext.state === "suspended") {
-    await audioContext.resume();
+  try {
+    if (audioContext.state !== "running") {
+      await audioContext.resume();
+    }
+  } catch {
+    state.error = "Could not start audio. Please turn off silent mode and try again.";
+    emit();
+    return;
+  }
+  if (audioContext.state !== "running") {
+    state.error = "Audio is blocked on this device. Tap play again after interacting with the screen.";
+    emit();
+    return;
   }
   startTrack(state.track);
   applyVolume();
