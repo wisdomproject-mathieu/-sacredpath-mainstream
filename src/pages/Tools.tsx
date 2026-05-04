@@ -24,9 +24,9 @@ const BOX_CYCLE_SECONDS = 16;
 const FOUR_SEVEN_EIGHT_SECONDS = 19;
 
 const FRAME_SIZES = [
-  { id: "compact", label: "Compact", className: "h-60 w-60" },
+  { id: "compact", label: "Compact", className: "h-56 w-56" },
   { id: "balanced", label: "Balanced", className: "h-72 w-72" },
-  { id: "immersive", label: "Immersive", className: "h-80 w-80" },
+  { id: "immersive", label: "Immersive", className: "h-[24rem] w-[24rem]" },
 ] as const;
 
 type FrameSizeId = (typeof FRAME_SIZES)[number]["id"];
@@ -65,6 +65,8 @@ export default function Tools() {
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [phaseRemaining, setPhaseRemaining] = useState(getPhases("box")[0].seconds);
   const [musicState, setMusicState] = useState(getMusicState());
+  const [ballColor, setBallColor] = useState("#e6b980");
+  const [ballStroke, setBallStroke] = useState("rgba(19,15,8,0.8)");
 
   const phases = useMemo(() => getPhases(breathingMode), [breathingMode]);
   const frameSizeClass = FRAME_SIZES.find((size) => size.id === frameSize)?.className ?? "h-72 w-72";
@@ -74,6 +76,48 @@ export default function Tools() {
     initMusicState();
     return subscribeMusic(setMusicState);
   }, []);
+
+  useEffect(() => {
+    if (!selectedPhoto) {
+      setBallColor("#e6b980");
+      setBallStroke("rgba(19,15,8,0.8)");
+      return;
+    }
+
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 24;
+      canvas.height = 24;
+      const context = canvas.getContext("2d");
+      if (!context) return;
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+
+      let red = 0;
+      let green = 0;
+      let blue = 0;
+      let count = 0;
+
+      for (let i = 0; i < pixels.length; i += 4) {
+        red += pixels[i];
+        green += pixels[i + 1];
+        blue += pixels[i + 2];
+        count += 1;
+      }
+
+      if (!count) return;
+      const avgRed = Math.round(red / count);
+      const avgGreen = Math.round(green / count);
+      const avgBlue = Math.round(blue / count);
+      const luminance = 0.2126 * avgRed + 0.7152 * avgGreen + 0.0722 * avgBlue;
+
+      setBallColor(`rgb(${avgRed}, ${avgGreen}, ${avgBlue})`);
+      setBallStroke(luminance > 150 ? "rgba(10,10,14,0.9)" : "rgba(250,245,230,0.9)");
+    };
+    image.src = selectedPhoto;
+  }, [selectedPhoto]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -362,16 +406,19 @@ export default function Tools() {
 
             {toolMode === "breathing" && breathingMode === "box" ? (
               <div className="absolute inset-0 grid place-items-center">
-                <svg viewBox="0 0 240 240" className="h-52 w-52">
+                <svg viewBox="0 0 240 240" className="h-[88%] w-[88%]">
                   <rect x="30" y="30" width="180" height="180" rx="16" fill="none" stroke="rgba(230,185,128,0.45)" strokeWidth="2" />
                   <circle
                     cx={boxCoords.x}
                     cy={boxCoords.y}
-                    r="8"
-                    fill="#e6b980"
-                    stroke="rgba(19,15,8,0.75)"
-                    strokeWidth="1.5"
+                    r="10"
+                    fill={ballColor}
+                    stroke={ballStroke}
+                    strokeWidth="2"
                     opacity={isRunning ? 1 : 0.85}
+                    style={{
+                      filter: "drop-shadow(0 0 8px rgba(0,0,0,0.45))",
+                    }}
                   />
                 </svg>
               </div>
@@ -380,10 +427,13 @@ export default function Tools() {
             {toolMode === "breathing" && breathingMode === "478" ? (
               <div className="absolute inset-0 grid place-items-center">
                 <div
-                  className="h-36 w-36 rounded-full bg-gradient-to-br from-[#e6b980] to-[#f6c77d]"
+                  className="h-1/2 w-1/2 rounded-full"
                   style={{
+                    background: `radial-gradient(circle at 30% 25%, ${ballColor}, #f6c77d)`,
+                    border: `2px solid ${ballStroke}`,
                     animation: `breathe-478 ${FOUR_SEVEN_EIGHT_SECONDS}s ease-in-out infinite`,
                     animationPlayState: isRunning ? "running" : "paused",
+                    boxShadow: "0 0 24px rgba(0,0,0,0.35)",
                   }}
                 />
               </div>
