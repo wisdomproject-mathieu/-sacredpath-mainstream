@@ -11,9 +11,13 @@ type MusicState = {
 const STORAGE_KEY = "sp-music-settings";
 const listeners = new Set<(state: MusicState) => void>();
 
+const baseUrl = import.meta.env.BASE_URL ?? "/";
+const withBase = (path: string) =>
+  `${baseUrl}${path.replace(/^\//, "")}`.replace(/([^:]\/)\/+/g, "$1");
+
 const TRACK_URLS: Record<MusicTrack, string> = {
-  tantra: "/assets/audio/ambient-tantra.wav",
-  meditation: "/assets/audio/ambient-meditation.wav",
+  tantra: withBase("assets/audio/ambient-tantra.wav"),
+  meditation: withBase("assets/audio/ambient-meditation.wav"),
 };
 
 let audioEl: HTMLAudioElement | null = null;
