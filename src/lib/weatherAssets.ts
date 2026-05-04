@@ -36,12 +36,12 @@ export const WEATHER_TONE_LABELS: Record<WeatherVisualKey, string> = {
 };
 
 export const WEATHER_TONE_COPY: Record<WeatherVisualKey, string> = {
-  stormy: "Tense, charged, and carrying something unspoken.",
-  foggy: "Unclear, drifting, and still finding shape.",
-  frozen: "Numb, tired, and shut down in the body.",
-  warm: "Soft, tender, and wanting closeness.",
-  electric: "Curious, playful, adventurous.",
-  sunny: "Desire, heat, hunger.",
+  electric: "Curious · playful · alive",
+  foggy: "Unsure · distant · quiet",
+  frozen: "Numb · tired · shut down",
+  warm: "Open · soft · close",
+  sunny: "Passionate · bold · magnetic",
+  stormy: "Tense · reactive · overloaded",
 };
 
 export const WEATHER_IMAGE_POSITION: Record<WeatherVisualKey, string> = {

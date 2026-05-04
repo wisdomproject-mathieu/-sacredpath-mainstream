@@ -7,10 +7,22 @@ type RitualCardProps = {
   locked: boolean;
   isFreeToday: boolean;
   onClick: () => void;
+  showImage?: boolean;
+  imageSrcOverride?: string;
+  statusLabel?: string;
 };
 
-export default function RitualCard({ ritual, selected, locked, isFreeToday, onClick }: RitualCardProps) {
-  const imageSrc = `${import.meta.env.BASE_URL}assets/weather-mainstream/${ritual.imageMood}.png`;
+export default function RitualCard({
+  ritual,
+  selected,
+  locked,
+  isFreeToday,
+  onClick,
+  showImage = false,
+  imageSrcOverride,
+  statusLabel,
+}: RitualCardProps) {
+  const imageSrc = imageSrcOverride ?? `${import.meta.env.BASE_URL}assets/weather-mainstream/${ritual.imageMood}.png`;
   const imagePosition = getWeatherImagePosition(ritual.imageMood);
 
   return (
@@ -22,16 +34,20 @@ export default function RitualCard({ ritual, selected, locked, isFreeToday, onCl
         selected ? "border-accent bg-white/10" : "border-white/10 bg-card hover:bg-white/10"
       }`}
     >
-      <img
-        src={imageSrc}
-        alt={ritual.title}
-        className="w-full h-32 object-cover opacity-58 saturate-75"
-        style={{ objectPosition: imagePosition }}
-      />
-      <div className="absolute inset-0 h-32 bg-gradient-to-t from-[#060710]/92 via-[#0b1020]/68 to-[#0e1530]/28" />
+      {showImage ? (
+        <>
+          <img
+            src={imageSrc}
+            alt={ritual.title}
+            className="w-full h-32 object-cover opacity-58 saturate-75"
+            style={{ objectPosition: imagePosition }}
+          />
+          <div className="absolute inset-0 h-32 bg-gradient-to-t from-[#060710]/92 via-[#0b1020]/68 to-[#0e1530]/28" />
+        </>
+      ) : null}
       <div className="p-4">
         <p className="text-[11px] uppercase tracking-[0.2em] text-accent">
-          {isFreeToday ? "Free today" : locked ? "Premium" : "Unlocked"}
+          {statusLabel ?? (isFreeToday ? "FREE TODAY" : locked ? "UNLOCK" : "AVAILABLE")}
         </p>
         <p className="mt-2 text-lg font-semibold">{ritual.title}</p>
         <p className="text-sm text-muted mt-1">{ritual.subtitle}</p>

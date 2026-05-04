@@ -5,14 +5,14 @@ export function Home() {
     <div className="min-h-screen flex items-center justify-center px-6 bg-sp-bg text-slate-100">
       <div className="max-w-lg text-center space-y-6">
         <p className="text-xs tracking-[0.2em] uppercase text-sp-gold">
-          Sacred Path
+          The Two of Us
         </p>
         <h1 className="text-4xl font-serif text-amber-100">
-          Sacred Path for Couples
+          The Two of Us
         </h1>
         <p className="text-sm text-slate-300">
-          Tonight, receive one guided ritual aligned with your shared intimacy weather.
-          No scrolling, no overwhelm — just one path for two.
+          Small rituals to feel closer, one moment at a time.
+          No overwhelm - just one gentle practice for both of you.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
           <Link

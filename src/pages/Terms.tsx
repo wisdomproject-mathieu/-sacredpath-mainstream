@@ -13,7 +13,7 @@ export default function Terms() {
 
         <section className="space-y-4 text-sm leading-relaxed text-muted">
           <p>
-            Sacred Path for Couples provides relationship reflection tools, rituals, guided audio, and partner practices.
+            The Two of Us provides relationship reflection tools, rituals, guided audio, and partner practices.
             It is not medical, psychiatric, legal, or crisis support.
           </p>
           <p>
@@ -21,7 +21,7 @@ export default function Terms() {
             pressured, unsafe, uncertain, or emotionally overwhelmed.
           </p>
           <p>
-            Subscription terms: Sacred Path Premium is offered as an annual subscription. Payment and subscription
+            Subscription terms: The Two of Us Plus is offered as an annual subscription. Payment and subscription
             management are handled by Apple through your App Store account, including renewals and cancellations.
           </p>
           <p>

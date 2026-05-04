@@ -26,12 +26,12 @@ type WeatherOption = {
 };
 
 const WEATHER_OPTIONS: WeatherOption[] = [
-  { key: "warm", id: "warm", title: "Warm", subtitle: "Soft, tender..." },
-  { key: "electric", id: "electric", title: "Electric", subtitle: "Curious, playful, adventurous." },
-  { key: "sunny", id: "sunny", title: "Hot", subtitle: "Desire, heat..." },
-  { key: "stormy", id: "stormy", title: "Stormy", subtitle: "Heavy, tumultuous..." },
-  { key: "foggy", id: "foggy", title: "Foggy", subtitle: "Detached, confused..." },
-  { key: "frozen", id: "frozen", title: "Frozen", subtitle: "Numb, tired, shut down..." },
+  { key: "electric", id: "electric", title: "Electric", subtitle: "Curious · playful · alive" },
+  { key: "foggy", id: "foggy", title: "Foggy", subtitle: "Unsure · distant · quiet" },
+  { key: "frozen", id: "frozen", title: "Frozen", subtitle: "Numb · tired · shut down" },
+  { key: "warm", id: "warm", title: "Warm", subtitle: "Open · soft · close" },
+  { key: "sunny", id: "sunny", title: "Hot", subtitle: "Passionate · bold · magnetic" },
+  { key: "stormy", id: "stormy", title: "Stormy", subtitle: "Tense · reactive · overloaded" },
 ];
 
 function WeatherPill({ 
@@ -133,9 +133,9 @@ export default function Weather() {
     <Layout>
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-6 md:mb-10">
-          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-3">Your shared intimacy weather</h1>
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-3">How We Feel Today</h1>
           <p className="text-base md:text-lg text-muted max-w-2xl mx-auto">
-            Take a moment. Breathe. Share your current state, then welcome your partner's weather with love, respect, and curiosity.
+            Share your connection weather, then your partner can do the same. We will suggest a gentle practice for your next shared moment.
           </p>
         </div>
 
@@ -144,7 +144,7 @@ export default function Weather() {
             <p className="text-base md:text-lg leading-relaxed text-center text-muted">
               The secret to these rituals isn't "doing them perfectly." It’s the intention you bring.
               If you find yourself rushing, stop, take a breath, and reset.
-              Intimacy is a garden. Water it daily, and watch it bloom.
+              Connection grows in small moments. Keep it gentle, and pause anytime you need.
             </p>
           </Card>
         ) : (
@@ -169,7 +169,7 @@ export default function Weather() {
               </Button>
             ) : (
               <Button variant="primary" disabled={!canRevealPath} onClick={() => canRevealPath && navigate("/ritual")}>
-                Reveal your ritual and tonight path
+                Reveal your connection practice
               </Button>
             )}
           </div>

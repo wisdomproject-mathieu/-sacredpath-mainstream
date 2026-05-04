@@ -26,10 +26,10 @@ export default function Connect() {
       <div className="max-w-md mx-auto">
         <BackButton fallbackPath="/" />
         <div className="text-center mb-10">
-          <p className="text-[11px] uppercase tracking-widest text-accent mb-3">Sacred Path</p>
+          <p className="text-[11px] uppercase tracking-widest text-accent mb-3">The Two of Us</p>
           <h1 className="font-serif text-3xl mb-3">Connect your partner</h1>
           <p className="text-sm text-muted">
-            One subscription unlocks the path for both of you.
+            One subscription opens the full library for both of you.
           </p>
         </div>
 

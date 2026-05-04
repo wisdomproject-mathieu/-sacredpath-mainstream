@@ -9,15 +9,14 @@ import { isPremium } from "../lib/premium";
 import { getTonightPath } from "../lib/tonightPath";
 
 const STARTER_IDS = ["tk006", "sp203", "tk003", "tk005"];
-const TERRITORY_TILES = [
-  { title: "Daily anchors", desc: "Simple rituals for busy days.", count: 28, sample: ["Candle Arrival", "Daily Homecoming"] },
-  { title: "Repair & storm clearing", desc: "De-escalation and reconnection.", count: 24, sample: ["The Sacred Pause", "Softened Startup"] },
-  { title: "Deepening slow love", desc: "Presence, breath, and attunement.", count: 22, sample: ["Soul Gazing", "Heart Breathing"] },
-  { title: "Erotic spark & play", desc: "Playful chemistry with consent.", count: 26, sample: ["Verbal Foreplay", "Truth or Tease"] },
-  { title: "Grounding & care", desc: "Aftercare and nervous-system safety.", count: 18, sample: ["Shared Aftermath", "Held Breathing"] },
-  { title: "Integration & long arc", desc: "Weekly anchors and relationship growth.", count: 19, sample: ["Weekly Repair Check", "Beloved Letter"] },
+const FREE_LIBRARY_MENU = [
+  { title: "RECONNECT DAILY", desc: "Simple rituals for busy days and softer check-ins." },
+  { title: "REPAIR TENSION", desc: "Calm practices for emotional safety and listening." },
+  { title: "DEEPEN CLOSENESS", desc: "Warm practices for trust, tenderness, and presence." },
+  { title: "PLAY TOGETHER", desc: "Light, consent-forward practices for shared joy." },
+  { title: "SLOW DOWN", desc: "Grounding rituals that reduce overwhelm and pressure." },
+  { title: "TALK HONESTLY", desc: "Conversation practices to feel understood and supported." },
 ];
-
 export default function Rituals() {
   const { state } = useSession();
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -47,6 +46,19 @@ export default function Rituals() {
 
   const list = useMemo(() => [freeToday, ...rituals.filter((item) => item.id !== freeToday.id)], [freeToday]);
   const freePreviewList = useMemo(() => list.filter((r) => r.id !== freeToday.id).slice(0, 48), [list, freeToday.id]);
+  const dailyBackgrounds = useMemo(
+    () => [
+      `${import.meta.env.BASE_URL}assets/weather-mainstream/electric.png`,
+      `${import.meta.env.BASE_URL}assets/weather-mainstream/foggy.png`,
+      `${import.meta.env.BASE_URL}assets/weather-mainstream/frozen.png`,
+      `${import.meta.env.BASE_URL}assets/weather-mainstream/warm.png`,
+      `${import.meta.env.BASE_URL}assets/weather-mainstream/sunny.png`,
+      `${import.meta.env.BASE_URL}assets/weather-mainstream/stormy.png`,
+    ],
+    [],
+  );
+  const dayKey = useMemo(() => Math.floor(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 86400000), []);
+  const freeDailyImage = useMemo(() => dailyBackgrounds[dayKey % dailyBackgrounds.length], [dailyBackgrounds, dayKey]);
   const premiumFilteredList = useMemo(() => {
     return list.filter((ritual) => {
       if (ritual.id === freeToday.id) return false;
@@ -126,22 +138,24 @@ export default function Rituals() {
       <div className="max-w-6xl mx-auto space-y-6">
         <BackButton fallbackPath="/" />
         <header className="text-center space-y-3">
-          <h1 className="font-serif text-4xl md:text-5xl">A complete intimacy library for the two of you.</h1>
+          <h1 className="font-serif text-4xl md:text-5xl">A complete connection library for the two of you.</h1>
           <p className="text-muted max-w-3xl mx-auto">
-            One daily practice is free. Unlock <span className="text-accent font-semibold">400+ rituals</span>, guided voice, oracle prompts, and shared journey tools for both partners, with new practices and features added regularly.
+            One daily practice is free. Unlock <span className="text-accent font-semibold">400+ rituals</span>, guided voice, gentle oracle prompts, and shared journey tools for both partners, with new practices added regularly.
           </p>
         </header>
 
         <section className="grid gap-4 lg:grid-cols-[1.6fr_1fr]">
           <div className="space-y-3">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-accent">
-              {tonightPath?.freeRitual ? "Tonight's Path (free)" : "Daily discovery"}
-            </p>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-accent">TODAY&apos;S FREE PRACTICE</p>
+            <p className="text-sm text-muted">A gentle daily ritual to help you feel closer.</p>
             <RitualCard
               ritual={freeToday}
               selected={selected?.id === freeToday.id}
               locked={false}
               isFreeToday={true}
+              showImage
+              imageSrcOverride={freeDailyImage}
+              statusLabel="FREE TODAY"
               onClick={() => toggleSelected(freeToday.id)}
             />
             {selected?.id === freeToday.id ? renderInlineDetails(freeToday) : null}
@@ -200,7 +214,7 @@ export default function Rituals() {
           <section className="rounded-2xl border border-accent/30 bg-accent/10 p-4 md:p-5 space-y-3">
             <h3 className="font-serif text-2xl">Unlock this ritual</h3>
             <p className="text-sm text-muted">
-              This practice is part of the full Sacred Path library for both of you.
+              This practice is included in the full library for both of you.
             </p>
             <SubscribeButton source="rituals" mode="navigate" />
           </section>
@@ -209,7 +223,7 @@ export default function Rituals() {
           <section className="rounded-2xl border border-accent/30 bg-accent/10 p-4 md:p-5 space-y-3">
             <h3 className="font-serif text-2xl">Unlock the complete library</h3>
             <p className="text-sm text-muted">
-              Premium opens all ritual territories, full details, Sacred Voice, Oracle depth, and Journey tools.
+              One subscription opens deeper practices, full details, guided voice, and journey tools for both partners.
             </p>
             <SubscribeButton source="rituals" mode="navigate" />
           </section>
@@ -231,6 +245,8 @@ export default function Rituals() {
                       selected={selected?.id === ritual.id}
                       locked={locked}
                       isFreeToday={ritual.id === freeToday.id}
+                      showImage={false}
+                      statusLabel={locked ? "UNLOCK" : "AVAILABLE"}
                       onClick={() => toggleSelected(ritual.id)}
                     />
                     {selected?.id === ritual.id ? renderInlineDetails(ritual) : null}
@@ -242,11 +258,20 @@ export default function Rituals() {
         ) : (
           <>
             <section className="space-y-3">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-accent">Start free</p>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-accent">MORE PRACTICES TO EXPLORE</p>
+              <p className="text-sm text-muted">A small preview from the full library.</p>
+              <div className="flex gap-3 overflow-x-auto pb-1">
                 {starterRituals.map((ritual) => (
-                  <div key={ritual.id} className="space-y-2">
-                    <RitualCard ritual={ritual} selected={selected?.id === ritual.id} locked={false} isFreeToday={false} onClick={() => toggleSelected(ritual.id)} />
+                  <div key={ritual.id} className="min-w-[280px] flex-1 space-y-2">
+                    <RitualCard
+                      ritual={ritual}
+                      selected={selected?.id === ritual.id}
+                      locked={false}
+                      isFreeToday={false}
+                      showImage
+                      statusLabel="PREVIEW"
+                      onClick={() => toggleSelected(ritual.id)}
+                    />
                     {selected?.id === ritual.id ? renderInlineDetails(ritual) : null}
                   </div>
                 ))}
@@ -254,18 +279,18 @@ export default function Rituals() {
             </section>
 
             <section className="space-y-3">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-accent">Inside the full library</p>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-accent">LIBRARY CONTENT</p>
               <div className="grid gap-3 md:grid-cols-2">
-                {TERRITORY_TILES.map((tile) => (
+                {FREE_LIBRARY_MENU.map((tile) => (
                   <button
                     key={tile.title}
                     onClick={() => toggleSelected("premium-teaser")}
                     className="rounded-2xl border border-white/10 bg-card p-4 text-left hover:bg-white/10 transition"
                   >
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Premium territory</p>
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Included in full library</p>
                     <h3 className="font-serif text-2xl mt-1">{tile.title}</h3>
                     <p className="text-sm text-muted mt-1">{tile.desc}</p>
-                    <p className="text-xs text-muted mt-2">{tile.count} rituals · {tile.sample.join(" · ")}</p>
+                    <p className="text-xs text-muted mt-2">Unlock full practice</p>
                   </button>
                 ))}
               </div>
@@ -286,6 +311,8 @@ export default function Rituals() {
                         selected={selected?.id === ritual.id}
                         locked={locked}
                         isFreeToday={false}
+                        showImage={false}
+                        statusLabel={locked ? "UNLOCK" : "AVAILABLE"}
                         onClick={() => toggleSelected(ritual.id)}
                       />
                       {selected?.id === ritual.id ? renderInlineDetails(ritual) : null}

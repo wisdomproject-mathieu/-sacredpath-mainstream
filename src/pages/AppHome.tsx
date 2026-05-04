@@ -20,12 +20,12 @@ import {
 type HomeCheckinStage = "me" | "meSelected" | "partner" | "complete";
 
 const WEATHER_OPTIONS: Array<{ id: IntimacyWeather; subtitle: string }> = [
-  { id: "sunny", subtitle: "Desire, heat, hunger" },
-  { id: "warm", subtitle: "Soft, tender, wanting closeness" },
-  { id: "electric", subtitle: "Curious, playful, adventurous" },
-  { id: "foggy", subtitle: "Unclear, distant, uncertain" },
-  { id: "frozen", subtitle: "Numb, shut down, tired" },
-  { id: "stormy", subtitle: "Charged, tense, friction" },
+  { id: "electric", subtitle: "Curious · playful · alive" },
+  { id: "foggy", subtitle: "Unsure · distant · quiet" },
+  { id: "frozen", subtitle: "Numb · tired · shut down" },
+  { id: "warm", subtitle: "Open · soft · close" },
+  { id: "sunny", subtitle: "Passionate · bold · magnetic" },
+  { id: "stormy", subtitle: "Tense · reactive · overloaded" },
 ];
 
 function SmallWeatherCard({
@@ -133,12 +133,12 @@ export default function AppHome() {
 
         <header className="space-y-3 text-center">
           <h1 className="font-serif text-4xl leading-[1.02] sm:text-5xl md:text-6xl">
-            Understand the mood
+            Understand how
             <br />
-            between you in seconds.
+            you both feel in seconds.
           </h1>
           <p className="mx-auto max-w-3xl text-base leading-relaxed text-muted md:text-lg">
-            Choose your intimacy weather, receive one practice for tonight, and reconnect without pressure.
+            Choose your connection weather, receive one gentle practice, and reconnect without pressure.
           </p>
         </header>
 
@@ -157,7 +157,7 @@ export default function AppHome() {
             className="rounded-2xl border border-white/10 bg-card p-4 text-left transition hover:bg-white/10"
           >
             <p className="font-serif text-2xl">Ask the Intimacy Oracle</p>
-            <p className="mt-1 text-sm text-muted">Choose what you need tonight and get a guided ritual.</p>
+            <p className="mt-1 text-sm text-muted">Choose what you need and get a guided connection practice.</p>
           </button>
           <button
             type="button"
@@ -209,9 +209,9 @@ export default function AppHome() {
         {stage === "me" ? (
           <section className="space-y-4">
             <div className="space-y-2 text-center">
-              <h2 className="font-serif text-3xl md:text-4xl">How are you arriving today?</h2>
+              <h2 className="font-serif text-3xl md:text-4xl">How are you feeling today?</h2>
               <p className="mx-auto max-w-2xl text-muted">
-                Choose the weather that best describes your body and mood right now.
+                Choose the feeling that best matches your mood. Your partner can do the same, and we will suggest a gentle practice.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
@@ -243,7 +243,7 @@ export default function AppHome() {
                 onClick={() => setStage("partner")}
                 className="w-full rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-6 py-3.5 font-semibold text-[#130f08] transition-opacity hover:opacity-90"
               >
-                Now, sense your beloved partner&apos;s weather
+                Now choose your partner&apos;s connection weather
               </button>
               <button
                 type="button"
@@ -259,7 +259,7 @@ export default function AppHome() {
         {stage === "partner" ? (
           <section className="space-y-4">
             <div className="space-y-2 text-center">
-              <h2 className="font-serif text-3xl md:text-4xl">Now sense your beloved partner&apos;s weather</h2>
+              <h2 className="font-serif text-3xl md:text-4xl">Now choose your partner&apos;s connection weather</h2>
               <p className="mx-auto max-w-2xl text-muted">
                 Choose the weather you feel from your partner with care, curiosity, and respect.
               </p>
@@ -302,7 +302,7 @@ export default function AppHome() {
               <h3 className="font-serif text-3xl">{tonightPath.homeCard.title}</h3>
               <p className="text-muted">{tonightPath.homeCard.body}</p>
               <p className="pt-1 text-sm">
-                <span className="text-muted">Free ritual:</span>{" "}
+                <span className="text-muted">Free practice:</span>{" "}
                 <span className="font-semibold">{tonightPath.freeRitual.title}</span>
               </p>
             </div>
@@ -313,7 +313,7 @@ export default function AppHome() {
                 onClick={() => navigate("/ritual")}
                 className="flex-1 rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-6 py-3.5 font-semibold text-[#130f08] transition-opacity hover:opacity-90"
               >
-                Open tonight&apos;s ritual
+                Open today&apos;s practice
               </button>
               <button
                 type="button"
@@ -329,8 +329,7 @@ export default function AppHome() {
         {!hasPremium ? (
           <section className="rounded-2xl border border-accent/30 bg-accent/10 p-5">
             <p className="text-sm">
-              Unlock the full intimacy library for both of you - $29.99 per year. One subscription. Two partners. 300+ rituals,
-              Sacred Voice, oracle prompts, and your shared journey.
+              Unlock the full library for both of you - $29.99 per year. One subscription opens deeper practices, guided voice, oracle prompts, and your shared journey.
             </p>
             <div className="mt-4 flex gap-3">
               <SubscribeButton source="home" mode="navigate" />

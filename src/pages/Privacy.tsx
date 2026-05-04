@@ -13,7 +13,7 @@ export default function Privacy() {
 
         <section className="space-y-4 text-sm leading-relaxed text-muted">
           <p>
-            Sacred Path for Couples may store relationship inputs such as names, weather selections, saved rituals,
+            The Two of Us may store relationship inputs such as names, weather selections, saved rituals,
             and notes on your device to power your experience.
           </p>
           <p>

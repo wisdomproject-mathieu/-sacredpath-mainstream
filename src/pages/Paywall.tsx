@@ -28,15 +28,15 @@ export default function Paywall() {
   const [offeringsMessage, setOfferingsMessage] = useState("");
   const source = searchParams.get("source");
   const heading = useMemo(() => {
-    if (source === "home") return "Unlock the full Sacred Path for both of you.";
+    if (source === "home") return "Unlock the full Two of Us library for both of you.";
     if (source === "ritual") return "Unlock deeper rituals for both of you.";
-    if (source === "rituals") return "Unlock the complete intimacy library.";
+    if (source === "rituals") return "Unlock the complete couple practice library.";
     if (source === "voice") return "Unlock Sacred Voice for both of you.";
     if (source === "oracle") return "Unlock unlimited Intimacy Oracle.";
     if (source === "journey" || source === "journey-benefits") return "Unlock your full shared Journey.";
     if (source === "deeper") return "Go deeper together with the full premium path.";
     if (source === "saved") return "Keep building your shared memory.";
-    return "Unlock the full Sacred Path for both of you.";
+    return "Unlock the full Two of Us library for both of you.";
   }, [source]);
 
   useEffect(() => {
@@ -99,7 +99,7 @@ export default function Paywall() {
         <div className="text-center mb-12">
           <h1 className="font-serif text-4xl md:text-5xl mb-4">{heading}</h1>
           <p className="text-lg text-muted max-w-3xl mx-auto">
-            Unlock the full intimacy library for both of you - $29.99 per year. One subscription. Two partners.
+            Unlock the full practice library for both of you - $29.99 per year. One subscription. Two partners.
             Daily rituals, guided voice, oracle prompts, and your shared journey.
           </p>
           <p className="text-sm text-muted max-w-3xl mx-auto mt-3">
@@ -122,10 +122,10 @@ export default function Paywall() {
             <h3 className="font-serif text-2xl mb-4">Hold charge.<br/>Last longer.</h3>
             <p className="text-sm text-muted mb-6">Presence, pacing, breath, and steadier erotic energy.</p>
             <ul className="text-sm space-y-3 text-text/90 list-disc pl-5">
-              <li>Stay present under arousal instead of rushing the night.</li>
-              <li>Learn a calmer way to last longer without losing spark.</li>
-              <li>Use semen retention as depth and energy management.</li>
-              <li>Feel more pleasure in the whole body.</li>
+              <li>Practice steadier presence when emotions are running high.</li>
+              <li>Build confidence through calm pacing and clearer communication.</li>
+              <li>Use breath and grounding to stay connected in the moment.</li>
+              <li>Create more warmth and ease in shared moments.</li>
             </ul>
           </Card>
 
@@ -136,8 +136,8 @@ export default function Paywall() {
             <ul className="text-sm space-y-3 text-text/90 list-disc pl-5">
               <li>Receive slower touch and clearer pacing.</li>
               <li>Build emotional safety and erotic softness together.</li>
-              <li>Turn conscious touch into real desire.</li>
-              <li>Let intimacy feel nourishing and warm.</li>
+              <li>Turn gentle touch into stronger emotional closeness.</li>
+              <li>Let connection feel nourishing and warm.</li>
             </ul>
           </Card>
 
@@ -148,7 +148,7 @@ export default function Paywall() {
             <ul className="text-sm space-y-3 text-text/90 list-disc pl-5">
               <li>One subscription unlocks the premium path.</li>
               <li>Get richer rituals and deeper teachings.</li>
-              <li>Move from one card into a real intimacy system.</li>
+              <li>Move from one prompt into a practical relationship system.</li>
               <li>Keep simplicity while upgrading the depth.</li>
             </ul>
           </Card>
@@ -166,7 +166,7 @@ export default function Paywall() {
           )}
           <Card>
             <p className="text-sm">
-              Sacred Path Premium unlocks the full ritual library, Sacred Voice, Intimacy Oracle, Journey tools, and deeper practices for both partners.
+              The Two of Us Plus unlocks the full ritual library, guided voice, Oracle, Journey tools, and deeper practices for both partners.
             </p>
             <p className="text-sm mt-3">Yearly subscription: $29.99 per year.</p>
             <p className="text-sm">Monthly subscription: $2.99 per month.</p>
@@ -190,7 +190,7 @@ export default function Paywall() {
           </p>
           <Card>
             <p className="text-sm">
-              <strong>Product:</strong> Sacred Path Premium
+              <strong>Product:</strong> The Two of Us Plus
             </p>
             <p className="text-sm">
               <strong>Price:</strong> $29.99 per year

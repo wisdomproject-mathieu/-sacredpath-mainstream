@@ -8,7 +8,7 @@ export default function Support() {
         <BackButton fallbackPath="/" />
         <header className="space-y-2">
           <h1 className="font-serif text-4xl">Support</h1>
-          <p className="text-sm text-muted">Need help with Sacred Path for Couples?</p>
+          <p className="text-sm text-muted">Need help with The Two of Us?</p>
         </header>
 
         <section className="space-y-4 text-sm leading-relaxed text-muted">
@@ -19,7 +19,7 @@ export default function Support() {
             For app support, provide: device model, iOS version, and the page where the issue happened.
           </p>
           <p>
-            Recommended support contact (configure before release): support@sacredpath.app
+            Recommended support contact (configure before release): support@thetwoofus.app
           </p>
         </section>
       </div>
