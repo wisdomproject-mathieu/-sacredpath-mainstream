@@ -34,6 +34,15 @@ const WEATHER_OPTIONS: WeatherOption[] = [
   { key: "stormy", id: "stormy", title: "Stormy", subtitle: "Tense · reactive · overloaded" },
 ];
 
+const WEATHER_OVERLAY_CLASS: Record<WeatherVisualKey, string> = {
+  electric: "from-[#2b185f]/84 via-[#2f3f8e]/42 to-transparent",
+  foggy: "from-[#313748]/84 via-[#454d5f]/36 to-transparent",
+  frozen: "from-[#1d2e4b]/86 via-[#325375]/42 to-transparent",
+  warm: "from-[#4d321a]/82 via-[#7a5a31]/34 to-transparent",
+  sunny: "from-[#632718]/86 via-[#9b4326]/42 to-transparent",
+  stormy: "from-[#1a2c4a]/88 via-[#253e67]/45 to-transparent",
+};
+
 function WeatherPill({ 
   role, 
   option, 
@@ -59,9 +68,10 @@ function WeatherPill({
         className="w-full aspect-[4/3] object-cover opacity-80 group-hover:opacity-100 transition-opacity"
         style={{ objectPosition: getWeatherImagePosition(option.key) }}
       />
-      <div className="absolute inset-0 bg-black/60 p-2 sm:p-3 flex flex-col justify-end">
-        <p className="text-xs sm:text-sm font-semibold text-text">{option.title}.</p>
-        <p className="text-[11px] sm:text-xs text-muted truncate">{option.subtitle}</p>
+      <div className={`absolute inset-0 bg-gradient-to-br ${WEATHER_OVERLAY_CLASS[option.key]}`} />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent p-2 sm:p-3 flex flex-col justify-end">
+        <p className="text-xs sm:text-sm font-semibold text-white">{option.title}</p>
+        <p className="text-[11px] sm:text-xs text-white/85">{option.subtitle}</p>
       </div>
     </button>
   );

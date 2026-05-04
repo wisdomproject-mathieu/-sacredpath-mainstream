@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import BrandHeader from "./BrandHeader";
+import FloatingMusicButton from "./FloatingMusicButton";
 
 interface LayoutProps {
   children: ReactNode;
@@ -13,10 +14,11 @@ export default function Layout({ children, showHeader = true, className = "" }: 
     <div className={`sp-page ${className}`.trim()}>
       <div
         className="sp-container"
-        style={{ paddingBottom: "calc(13rem + env(safe-area-inset-bottom))" }}
+        style={{ paddingBottom: "calc(14rem + env(safe-area-inset-bottom))" }}
       >
         {showHeader ? <BrandHeader className="mb-8" /> : null}
         <main>{children}</main>
+        <FloatingMusicButton />
         <nav
           className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-[#0f0d1b]/95 px-3 pb-[calc(env(safe-area-inset-bottom)+0.6rem)] pt-2 backdrop-blur md:px-4"
           aria-label="Primary navigation"

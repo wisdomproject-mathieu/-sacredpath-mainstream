@@ -3,6 +3,12 @@ import Layout from "../components/Layout";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import BackButton from "../components/BackButton";
+import {
+  getMusicState,
+  initMusicState,
+  subscribeMusic,
+  toggleMusicPlayback,
+} from "../lib/musicPlayer";
 
 type ToolMode = "timer" | "breathing";
 type BreathingMode = "box" | "478";
@@ -16,13 +22,11 @@ const DURATION_OPTIONS = [3, 5, 10] as const;
 const BOX_CYCLE_SECONDS = 16;
 const FOUR_SEVEN_EIGHT_SECONDS = 19;
 
-const FOCUS_IMAGES = [
-  { id: "warm", label: "Warm", src: `${import.meta.env.BASE_URL}assets/weather-mainstream/warm.png` },
-  { id: "electric", label: "Electric", src: `${import.meta.env.BASE_URL}assets/weather-mainstream/electric.png` },
-  { id: "foggy", label: "Foggy", src: `${import.meta.env.BASE_URL}assets/weather-mainstream/foggy.png` },
-  { id: "frozen", label: "Frozen", src: `${import.meta.env.BASE_URL}assets/weather-mainstream/frozen.png` },
-  { id: "hot", label: "Hot", src: `${import.meta.env.BASE_URL}assets/weather-mainstream/sunny.png` },
-  { id: "stormy", label: "Stormy", src: `${import.meta.env.BASE_URL}assets/weather-mainstream/stormy.png` },
+const BREATHING_BACKGROUNDS = [
+  { id: "candle", label: "Candle", gradient: "linear-gradient(135deg, #4f2c17 0%, #7a4a2b 35%, #2a1b14 100%)" },
+  { id: "ocean", label: "Ocean", gradient: "linear-gradient(135deg, #123652 0%, #1f596c 40%, #0f2134 100%)" },
+  { id: "forest", label: "Forest", gradient: "linear-gradient(135deg, #1b3b2c 0%, #2d5b3f 40%, #12231b 100%)" },
+  { id: "night", label: "Night", gradient: "linear-gradient(135deg, #23183d 0%, #192646 45%, #0c101f 100%)" },
 ] as const;
 
 function formatClock(totalSeconds: number) {
@@ -51,14 +55,23 @@ export default function Tools() {
   const [toolMode, setToolMode] = useState<ToolMode>("timer");
   const [durationMin, setDurationMin] = useState<(typeof DURATION_OPTIONS)[number]>(3);
   const [breathingMode, setBreathingMode] = useState<BreathingMode>("box");
-  const [focusImageId, setFocusImageId] = useState<(typeof FOCUS_IMAGES)[number]["id"]>("warm");
+  const [breathingBackgroundId, setBreathingBackgroundId] =
+    useState<(typeof BREATHING_BACKGROUNDS)[number]["id"]>("candle");
   const [remainingSeconds, setRemainingSeconds] = useState(durationMin * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [phaseRemaining, setPhaseRemaining] = useState(getPhases("box")[0].seconds);
+  const [musicState, setMusicState] = useState(getMusicState());
 
   const phases = useMemo(() => getPhases(breathingMode), [breathingMode]);
-  const focusImage = FOCUS_IMAGES.find((img) => img.id === focusImageId) ?? FOCUS_IMAGES[0];
+  const breathingBackground =
+    BREATHING_BACKGROUNDS.find((background) => background.id === breathingBackgroundId) ??
+    BREATHING_BACKGROUNDS[0];
+
+  useEffect(() => {
+    initMusicState();
+    return subscribeMusic(setMusicState);
+  }, []);
 
   useEffect(() => {
     setRemainingSeconds(durationMin * 60);
@@ -149,7 +162,7 @@ export default function Tools() {
       <div className="mx-auto max-w-4xl space-y-6">
         <BackButton fallbackPath="/" />
 
-        <header className="text-center space-y-2">
+        <header className="space-y-2 text-center">
           <h1 className="font-serif text-4xl md:text-5xl">Tools</h1>
           <p className="text-muted">Simple timer and guided breathing for calming and reconnection.</p>
         </header>
@@ -216,28 +229,45 @@ export default function Tools() {
                   4-7-8
                 </button>
               </div>
+
+              <p className="text-[11px] uppercase tracking-[0.2em] text-accent">Calm background</p>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {BREATHING_BACKGROUNDS.map((background) => (
+                  <button
+                    key={background.id}
+                    type="button"
+                    onClick={() => setBreathingBackgroundId(background.id)}
+                    className={`overflow-hidden rounded-xl border px-2 py-2 text-xs font-semibold ${
+                      breathingBackgroundId === background.id
+                        ? "border-accent ring-2 ring-accent/35"
+                        : "border-white/10"
+                    }`}
+                    aria-label={`Select ${background.label} breathing background`}
+                  >
+                    <span
+                      className="mb-2 block h-12 w-full rounded-lg"
+                      style={{ background: background.gradient }}
+                    />
+                    <span className="text-white/90">{background.label}</span>
+                  </button>
+                ))}
+              </div>
             </>
           ) : null}
-
-          <p className="text-[11px] uppercase tracking-[0.2em] text-accent">Focus picture</p>
-          <div className="grid grid-cols-3 gap-2">
-            {FOCUS_IMAGES.map((img) => (
-              <button
-                key={img.id}
-                type="button"
-                onClick={() => setFocusImageId(img.id)}
-                className={`overflow-hidden rounded-xl border ${
-                  focusImageId === img.id ? "border-accent ring-2 ring-accent/40" : "border-white/10"
-                }`}
-                aria-label={`Select ${img.label} focus image`}
-              >
-                <img src={img.src} alt={img.label} className="h-16 w-full object-cover" />
-              </button>
-            ))}
-          </div>
         </Card>
 
-        <Card className="text-center space-y-4">
+        <Card className="space-y-4">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-accent">Ambient Music</p>
+          <p className="text-sm text-muted">
+            Soft background sound for breathing, rituals, and quiet connection.
+          </p>
+          {musicState.error ? <p className="text-xs text-red-300">{musicState.error}</p> : null}
+          <Button onClick={() => void toggleMusicPlayback()}>
+            {musicState.isPlaying ? "Pause" : "Play"}
+          </Button>
+        </Card>
+
+        <Card className="space-y-4 text-center">
           <p className="text-[11px] uppercase tracking-[0.2em] text-accent">
             {toolMode === "timer" ? "Session timer" : "Guided breathing"}
           </p>
@@ -250,13 +280,11 @@ export default function Tools() {
             </div>
           ) : null}
 
-          <div className="relative mx-auto h-60 w-60 overflow-hidden rounded-3xl border border-white/15 bg-white/5">
-            <img
-              src={focusImage.src}
-              alt={`${focusImage.label} focus`}
-              className="absolute inset-0 h-full w-full object-cover opacity-50"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/25 to-black/45" />
+          <div
+            className="relative mx-auto h-60 w-60 overflow-hidden rounded-3xl border border-white/15"
+            style={{ background: breathingBackground.gradient }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-b from-black/12 via-black/20 to-black/42" />
 
             {toolMode === "breathing" && breathingMode === "box" ? (
               <div className="absolute inset-0 grid place-items-center">

@@ -28,6 +28,15 @@ const WEATHER_OPTIONS: Array<{ id: IntimacyWeather; subtitle: string }> = [
   { id: "stormy", subtitle: "Tense · reactive · overloaded" },
 ];
 
+const WEATHER_OVERLAY_CLASS: Record<WeatherVisualKey, string> = {
+  electric: "from-[#321a63]/88 via-[#2d3f93]/45 to-transparent",
+  foggy: "from-[#2e3342]/86 via-[#3f4656]/40 to-transparent",
+  frozen: "from-[#1e2f4f]/88 via-[#2f4a6e]/42 to-transparent",
+  warm: "from-[#4a321d]/86 via-[#7f5a2f]/36 to-transparent",
+  sunny: "from-[#5e2617]/88 via-[#8f3f25]/42 to-transparent",
+  stormy: "from-[#1b2948]/90 via-[#263f66]/45 to-transparent",
+};
+
 function SmallWeatherCard({
   role,
   tone,
@@ -56,7 +65,8 @@ function SmallWeatherCard({
         className="h-28 w-full object-cover md:h-32"
         style={{ objectPosition: getWeatherImagePosition(tone) }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/28 to-transparent" />
+      <div className={`absolute inset-0 bg-gradient-to-br ${WEATHER_OVERLAY_CLASS[tone]}`} />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/42 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 p-2 text-left">
         <p className="text-sm font-semibold text-white">{WEATHER_TONE_LABELS[tone]}</p>
         <p className="text-[11px] leading-tight text-white/80">{subtitle}</p>
