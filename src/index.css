@@ -313,6 +313,22 @@ main {
   max-width: none;
 }
 
+.sp-brand-image {
+  padding: 0;
+  overflow: hidden;
+  background: #130f22;
+}
+
+.sp-brand-banner {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: inherit;
+  object-fit: cover;
+  object-position: center;
+  background: #130f22;
+}
+
 @media (max-width: 640px) {
   .sp-brand {
     gap: 12px;
