@@ -12,7 +12,7 @@ export default function BrandHeader({
   className = "",
   variant = "compact",
   withNote = true,
-  note = "Small rituals to feel closer, one moment at a time.",
+  note = "Ancient wisdom for modern couples.",
 }: BrandHeaderProps) {
   const variantClassName = variant === "wide" ? "sp-brand-wide" : "sp-brand-compact";
 
@@ -23,8 +23,8 @@ export default function BrandHeader({
       </div>
 
       <div>
-        <div className="sp-brand-kicker">The Two of Us</div>
-        <div className="sp-brand-title">The Two of Us</div>
+        <div className="sp-brand-kicker">THE TWO OF US</div>
+        <div className="sp-brand-title">For Couples</div>
         {withNote ? <p className="sp-brand-subtitle">{note}</p> : null}
       </div>
     </div>
