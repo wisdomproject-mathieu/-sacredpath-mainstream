@@ -270,8 +270,7 @@ export default function Rituals() {
                     }}
                     className="rounded-2xl border border-white/10 bg-card p-4 text-left hover:bg-white/10 transition"
                   >
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Included in full library</p>
-                    <h3 className="font-serif text-2xl mt-1">{tile.title}</h3>
+                    <h3 className="font-serif text-2xl font-bold mt-1">{tile.title}</h3>
                     <p className="text-sm text-muted mt-1">{tile.desc}</p>
                     <p className="text-xs text-muted mt-2">Unlock full practice</p>
                   </button>
