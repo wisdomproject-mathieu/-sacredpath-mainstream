@@ -201,8 +201,8 @@ export default function Tools() {
   const boxProgressSeconds = (durationMin * 60 - remainingSeconds) % BOX_CYCLE_SECONDS;
   const boxSegment = Math.floor(boxProgressSeconds / 4);
   const boxSegmentProgress = (boxProgressSeconds % 4) / 4;
-  const boxStart = { x: 30, y: 30 };
-  const boxEnd = { x: 210, y: 210 };
+  const boxStart = { x: 20, y: 20 };
+  const boxEnd = { x: 220, y: 220 };
   const boxCoords = (() => {
     if (boxSegment === 0) {
       return { x: boxStart.x + (boxEnd.x - boxStart.x) * boxSegmentProgress, y: boxStart.y };
@@ -407,7 +407,7 @@ export default function Tools() {
             {toolMode === "breathing" && breathingMode === "box" ? (
               <div className="absolute inset-0 grid place-items-center">
                 <svg viewBox="0 0 240 240" className="h-[88%] w-[88%]">
-                  <rect x="30" y="30" width="180" height="180" rx="16" fill="none" stroke="rgba(230,185,128,0.45)" strokeWidth="2" />
+                  <rect x="20" y="20" width="200" height="200" rx="18" fill="none" stroke="rgba(230,185,128,0.52)" strokeWidth="2.5" />
                   <circle
                     cx={boxCoords.x}
                     cy={boxCoords.y}
