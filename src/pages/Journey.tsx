@@ -24,6 +24,17 @@ type OracleEntry = {
   partnerWeather?: string | null;
 };
 
+const WHISPER_LIBRARY = [
+  "Thank you for loving me even on my hardest days.",
+  "I see you, and I appreciate everything you carry for us.",
+  "Tonight I choose softness, patience, and closeness with you.",
+  "You are my safe place, and I never take that for granted.",
+  "I miss you, and I can’t wait to hold you close.",
+  "Your presence calms my heart in ways words cannot explain.",
+  "I am proud of us and how we keep choosing each other.",
+  "You are deeply loved, deeply wanted, and deeply appreciated.",
+];
+
 export default function Journey() {
   const [searchParams] = useSearchParams();
   const hasPremium = isPremium();
@@ -36,6 +47,7 @@ export default function Journey() {
   const [specialDates, setSpecialDates] = useState<DateEntry[]>([]);
   const [note, setNote] = useState("");
   const [savedNotes, setSavedNotes] = useState<string[]>([]);
+  const [selectedWhisper, setSelectedWhisper] = useState("");
   const [oracleEntries, setOracleEntries] = useState<OracleEntry[]>([]);
   const [toast, setToast] = useState("");
   const [oracleAccordionOpen, setOracleAccordionOpen] = useState(false);
@@ -166,12 +178,30 @@ export default function Journey() {
     window.setTimeout(() => setToast(""), 1800);
   };
 
-  const sendWhatsApp = () => {
-    const message = note.trim()
-      ? `A private whisper from your beloved: "${note.trim()}". Open your shared Journey to save it: ${window.location.origin}${import.meta.env.BASE_URL}journey?incomingNote=${encodeURIComponent(note.trim())}`
+  const sendWhisperToBeloved = () => {
+    const messageBody = (selectedWhisper || note).trim();
+    const message = messageBody
+      ? `A private whisper from your beloved: "${messageBody}". Open your shared Journey to save it: ${window.location.origin}${import.meta.env.BASE_URL}journey?incomingNote=${encodeURIComponent(messageBody)}`
       : `A private whisper from your beloved is waiting. Open your shared Journey: ${window.location.origin}${import.meta.env.BASE_URL}journey`;
-    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+    const encoded = encodeURIComponent(
+      messageBody
+        ? `A private whisper from your beloved: "${messageBody}". Open your shared Journey to save it: ${window.location.origin}${import.meta.env.BASE_URL}journey?incomingNote=${encodeURIComponent(messageBody)}`
+        : message,
+    );
+    const waUrl = `https://wa.me/?text=${encoded}`;
+    const smsUrl = `sms:?&body=${encoded}`;
+    const popup = window.open(waUrl, "_blank", "noopener,noreferrer");
+
+    if (!popup) {
+      window.location.href = smsUrl;
+      return;
+    }
+
+    window.setTimeout(() => {
+      if (document.visibilityState === "visible") {
+        window.location.href = smsUrl;
+      }
+    }, 1200);
   };
 
   const saveWhisperNote = () => {
@@ -274,10 +304,29 @@ export default function Journey() {
                 <h2 className="font-serif text-2xl">Private whispers</h2>
               </div>
               <p className="text-sm text-muted">
-                Hidden mainstream feature for love notes and gratitude whispers. Save it privately, then send it in one tap.
+                Build your library of love and gratitude whispers, then share in two clicks.
               </p>
               {hasPremium ? (
                 <>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {WHISPER_LIBRARY.map((item, index) => (
+                      <button
+                        key={`${item}-${index}`}
+                        type="button"
+                        onClick={() => {
+                          setSelectedWhisper(item);
+                          setNote(item);
+                        }}
+                        className={`rounded-xl border px-3 py-2 text-left text-sm transition ${
+                          selectedWhisper === item
+                            ? "border-accent bg-accent/15"
+                            : "border-white/10 bg-white/5 hover:bg-white/10"
+                        }`}
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
                   <textarea
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
@@ -290,10 +339,10 @@ export default function Journey() {
                     </Button>
                     <button
                       type="button"
-                      onClick={sendWhatsApp}
+                      onClick={sendWhisperToBeloved}
                       className="w-full rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-6 py-3 font-semibold text-[#130f08] transition-opacity hover:opacity-90"
                     >
-                      Send to beloved on WhatsApp
+                      Whisper to your beloved
                     </button>
                   </div>
                 </>
