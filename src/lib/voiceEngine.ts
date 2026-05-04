@@ -1,5 +1,4 @@
 import type { SacredPathRitual } from "../data/sacredPathRituals";
-import { playGoogleTranslateSegment } from "./googleTranslateTts";
 import { synthesizeGuidedVoiceAudio } from "./guidedVoiceTts";
 
 export type VoiceStyle = "warm" | "calm" | "deep" | "soft";
@@ -60,7 +59,6 @@ let paused = false;
 let stopped = false;
 let pauseTimer: number | null = null;
 let activeAudio: HTMLAudioElement | null = null;
-let fallbackMode = false;
 let activeSessionId = "";
 let activeVoiceStyle: VoiceStyle = "warm";
 let onStatus: ((status: VoiceStatus) => void) | undefined;
@@ -87,6 +85,7 @@ function scheduleNextAudio(sessionId: string, voiceStyle: VoiceStyle): void {
   const segment = queue[queueIndex];
   void (async () => {
     try {
+      // Try Gemini first, fall back to ElevenLabs if configured.
       const result = await synthesizeGuidedVoiceAudio({
         sessionId: `${sessionId}-${segment.id}`,
         text: segment.text,
@@ -97,18 +96,19 @@ function scheduleNextAudio(sessionId: string, voiceStyle: VoiceStyle): void {
         pitch: -1.2,
         model: GEMINI_VOICE_MODEL,
         format: "wav",
-      }).catch(async () =>
-        synthesizeGuidedVoiceAudio({
+      }).catch(async (geminiErr) => {
+        if (!ELEVENLABS_VOICE_ID) throw geminiErr;
+        return synthesizeGuidedVoiceAudio({
           sessionId: `${sessionId}-${segment.id}-elevenlabs`,
           text: segment.text,
           provider: "elevenlabs",
           voiceStyle,
-          voiceId: ELEVENLABS_VOICE_ID || undefined,
+          voiceId: ELEVENLABS_VOICE_ID,
           speakingRate: 0.84,
           pitch: -1.2,
           format: "mp3",
-        }),
-      );
+        });
+      });
 
       if (stopped) return;
       const audio = new Audio(result.audioUrl);
@@ -125,86 +125,19 @@ function scheduleNextAudio(sessionId: string, voiceStyle: VoiceStyle): void {
       };
 
       audio.onerror = () => {
-        fallbackMode = true;
-        void speakWithBrowserFallback(queue, onStatus, queueIndex);
+        console.warn("[Guided Voice] Audio playback error, stopping.");
+        speaking = false;
+        setStatus("idle");
       };
 
       await audio.play();
     } catch (error) {
-      try {
-        const audio = await playGoogleTranslateSegment(segment.text, {
-          lang: "en",
-          rate: 0.82,
-          onEnded: () => {
-            if (stopped) return;
-            clearPauseTimer();
-            pauseTimer = window.setTimeout(() => {
-              if (stopped || paused) return;
-              queueIndex += 1;
-              scheduleNextAudio(sessionId, voiceStyle);
-            }, segment.pauseAfterMs);
-          },
-        });
-        activeAudio = audio;
-        return;
-      } catch {
-        // Continue to device fallback.
-      }
       if (stopped) return;
-      console.warn("[Guided Voice] backend segment failed, switching to device voice", error);
-      fallbackMode = true;
-      void speakWithBrowserFallback(queue, onStatus, queueIndex);
+      console.warn("[Guided Voice] AI voice synthesis failed:", error);
+      speaking = false;
+      setStatus("idle");
     }
   })();
-}
-
-function pickFallbackVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
-  const preferred = [
-    "Samantha",
-    "Google UK English Female",
-    "Karen",
-    "Moira",
-    "Ava",
-    "Google US English",
-  ];
-
-  for (const name of preferred) {
-    const found = voices.find((v) => v.name === name);
-    if (found) return found;
-  }
-
-  const enVoice = voices.find((v) => v.lang?.toLowerCase().startsWith("en"));
-  return enVoice ?? voices[0] ?? null;
-}
-
-function scheduleNextFallback() {
-  if (stopped || paused) return;
-  if (queueIndex >= queue.length) {
-    speaking = false;
-    setStatus("idle");
-    return;
-  }
-
-  const segment = queue[queueIndex];
-  const utterance = new SpeechSynthesisUtterance(segment.text);
-  const voices = window.speechSynthesis.getVoices();
-  const picked = pickFallbackVoice(voices);
-  if (picked) utterance.voice = picked;
-  utterance.rate = 0.82;
-  utterance.pitch = 0.95;
-  utterance.volume = 1;
-
-  utterance.onend = () => {
-    if (stopped) return;
-    clearPauseTimer();
-    pauseTimer = window.setTimeout(() => {
-      if (stopped || paused) return;
-      queueIndex += 1;
-      scheduleNextFallback();
-    }, segment.pauseAfterMs);
-  };
-
-  window.speechSynthesis.speak(utterance);
 }
 
 export function buildVoiceSegmentsFromRitual(
@@ -265,26 +198,6 @@ export function buildVoiceSegmentsFromRitual(
   return segments;
 }
 
-export async function speakWithBrowserFallback(
-  segments: VoiceSegment[],
-  statusCb?: (s: VoiceStatus) => void,
-  startIndex = 0,
-) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-    throw new Error("Speech synthesis unavailable on this device");
-  }
-
-  onStatus = statusCb;
-  stopVoice();
-  queue = segments;
-  queueIndex = startIndex;
-  speaking = true;
-  paused = false;
-  stopped = false;
-  setStatus("playing");
-  scheduleNextFallback();
-}
-
 export async function speakRitualGuide(
   ritual: SacredPathRitual,
   options: VoiceBuildOptions,
@@ -302,20 +215,12 @@ export async function speakRitualGuide(
   speaking = true;
   paused = false;
   stopped = false;
-  fallbackMode = false;
   activeSessionId = `${ritual.id}-${Date.now()}`;
   activeVoiceStyle = options.voiceStyle;
   setStatus("playing");
 
-  try {
-    scheduleNextAudio(activeSessionId, activeVoiceStyle);
-    return { usingFallback: false };
-  } catch (error) {
-    console.warn("[Guided Voice] backend unavailable, using device voice", error);
-    fallbackMode = true;
-    await speakWithBrowserFallback(segments, statusCb);
-    return { usingFallback: true };
-  }
+  scheduleNextAudio(activeSessionId, activeVoiceStyle);
+  return { usingFallback: false };
 }
 
 export function pauseVoice() {
@@ -323,9 +228,7 @@ export function pauseVoice() {
   paused = true;
   clearPauseTimer();
 
-  if (fallbackMode && typeof window !== "undefined" && "speechSynthesis" in window) {
-    window.speechSynthesis.pause();
-  } else if (activeAudio) {
+  if (activeAudio) {
     activeAudio.pause();
   }
 
@@ -335,12 +238,6 @@ export function pauseVoice() {
 export function resumeVoice() {
   if (!speaking || !paused) return;
   paused = false;
-
-  if (fallbackMode && typeof window !== "undefined" && "speechSynthesis" in window) {
-    window.speechSynthesis.resume();
-    setStatus("playing");
-    return;
-  }
 
   if (activeAudio && activeAudio.paused) {
     void activeAudio.play();
@@ -357,10 +254,6 @@ export function stopVoice() {
   paused = false;
   speaking = false;
   clearPauseTimer();
-
-  if (typeof window !== "undefined" && "speechSynthesis" in window) {
-    window.speechSynthesis.cancel();
-  }
 
   if (activeAudio) {
     activeAudio.pause();

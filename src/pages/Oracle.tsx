@@ -13,18 +13,16 @@ import {
 } from "../lib/intimacyOracle";
 import { intimacyOracleCards } from "../data/intimacyOracle";
 import { synthesizeGuidedVoiceAudio } from "../lib/guidedVoiceTts";
-import { playGoogleTranslateSegment, splitTextForTts } from "../lib/googleTranslateTts";
 
 const DAILY_KEY = "sacredpath-oracle-daily";
 const RECENT_KEY = "sacredpath-oracle-recent";
 const JOURNEY_KEY = "sacredpath-journey-oracle";
-type OracleBackendProvider = "gemini" | "polly" | "google";
-const ORACLE_PRIMARY_PROVIDER = (import.meta.env.VITE_ORACLE_PRIMARY_TTS_PROVIDER || "polly").toLowerCase() as OracleBackendProvider;
-const ORACLE_POLLY_VOICE_ID = import.meta.env.VITE_ORACLE_POLLY_VOICE_ID || "Kimberly";
-const ORACLE_GEMINI_VOICE_NAME = import.meta.env.VITE_ORACLE_GEMINI_VOICE_NAME || "Kimberly";
-const ORACLE_WAVENET_VOICE = import.meta.env.VITE_ORACLE_WAVENET_VOICE || "en-US-Wavenet-F";
-const ORACLE_GEMINI_FALLBACK_MODEL =
-  import.meta.env.VITE_ORACLE_GEMINI_TTS_MODEL || "gemini-3.1-flash-tts-preview";
+
+// Gemini TTS is the primary (and only) voice provider.
+// Set VITE_ORACLE_GEMINI_TTS_MODEL and VITE_ORACLE_GEMINI_VOICE_NAME in .env to override.
+const ORACLE_GEMINI_VOICE_NAME = import.meta.env.VITE_ORACLE_GEMINI_VOICE_NAME || "Sulafat";
+const ORACLE_GEMINI_MODEL =
+  import.meta.env.VITE_ORACLE_GEMINI_TTS_MODEL || "gemini-2.5-flash-preview-tts";
 
 const QUESTION_HELPER =
   "Try: How can I reconnect tonight? What should I understand about my partner? What is blocking intimacy between us?";
@@ -52,11 +50,10 @@ export default function Oracle() {
   const [showQuestionPrompt, setShowQuestionPrompt] = useState(false);
   const [suggestedQuestion, setSuggestedQuestion] = useState(QUESTION_SUGGESTIONS[0]);
   const [voiceStatus, setVoiceStatus] = useState<"idle" | "playing" | "paused">("idle");
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const speechSegmentsRef = useRef<Array<{ text: string; pauseAfterMs: number }>>([]);
   const segmentIndexRef = useRef(0);
-  const voiceModeRef = useRef<"none" | "google" | "backend" | "browser">("none");
+  const activeRef = useRef(false);
   const queueTimerRef = useRef<number | null>(null);
 
   const userWeather = normalizeWeatherName(state.youWeatherTone ?? state.youWeather);
@@ -224,6 +221,7 @@ export default function Oracle() {
       .trim();
 
   const stopOracleVoice = () => {
+    activeRef.current = false;
     if (queueTimerRef.current !== null) {
       window.clearTimeout(queueTimerRef.current);
       queueTimerRef.current = null;
@@ -233,13 +231,8 @@ export default function Oracle() {
       audioRef.current.currentTime = 0;
       audioRef.current = null;
     }
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-    }
-    utteranceRef.current = null;
     speechSegmentsRef.current = [];
     segmentIndexRef.current = 0;
-    voiceModeRef.current = "none";
     setVoiceStatus("idle");
   };
 
@@ -290,21 +283,11 @@ export default function Oracle() {
       .join(" ... ");
   };
 
-  const nextProvider = (provider: OracleBackendProvider): OracleBackendProvider | null => {
-    if (provider === "gemini") return "polly";
-    if (provider === "polly") return "google";
-    return null;
-  };
-
-  const playBackendSegment = async (
-    card = selectedCard,
-    provider: OracleBackendProvider = ORACLE_PRIMARY_PROVIDER,
-  ) => {
-    if (voiceModeRef.current !== "backend") return;
+  const playNextSegment = async (card = selectedCard) => {
+    if (!activeRef.current) return;
     const segment = speechSegmentsRef.current[segmentIndexRef.current];
     if (!segment) {
       setVoiceStatus("idle");
-      voiceModeRef.current = "none";
       return;
     }
     try {
@@ -312,172 +295,35 @@ export default function Oracle() {
         sessionId: `oracle-${card.id}-${Date.now()}-${segmentIndexRef.current}`,
         text: segment.text,
         voiceStyle: "calm",
-        provider,
-        voiceName: provider === "google" ? ORACLE_WAVENET_VOICE : provider === "gemini" ? ORACLE_GEMINI_VOICE_NAME : undefined,
+        provider: "gemini",
+        voiceName: ORACLE_GEMINI_VOICE_NAME,
         speakingRate: 0.84,
         pitch: -1.2,
-        model: provider === "gemini" ? ORACLE_GEMINI_FALLBACK_MODEL : undefined,
-        voiceId: provider === "polly" ? ORACLE_POLLY_VOICE_ID : undefined,
-        format: provider === "polly" ? "mp3" : undefined,
+        model: ORACLE_GEMINI_MODEL,
+        format: "wav",
       });
-      if (voiceModeRef.current !== "backend") return;
+      if (!activeRef.current) return;
       const audio = new Audio(tts.audioUrl);
       audioRef.current = audio;
       audio.onended = () => {
-        if (voiceModeRef.current !== "backend") return;
+        if (!activeRef.current) return;
         queueTimerRef.current = window.setTimeout(() => {
-          if (voiceModeRef.current !== "backend") return;
+          if (!activeRef.current) return;
           segmentIndexRef.current += 1;
-          void playBackendSegment(card);
+          void playNextSegment(card);
         }, segment.pauseAfterMs);
       };
       audio.onerror = () => {
-        setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
+        setNotice("Sacred Voice encountered an error. You can still read the ritual together.");
         setVoiceStatus("idle");
-        voiceModeRef.current = "none";
+        activeRef.current = false;
       };
       await audio.play();
     } catch {
-      const fallback = nextProvider(provider);
-      if (fallback) {
-        void playBackendSegment(card, fallback);
-        return;
-      }
-      voiceModeRef.current = "google";
-      void playGoogleSegment(card);
-    }
-  };
-
-  const playGoogleChunkedSegment = async (text: string): Promise<void> => {
-    const normalized = humanizeForVoice(text).replace(/\s+/g, " ").trim();
-    const sentences = normalized
-      .split(/(?<=[.!?])\s+/)
-      .map((item) => item.trim())
-      .filter(Boolean);
-    const units = sentences.length ? sentences : [normalized];
-    let spokenChunks = 0;
-
-    for (let sentenceIndex = 0; sentenceIndex < units.length; sentenceIndex += 1) {
-      if (voiceModeRef.current !== "google") return;
-      const sentence = units[sentenceIndex];
-      const primaryChunks = splitTextForTts(sentence, 140);
-
-      for (let chunkIndex = 0; chunkIndex < primaryChunks.length; chunkIndex += 1) {
-        if (voiceModeRef.current !== "google") return;
-        const chunk = primaryChunks[chunkIndex];
-        const tryPlay = async (candidate: string): Promise<boolean> => {
-          try {
-            await new Promise<void>((resolve, reject) => {
-              void playGoogleTranslateSegment(candidate, {
-                lang: "en",
-                rate: 0.78,
-                onEnded: () => resolve(),
-                onError: () => reject(new Error("google-tts-chunk-failed")),
-              })
-                .then((audio) => {
-                  audioRef.current = audio;
-                })
-                .catch(reject);
-            });
-            spokenChunks += 1;
-            return true;
-          } catch {
-            return false;
-          }
-        };
-
-        const primaryOk = await tryPlay(chunk);
-        if (!primaryOk) {
-          const retryChunks = splitTextForTts(chunk, 90);
-          let retryOk = false;
-          for (const retryChunk of retryChunks) {
-            if (voiceModeRef.current !== "google") return;
-            const ok = await tryPlay(retryChunk);
-            if (!ok) {
-              retryOk = false;
-              break;
-            }
-            retryOk = true;
-          }
-          if (!retryOk) {
-            continue;
-          }
-        }
-
-        if (voiceModeRef.current !== "google") return;
-        await new Promise<void>((resolve) => {
-          queueTimerRef.current = window.setTimeout(() => resolve(), 340);
-        });
-      }
-    }
-
-    if (spokenChunks === 0) {
-      throw new Error("google-tts-no-audio");
-    }
-  };
-
-  const playGoogleSegment = async (card = selectedCard) => {
-    if (voiceModeRef.current !== "google") return;
-    const segment = speechSegmentsRef.current[segmentIndexRef.current];
-    if (!segment) {
-      setVoiceStatus("idle");
-      voiceModeRef.current = "none";
-      return;
-    }
-
-    try {
-      await playGoogleChunkedSegment(segment.text);
-      if (voiceModeRef.current !== "google") return;
-      queueTimerRef.current = window.setTimeout(() => {
-        if (voiceModeRef.current !== "google") return;
-        segmentIndexRef.current += 1;
-        void playGoogleSegment(card);
-      }, segment.pauseAfterMs);
-    } catch {
-      if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        voiceModeRef.current = "browser";
-        playBrowserSegment();
-        return;
-      }
       setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
       setVoiceStatus("idle");
-      voiceModeRef.current = "none";
+      activeRef.current = false;
     }
-  };
-
-  const playBrowserSegment = () => {
-    if (voiceModeRef.current !== "browser") return;
-    const segment = speechSegmentsRef.current[segmentIndexRef.current];
-    if (!segment) {
-      setVoiceStatus("idle");
-      voiceModeRef.current = "none";
-      return;
-    }
-    const utterance = new SpeechSynthesisUtterance(segment.text);
-    utteranceRef.current = utterance;
-    utterance.rate = 0.68;
-    utterance.pitch = 0.9;
-    utterance.volume = 1;
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = ["Samantha", "Google UK English Female", "Karen", "Ava", "Google US English"];
-    const selected = preferred
-      .map((name) => voices.find((voice) => voice.name === name))
-      .find(Boolean) ?? voices.find((voice) => voice.lang?.toLowerCase().startsWith("en"));
-    if (selected) utterance.voice = selected;
-    utterance.onend = () => {
-      if (voiceModeRef.current !== "browser") return;
-      queueTimerRef.current = window.setTimeout(() => {
-        if (voiceModeRef.current !== "browser") return;
-        segmentIndexRef.current += 1;
-        playBrowserSegment();
-      }, segment.pauseAfterMs);
-    };
-    utterance.onerror = () => {
-      setNotice("Sacred Voice is not available right now. You can still read the ritual together.");
-      setVoiceStatus("idle");
-      voiceModeRef.current = "none";
-    };
-    window.speechSynthesis.speak(utterance);
   };
 
   const startOracleVoice = async (card = selectedCard, inputQuestion = question) => {
@@ -487,41 +333,42 @@ export default function Oracle() {
     }
     stopOracleVoice();
     setVoiceStatus("playing");
+    activeRef.current = true;
     speechSegmentsRef.current = getOracleSegments(card, inputQuestion);
     segmentIndexRef.current = 0;
 
+    // Try synthesizing the full narration as a single request first (better quality).
     const narration = buildOracleNarration(card, inputQuestion);
-
     try {
       const tts = await synthesizeGuidedVoiceAudio({
         sessionId: `oracle-full-${card.id}-${Date.now()}`,
         text: narration,
         voiceStyle: "calm",
-        provider: ORACLE_PRIMARY_PROVIDER,
-        voiceName: ORACLE_PRIMARY_PROVIDER === "google" ? ORACLE_WAVENET_VOICE : undefined,
+        provider: "gemini",
+        voiceName: ORACLE_GEMINI_VOICE_NAME,
         speakingRate: 0.78,
         pitch: -1.4,
-        model: ORACLE_PRIMARY_PROVIDER === "gemini" ? ORACLE_GEMINI_FALLBACK_MODEL : undefined,
-        voiceId: ORACLE_PRIMARY_PROVIDER === "polly" ? ORACLE_POLLY_VOICE_ID : undefined,
-        format: ORACLE_PRIMARY_PROVIDER === "polly" ? "mp3" : undefined,
+        model: ORACLE_GEMINI_MODEL,
+        format: "wav",
       });
+      if (!activeRef.current) return;
       const audio = new Audio(tts.audioUrl);
       audioRef.current = audio;
-      voiceModeRef.current = "backend";
       audio.onended = () => {
         setVoiceStatus("idle");
-        voiceModeRef.current = "none";
+        activeRef.current = false;
       };
       audio.onerror = () => {
-        voiceModeRef.current = "google";
-        void playGoogleSegment(card);
+        // Full narration failed — try segment-by-segment instead.
+        void playNextSegment(card);
       };
       await audio.play();
       return;
     } catch {
-      // Fallback to segmented backend > google > browser path.
-      voiceModeRef.current = "backend";
-      void playBackendSegment(card);
+      // Full narration failed — try segment-by-segment instead.
+      if (activeRef.current) {
+        void playNextSegment(card);
+      }
     }
   };
 
@@ -533,11 +380,7 @@ export default function Oracle() {
     if (audioRef.current) {
       audioRef.current.pause();
       setVoiceStatus("paused");
-      return;
     }
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.pause();
-    setVoiceStatus("paused");
   };
 
   const resumeOracleVoice = () => {
@@ -546,14 +389,11 @@ export default function Oracle() {
       setVoiceStatus("playing");
       return;
     }
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    if (voiceModeRef.current === "backend" && !audioRef.current) {
+    // No active audio — resume from current segment position.
+    if (activeRef.current) {
       setVoiceStatus("playing");
-      void playBackendSegment();
-      return;
+      void playNextSegment();
     }
-    setVoiceStatus("playing");
-    window.speechSynthesis.resume();
   };
 
   useEffect(() => () => stopOracleVoice(), []);
@@ -692,7 +532,7 @@ export default function Oracle() {
                   </button>
                 </div>
                 <p className="text-xs text-muted">
-                  Guided mode uses a calm voice with pauses between sentences.
+                  Guided mode uses a calm AI voice with pauses between sentences.
                 </p>
               </div>
             )}
@@ -709,7 +549,7 @@ export default function Oracle() {
                 Here is a suggestion for you:
               </p>
               <p className="mt-2 rounded-xl border border-white/10 bg-white/5 p-3 text-sm leading-relaxed">
-                “{suggestedQuestion}”
+                "{suggestedQuestion}"
               </p>
               <p className="mt-3 text-sm text-white/90">Ask Intimacy Oracle?</p>
               <div className="mt-4 grid gap-2 sm:grid-cols-2">
