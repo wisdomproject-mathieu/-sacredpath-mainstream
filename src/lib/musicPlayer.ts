@@ -76,10 +76,15 @@ async function playCurrentTrack(): Promise<void> {
   audioEl.currentTime = 0;
 
   let lastError: unknown = null;
-  for (const candidate of TRACK_URLS[state.track]) {
+  const fallbackTrack: MusicTrack = state.track === "tantra" ? "meditation" : "tantra";
+  const candidates = [...TRACK_URLS[state.track], ...TRACK_URLS[fallbackTrack]];
+
+  for (const candidate of candidates) {
     try {
       audioEl.src = candidate;
+      audioEl.load();
       await audioEl.play();
+      state.error = "";
       return;
     } catch (error) {
       lastError = error;
