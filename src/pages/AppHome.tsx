@@ -1,353 +1,386 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Layout from "../components/Layout";
-import BrandHeader from "../components/BrandHeader";
-import SubscribeButton from "../components/SubscribeButton";
-import { useSession } from "../contexts/SessionContext";
-import { getTonightPath } from "../lib/tonightPath";
-import { isPremium, PREMIUM_STORAGE_KEY, setPremiumForTesting } from "../lib/premium";
-import type { IntimacyWeather } from "../lib/ritualRegistry";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { Copy, HeartHandshake, Sparkles } from "lucide-react";
+import { toast } from "sonner";
+
+import SacredPathBrand from "@/components/SacredPathBrand";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import {
-  getDisplayName,
-  getWeatherImageUrlByTone,
-  getWeatherImagePosition,
-  getWeatherVisualKey,
-  WEATHER_TONE_COPY,
-  WEATHER_TONE_LABELS,
-  type WeatherVisualKey,
-} from "../lib/weatherAssets";
+  fetchCoupleStateForUser,
+  markEverConnected,
+  storeConnectedCoupleId,
+  clearForceDisconnected,
+} from "@/lib/couples";
+import { type WeatherState } from "@/data/ritualLibrary";
 
-type HomeCheckinStage = "me" | "meSelected" | "partner" | "complete";
-
-const WEATHER_OPTIONS: Array<{ id: IntimacyWeather; subtitle: string }> = [
-  { id: "electric", subtitle: "Curious · playful · alive" },
-  { id: "foggy", subtitle: "Unsure · distant · quiet" },
-  { id: "frozen", subtitle: "Numb · tired · shut down" },
-  { id: "warm", subtitle: "Open · soft · close" },
-  { id: "sunny", subtitle: "Passionate · bold · magnetic" },
-  { id: "stormy", subtitle: "Tense · reactive · overloaded" },
+const WEATHER: Array<{ key: WeatherState; label: string; subtitle: string; tones: string }> = [
+  { key: "sunny", label: "Sunny", subtitle: "Clear and connected", tones: "from-amber-300 to-yellow-500" },
+  { key: "warm", label: "Warm", subtitle: "Tender and close", tones: "from-rose-300 to-orange-400" },
+  { key: "electric", label: "Electric", subtitle: "Spark and chemistry", tones: "from-violet-400 to-blue-500" },
+  { key: "foggy", label: "Foggy", subtitle: "Unclear and distant", tones: "from-slate-300 to-violet-300" },
+  { key: "frozen", label: "Frozen", subtitle: "Numb and shut down", tones: "from-cyan-300 to-blue-400" },
+  { key: "stormy", label: "Stormy", subtitle: "Charged and tense", tones: "from-slate-500 to-slate-700" },
 ];
 
-const WEATHER_OVERLAY_CLASS: Record<WeatherVisualKey, string> = {
-  electric: "from-[#321a63]/88 via-[#2d3f93]/45 to-transparent",
-  foggy: "from-[#2e3342]/86 via-[#3f4656]/40 to-transparent",
-  frozen: "from-[#1e2f4f]/88 via-[#2f4a6e]/42 to-transparent",
-  warm: "from-[#4a321d]/86 via-[#7f5a2f]/36 to-transparent",
-  sunny: "from-[#5e2617]/88 via-[#8f3f25]/42 to-transparent",
-  stormy: "from-[#1b2948]/90 via-[#263f66]/45 to-transparent",
-};
-
-function SmallWeatherCard({
-  role,
-  tone,
-  subtitle,
-  selected,
-  onClick,
+function WeatherPicker({
+  title,
+  value,
+  onChange,
 }: {
-  role: "me" | "partner";
-  tone: WeatherVisualKey;
-  subtitle: string;
-  selected?: boolean;
-  onClick: () => void;
+  title: string;
+  value: WeatherState;
+  onChange: (value: WeatherState) => void;
 }) {
-  const image = getWeatherImageUrlByTone(role, tone);
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`group relative overflow-hidden rounded-2xl border transition ${
-        selected ? "border-accent ring-2 ring-accent/40" : "border-white/10 hover:border-white/25"
-      }`}
-    >
-      <img
-        src={image}
-        alt={WEATHER_TONE_LABELS[tone]}
-        className="h-28 w-full object-cover md:h-32"
-        style={{ objectPosition: getWeatherImagePosition(tone) }}
-      />
-      <div className={`absolute inset-0 bg-gradient-to-br ${WEATHER_OVERLAY_CLASS[tone]}`} />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/42 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 p-2 text-left">
-        <p className="text-sm font-semibold text-white">{WEATHER_TONE_LABELS[tone]}</p>
-        <p className="text-[11px] leading-tight text-white/80">{subtitle}</p>
+    <div className="space-y-3">
+      <p className="text-sm font-semibold text-foreground">{title}</p>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        {WEATHER.map((item) => (
+          <button
+            key={item.key}
+            type="button"
+            onClick={() => onChange(item.key)}
+            className={`rounded-2xl border p-3 text-left transition ${
+              value === item.key
+                ? "border-primary bg-primary/20 shadow-md shadow-primary/20"
+                : "border-border bg-card/70 hover:bg-card"
+            }`}
+          >
+            <div className={`h-1.5 rounded-full bg-gradient-to-r ${item.tones} mb-2`} />
+            <p className="font-semibold">{item.label}</p>
+            <p className="text-xs text-muted-foreground">{item.subtitle}</p>
+          </button>
+        ))}
       </div>
-    </button>
+    </div>
+  );
+}
+
+const generateCode = () => Math.random().toString(36).slice(2, 8).toUpperCase();
+
+function PartnerConnectCard() {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [isConnected, setIsConnected] = useState(false);
+  const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const [code, setCode] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const loadState = useCallback(async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    const resolved = await fetchCoupleStateForUser(supabase, user.id);
+    if (resolved.connected && resolved.activeCouple?.id) {
+      markEverConnected(user.id);
+      storeConnectedCoupleId(user.id, resolved.activeCouple.id);
+    }
+    setIsConnected(resolved.connected);
+    setInviteCode(
+      resolved.connected
+        ? resolved.activeCouple?.couple_code ?? null
+        : resolved.pendingInvite?.couple_code ?? null,
+    );
+    setLoading(false);
+  }, [user]);
+
+  useEffect(() => {
+    void loadState();
+  }, [loadState]);
+
+  useEffect(() => {
+    if (!user) return;
+    const refresh = () => void loadState();
+    const a = supabase
+      .channel(`home_couples_a_${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "couples", filter: `partner_a=eq.${user.id}` }, refresh)
+      .subscribe();
+    const b = supabase
+      .channel(`home_couples_b_${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "couples", filter: `partner_b=eq.${user.id}` }, refresh)
+      .subscribe();
+    return () => {
+      supabase.removeChannel(a);
+      supabase.removeChannel(b);
+    };
+  }, [user, loadState]);
+
+  const createInvite = async () => {
+    if (!user) return;
+    setBusy(true);
+    const existing = await fetchCoupleStateForUser(supabase, user.id);
+    if (existing.pendingInvite?.couple_code) {
+      setInviteCode(existing.pendingInvite.couple_code);
+      setBusy(false);
+      return;
+    }
+    for (let i = 0; i < 3; i++) {
+      const newCode = generateCode();
+      const { error } = await supabase.from("couples").insert({ partner_a: user.id, couple_code: newCode });
+      if (!error) {
+        await loadState();
+        setBusy(false);
+        return;
+      }
+      if (!error.message?.includes("unique")) break;
+    }
+    toast.error("Could not create invite right now.");
+    setBusy(false);
+  };
+
+  const joinWithCode = async () => {
+    if (!user || !code.trim()) return;
+    setBusy(true);
+    const cleanCode = code.trim().toUpperCase();
+    const { data: target } = await supabase
+      .from("couples")
+      .select("id, partner_a, partner_b")
+      .eq("couple_code", cleanCode)
+      .is("partner_b", null)
+      .maybeSingle();
+    if (!target) {
+      toast.error("Invite code not found.");
+      setBusy(false);
+      return;
+    }
+    if (target.partner_a === user.id) {
+      toast.error("This is already your own code.");
+      setBusy(false);
+      return;
+    }
+    const { data: updated } = await supabase
+      .from("couples")
+      .update({ partner_b: user.id })
+      .eq("id", target.id)
+      .is("partner_b", null)
+      .select("id, partner_b");
+    if (!updated || !updated.find((r) => r.partner_b === user.id)) {
+      toast.error("Could not join this couple right now.");
+      setBusy(false);
+      return;
+    }
+    clearForceDisconnected(user.id);
+    toast.success("You are now connected.");
+    setCode("");
+    await loadState();
+    setBusy(false);
+  };
+
+  const fallbackCopy = (text: string) => {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch {
+      return false;
+    }
+  };
+
+  const copyInvite = async () => {
+    if (!inviteCode) {
+      toast.error("No code yet. Tap 'Create invite code' first.");
+      return;
+    }
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(inviteCode);
+        toast.success(`Code ${inviteCode} copied.`);
+        return;
+      }
+      throw new Error("no clipboard");
+    } catch {
+      if (fallbackCopy(inviteCode)) {
+        toast.success(`Code ${inviteCode} copied.`);
+      } else {
+        toast.error("Copy failed. Long-press the code to copy it.");
+      }
+    }
+  };
+
+  const shareInvite = async () => {
+    if (!inviteCode) {
+      toast.error("No code yet. Tap 'Create invite code' first.");
+      return;
+    }
+    const message = `Join me on Sacred Path for Couples. Use my invite code: ${inviteCode}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "Sacred Path invite", text: message });
+        return;
+      }
+    } catch (err: any) {
+      if (err?.name === "AbortError") return;
+    }
+    await copyInvite();
+  };
+
+  if (loading) {
+    return (
+      <div className="rounded-3xl border border-border bg-card/70 p-5 md:p-6 h-32 animate-pulse" />
+    );
+  }
+
+  if (isConnected) {
+    return (
+      <div className="rounded-3xl border border-emerald-400/30 bg-gradient-to-br from-emerald-500/10 via-card/90 to-card/90 p-5 md:p-6 space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="rounded-2xl border border-emerald-400/30 bg-background/40 p-3 text-emerald-300">
+            <HeartHandshake className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-emerald-300/80">Connected</p>
+            <h2 className="font-display text-2xl text-foreground">Your temple is shared</h2>
+          </div>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          You and your partner are linked. Rituals, weather, and gratitude flow between you.
+        </p>
+        {inviteCode && (
+          <div className="rounded-2xl border border-border/60 bg-background/50 p-4">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">Your couple code</p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <code className="flex-1 min-w-[140px] font-mono text-2xl tracking-[0.3em] text-foreground select-all">
+                {inviteCode}
+              </code>
+              <Button size="sm" variant="outline" onClick={copyInvite}>
+                <Copy className="h-4 w-4 mr-1" /> Copy
+              </Button>
+              <Button size="sm" onClick={shareInvite}>
+                <Sparkles className="h-4 w-4 mr-1" /> Share
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/10 via-card/90 to-card/90 p-5 md:p-6 space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="rounded-2xl border border-primary/30 bg-background/40 p-3 text-primary">
+          <HeartHandshake className="h-5 w-5" />
+        </div>
+        <div>
+          <p className="text-xs uppercase tracking-[0.2em] text-primary/80">Connect with partner</p>
+          <h2 className="font-display text-2xl text-foreground">One code links your temple</h2>
+        </div>
+      </div>
+
+      {inviteCode ? (
+        <div className="rounded-2xl border border-border/60 bg-background/50 p-4">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">Your invite code</p>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <code className="flex-1 min-w-[140px] font-mono text-2xl tracking-[0.3em] text-foreground select-all">
+              {inviteCode}
+            </code>
+            <Button size="sm" variant="outline" onClick={copyInvite}>
+              <Copy className="h-4 w-4 mr-1" /> Copy
+            </Button>
+            <Button size="sm" onClick={shareInvite}>
+              <Sparkles className="h-4 w-4 mr-1" /> Share
+            </Button>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Share this code with your partner. Once they enter it, your temple becomes shared.
+          </p>
+        </div>
+      ) : (
+        <Button onClick={createInvite} disabled={busy} className="w-full md:w-auto">
+          <Sparkles className="h-4 w-4 mr-2" /> Create invite code
+        </Button>
+      )}
+
+      <div className="rounded-2xl border border-border/60 bg-background/50 p-4 space-y-2">
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">Have a code from your partner?</p>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Input
+            value={code}
+            onChange={(e) => setCode(e.target.value.toUpperCase())}
+            placeholder="ENTER CODE"
+            className="font-mono tracking-[0.2em] uppercase"
+            maxLength={12}
+          />
+          <Button onClick={joinWithCode} disabled={busy || !code.trim()} variant="secondary">
+            Join partner
+          </Button>
+        </div>
+      </div>
+
+      <p className="text-xs text-muted-foreground">
+        You can also continue solo — your weather, rituals, and journal still work without a partner.
+      </p>
+    </div>
   );
 }
 
 export default function AppHome() {
-  const { state, setState } = useSession();
-  const navigate = useNavigate();
-  const [hasPremium, setHasPremium] = useState(isPremium());
-  const didResetRef = useRef(false);
-
-  const [stage, setStage] = useState<HomeCheckinStage>("me");
-
-  useEffect(() => {
-    if (didResetRef.current) return;
-    didResetRef.current = true;
-    setState({
-      ...state,
-      youWeather: undefined,
-      partnerWeather: undefined,
-      youWeatherTone: undefined,
-      partnerWeatherTone: undefined,
-    });
-    setStage("me");
-  }, [setState, state]);
-
-  const myName = getDisplayName(state.youName, "Me");
-  const partnerName = getDisplayName(state.partnerName, "Partner");
-
-  const meTone = state.youWeatherTone ?? getWeatherVisualKey(state.youWeather);
-  const partnerTone = state.partnerWeatherTone ?? getWeatherVisualKey(state.partnerWeather);
-
-  const tonightPath = useMemo(
-    () => getTonightPath(state.youWeather, state.partnerWeather),
-    [state.youWeather, state.partnerWeather],
-  );
-
-  const selectMeWeather = (weather: IntimacyWeather) => {
-    setState({
-      ...state,
-      youWeather: weather,
-      youWeatherTone: weather,
-    });
-    setStage("meSelected");
-  };
-
-  const selectPartnerWeather = (weather: IntimacyWeather) => {
-    setState({
-      ...state,
-      partnerWeather: weather,
-      partnerWeatherTone: weather,
-    });
-    setStage("complete");
-  };
-
-  const togglePremiumMode = () => {
-    const next = !hasPremium;
-    setPremiumForTesting(next);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(PREMIUM_STORAGE_KEY, next ? "true" : "false");
-    }
-    setHasPremium(next);
-  };
+  const [myWeather, setMyWeather] = useState<WeatherState>("warm");
+  const [partnerWeather, setPartnerWeather] = useState<WeatherState>("sunny");
 
   return (
-    <Layout showHeader={false}>
-      <div className="mx-auto max-w-6xl space-y-6 md:space-y-8">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
-          <BrandHeader className="md:mb-0" />
+    <div className="px-4 py-6 md:py-8">
+      <div className="container max-w-5xl space-y-6 md:space-y-8">
+        {/* Brand — Mathieu + Edita */}
+        <div className="flex flex-col items-center gap-3 text-center">
+          <SacredPathBrand className="w-full max-w-[360px]" />
+          <h1 className="font-display text-3xl md:text-4xl font-semibold text-foreground">
+            How are you two feeling today?
+          </h1>
         </div>
 
-        <header className="space-y-3 text-center">
-          <h1 className="font-serif text-4xl leading-[1.02] sm:text-5xl md:text-6xl">
-            Understand the mood
-            <br />
-            between you in seconds.
-          </h1>
-          <p className="mx-auto max-w-3xl text-base leading-relaxed text-muted md:text-lg">
-            Choose your connection weather, receive one gentle practice, and reconnect without pressure.
+        {/* Partner connect (or solo) */}
+        <PartnerConnectCard />
+
+        {/* Weather selection */}
+        <div className="space-y-6 rounded-3xl border border-border bg-card/70 p-5 md:p-6">
+          <WeatherPicker title="My weather" value={myWeather} onChange={setMyWeather} />
+          <WeatherPicker title="Partner weather" value={partnerWeather} onChange={setPartnerWeather} />
+
+          <Link to={`/app/tonight-paths?me=${myWeather}&partner=${partnerWeather}`} className="block">
+            <Button className="w-full md:w-auto">Open Tonight Path</Button>
+          </Link>
+        </div>
+
+        {/* Gratitude card */}
+        <Link
+          to="/app/tools"
+          className="block rounded-3xl border border-cyan-400/30 bg-gradient-to-br from-cyan-500/10 via-card/90 to-card/90 p-5 md:p-6 transition hover:border-cyan-300/50"
+        >
+          <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/80">Calm reset</p>
+          <h2 className="mt-2 font-display text-2xl md:text-3xl text-foreground">
+            Timer & Breathing
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            Use a focused timer or guided breathing patterns: Box and 4-7-8 at 3, 5, or 10 minutes.
           </p>
-        </header>
+        </Link>
 
-        <section className="grid gap-3 md:grid-cols-3">
-          <button
-            type="button"
-            onClick={() => navigate("/weather")}
-            className="rounded-2xl border border-white/10 bg-card p-4 text-left transition hover:bg-white/10"
-          >
-            <p className="font-serif text-2xl">Check our weather</p>
-            <p className="mt-1 text-sm text-muted">Match a ritual to how you both feel.</p>
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate("/oracle")}
-            className="rounded-2xl border border-white/10 bg-card p-4 text-left transition hover:bg-white/10"
-          >
-            <p className="font-serif text-2xl">Ask the Intimacy Oracle</p>
-            <p className="mt-1 text-sm text-muted">Choose what you need and get a guided connection practice.</p>
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate("/rituals")}
-            className="rounded-2xl border border-white/10 bg-card p-4 text-left transition hover:bg-white/10"
-          >
-            <p className="font-serif text-2xl">Browse rituals</p>
-            <p className="mt-1 text-sm text-muted">Explore the library by time, mood, and focus.</p>
-          </button>
-        </section>
-
-        <section className="rounded-2xl border border-white/10 bg-card p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-accent">Testing mode</p>
-          <p className="mt-1 text-sm text-muted">
-            Current access: <span className="font-semibold text-text">{hasPremium ? "Premium" : "Free"}</span>
+        {/* Gratitude card */}
+        <Link
+          to="/app/space?tab=messages&kind=gratitude"
+          className="block rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/15 via-card/90 to-card/90 p-5 md:p-6 transition hover:border-primary/50"
+        >
+          <p className="text-xs uppercase tracking-[0.2em] text-primary/80">Gratitude whisper</p>
+          <h2 className="mt-2 font-display text-2xl md:text-3xl text-foreground">
+            Send one small thank-you
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            One sentence of gratitude keeps love warm between the great moments.
           </p>
-          <button
-            type="button"
-            onClick={togglePremiumMode}
-            className="mt-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold hover:bg-white/10"
-          >
-            Switch to {hasPremium ? "Free" : "Premium"}
-          </button>
-        </section>
-
-        <section className="rounded-[22px] border border-white/10 bg-card p-4 md:p-5">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <label className="space-y-2">
-              <input
-                value={state.youName ?? ""}
-                onChange={(e) => setState({ ...state, youName: e.target.value })}
-                aria-label="Your name"
-                placeholder="Me"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-text outline-none transition focus:border-accent/60"
-              />
-            </label>
-            <label className="space-y-2">
-              <input
-                value={state.partnerName ?? ""}
-                onChange={(e) => setState({ ...state, partnerName: e.target.value })}
-                aria-label="Partner name"
-                placeholder="Partner"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-text outline-none transition focus:border-accent/60"
-              />
-            </label>
-          </div>
-        </section>
-
-        {stage === "me" ? (
-          <section className="space-y-4">
-            <div className="space-y-2 text-center">
-              <h2 className="font-serif text-3xl md:text-4xl">How are you feeling today?</h2>
-              <p className="mx-auto max-w-2xl text-balance text-base leading-relaxed text-muted">
-                Choose the feeling that best matches your mood.
-                Your partner can do the same, and we will suggest a gentle practice for both of you.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-              {WEATHER_OPTIONS.map((option) => (
-                <SmallWeatherCard
-                  key={`me-${option.id}`}
-                  role="me"
-                  tone={option.id}
-                  subtitle={option.subtitle}
-                  onClick={() => selectMeWeather(option.id)}
-                />
-              ))}
-            </div>
-          </section>
-        ) : null}
-
-        {stage === "meSelected" ? (
-          <section className="space-y-4">
-            <div className="mx-auto max-w-2xl overflow-hidden rounded-[28px] border border-accent/40 bg-card">
-              <img
-                src={getWeatherImageUrlByTone("me", meTone)}
-                alt={`Me ${WEATHER_TONE_LABELS[meTone]}`}
-                className="h-[340px] w-full bg-[#151126] object-contain p-2 md:h-[420px]"
-              />
-            </div>
-            <div className="mx-auto flex max-w-2xl flex-col gap-3">
-              <button
-                type="button"
-                onClick={() => setStage("partner")}
-                className="w-full rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-6 py-3.5 font-semibold text-[#130f08] transition-opacity hover:opacity-90"
-              >
-                Now choose your partner&apos;s connection weather
-              </button>
-              <button
-                type="button"
-                onClick={() => setStage("me")}
-                className="text-sm text-muted hover:text-text"
-              >
-                Change my weather
-              </button>
-            </div>
-          </section>
-        ) : null}
-
-        {stage === "partner" ? (
-          <section className="space-y-4">
-            <div className="space-y-2 text-center">
-              <h2 className="font-serif text-3xl md:text-4xl">Now choose your partner&apos;s connection weather</h2>
-              <p className="mx-auto max-w-2xl text-muted">
-                Choose the weather you feel from your partner with care, curiosity, and respect.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-              {WEATHER_OPTIONS.map((option) => (
-                <SmallWeatherCard
-                  key={`partner-${option.id}`}
-                  role="partner"
-                  tone={option.id}
-                  subtitle={option.subtitle}
-                  onClick={() => selectPartnerWeather(option.id)}
-                />
-              ))}
-            </div>
-          </section>
-        ) : null}
-
-        {stage === "complete" && state.youWeather && state.partnerWeather && tonightPath?.freeRitual ? (
-          <section className="space-y-4 rounded-[24px] border border-accent/40 bg-card p-5 md:p-6">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="overflow-hidden rounded-2xl border border-white/10">
-                <img
-                  src={getWeatherImageUrlByTone("me", meTone)}
-                  alt={`${WEATHER_TONE_LABELS[meTone]} Me`}
-                  className="h-64 w-full bg-[#151126] object-contain p-2"
-                />
-              </div>
-              <div className="overflow-hidden rounded-2xl border border-white/10">
-                <img
-                  src={getWeatherImageUrlByTone("partner", partnerTone)}
-                  alt={`${WEATHER_TONE_LABELS[partnerTone]} Partner`}
-                  className="h-64 w-full bg-[#151126] object-contain p-2"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2 rounded-xl border border-white/10 bg-white/5 p-4">
-              <p className="text-xs uppercase tracking-[0.16em] text-accent">{tonightPath.homeCard.eyebrow}</p>
-              <h3 className="font-serif text-3xl">{tonightPath.homeCard.title}</h3>
-              <p className="text-muted">{tonightPath.homeCard.body}</p>
-              <p className="pt-1 text-sm">
-                <span className="text-muted">Free practice:</span>{" "}
-                <span className="font-semibold">{tonightPath.freeRitual.title}</span>
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <button
-                type="button"
-                onClick={() => navigate("/ritual")}
-                className="flex-1 rounded-full bg-gradient-to-br from-[#e6b980] to-[#eacda3] px-6 py-3.5 font-semibold text-[#130f08] transition-opacity hover:opacity-90"
-              >
-                Open today&apos;s practice
-              </button>
-              <button
-                type="button"
-                onClick={() => setStage("me")}
-                className="flex-1 rounded-full border border-white/10 bg-white/5 px-6 py-3.5 text-center transition-colors hover:bg-white/10"
-              >
-                Update our weather
-              </button>
-            </div>
-          </section>
-        ) : null}
-
-        {!hasPremium ? (
-          <section className="rounded-2xl border border-accent/30 bg-accent/10 p-5">
-            <p className="text-sm">
-              One subscription unlocks premium for two partners: deeper practices, guided voice, oracle prompts, and your shared journey.
-            </p>
-            <div className="mt-4 flex gap-3">
-              <SubscribeButton source="home" mode="navigate" />
-            </div>
-          </section>
-        ) : null}
+        </Link>
       </div>
-    </Layout>
+    </div>
   );
 }
